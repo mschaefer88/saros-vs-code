@@ -1,6 +1,12 @@
 package saros.net.xmpp;
 
 import java.util.Objects;
+import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.RosterPacket;
+import org.jivesoftware.smack.packet.RosterPacket.ItemType;
+import saros.communication.contact.ContactStatus;
 import saros.net.util.XMPPUtils;
 
 /**
@@ -54,6 +60,32 @@ public class XMPPContact {
    */
   public String getDisplayableName() {
     return XMPPUtils.getNickname(connectionService, jid, jid.getBase());
+  }
+
+  /**
+   * Get the latest available status information.
+   *
+   * @return current {@link ContactStatus}
+   */
+  public ContactStatus getStatus() {
+    Roster roster = connectionService.getRoster();
+    if (roster == null) return ContactStatus.createOffline();
+
+    Presence presence = roster.getPresence(jid.getBase());
+    RosterEntry rosterEntry = roster.getEntry(jid.getBase());
+
+    if (rosterEntry.getStatus() == RosterPacket.ItemStatus.SUBSCRIPTION_PENDING) {
+      return ContactStatus.createSubscriptionPending();
+    } else if (rosterEntry.getType() == ItemType.none || rosterEntry.getType() == ItemType.from) {
+      /* see http://xmpp.org/rfcs/rfc3921.html chapter 8.2.1, 8.3.1 and 8.6 */
+      return ContactStatus.createSubscriptionCanceled();
+    } else if (!presence.isAvailable()) {
+      return ContactStatus.createOffline();
+    } else if (presence.isAway()) {
+      return ContactStatus.createAway(presence.getMode().toString());
+    }
+
+    return ContactStatus.createAvailable();
   }
 
   /**
