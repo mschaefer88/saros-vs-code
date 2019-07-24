@@ -9,8 +9,8 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smack.packet.RosterPacket;
 import org.jivesoftware.smack.packet.RosterPacket.ItemType;
-import saros.net.util.XMPPUtils;
 import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPContact;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.model.ITreeElement;
@@ -23,15 +23,16 @@ import saros.ui.model.TreeElement;
  */
 public class RosterEntryElement extends TreeElement {
 
+  private final XMPPContact contact;
   private final Roster roster;
   private final JID jid;
-
   private final boolean hasSarosSupport;
 
-  public RosterEntryElement(Roster roster, JID jid, boolean hasSarosSupport) {
+  public RosterEntryElement(Roster roster, XMPPContact contact, boolean hasSarosSupport) {
 
     this.roster = roster;
-    this.jid = jid;
+    this.contact = contact;
+    this.jid = contact.getJid();
     this.hasSarosSupport = hasSarosSupport;
   }
 
@@ -44,15 +45,12 @@ public class RosterEntryElement extends TreeElement {
   @Override
   public StyledString getStyledText() {
     StyledString styledString = new StyledString();
+    styledString.append(contact.getDisplayableName());
 
     final RosterEntry rosterEntry = getRosterEntry();
-
     if (rosterEntry == null) {
-      styledString.append(jid.toString());
       return styledString;
     }
-
-    styledString.append(XMPPUtils.getDisplayableName(rosterEntry));
 
     final Presence presence = roster.getPresence(jid.getBase());
 

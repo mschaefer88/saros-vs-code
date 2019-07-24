@@ -18,6 +18,7 @@ import saros.SarosPluginContext;
 import saros.net.util.XMPPUtils;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.XMPPContact;
 import saros.net.xmpp.discovery.DiscoveryManager;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.Messages;
@@ -94,7 +95,8 @@ public class StartSessionWithContacts extends ContributionItem {
      * The model knows how to display roster entries best.
      */
     RosterEntryElement rosterEntryElement =
-        new RosterEntryElement(connectionService.getRoster(), new JID(rosterEntry.getUser()), true);
+        new RosterEntryElement(
+            connectionService.getRoster(), new XMPPContact(new JID(rosterEntry.getUser())), true);
 
     MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
     menuItem.setText(rosterEntryElement.getStyledText().toString());

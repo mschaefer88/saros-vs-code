@@ -16,6 +16,7 @@ import org.jivesoftware.smack.packet.Presence;
 import saros.SarosConstants;
 import saros.SarosPluginContext;
 import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPContact;
 import saros.net.xmpp.discovery.DiscoveryManager;
 import saros.net.xmpp.discovery.DiscoveryManagerListener;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -162,7 +163,8 @@ public final class RosterContentProvider extends TreeContentProvider {
     final Boolean isSarosSupport =
         discoveryManager.isFeatureSupported(jid, SarosConstants.XMPP_FEATURE_NAMESPACE);
 
-    return new RosterEntryElement(roster, jid, isSarosSupport == null ? false : isSarosSupport);
+    return new RosterEntryElement(
+        roster, new XMPPContact(jid), isSarosSupport == null ? false : isSarosSupport);
   }
 
   private void querySarosSupport(Collection<String> users) {

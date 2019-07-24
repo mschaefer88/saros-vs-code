@@ -25,6 +25,7 @@ import saros.net.ConnectionState;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.XMPPContact;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.model.ITreeElement;
 import saros.ui.model.TreeLabelProvider;
@@ -94,7 +95,7 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
           checkStateProvider.setChecked(event.getElement(), event.getChecked());
 
           // Fire selection event
-          JID jid = (JID) Platform.getAdapterManager().getAdapter(event.getElement(), JID.class);
+          JID jid = Platform.getAdapterManager().getAdapter(event.getElement(), JID.class);
           if (jid != null) notifyContactSelectionChanged(jid, event.getChecked());
         }
       };
@@ -167,7 +168,8 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
 
     // insert dummy values except the jid as those elements are never
     // display anyways and only used for comparison
-    for (JID contact : contacts) elementsToCheck.add(new RosterEntryElement(null, contact, false));
+    for (JID contact : contacts)
+      elementsToCheck.add(new RosterEntryElement(null, new XMPPContact(contact), false));
 
     Map<RosterEntryElement, Boolean> checkStatesChanges =
         calculateCheckStateDiff(allElements, checkedElements, elementsToCheck);
@@ -235,7 +237,7 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
     List<JID> contacts = new ArrayList<JID>();
 
     for (Object element : getViewer().getCheckedElements()) {
-      JID contact = (JID) ((ITreeElement) element).getAdapter(JID.class);
+      JID contact = ((ITreeElement) element).getAdapter(JID.class);
       if (contact != null) contacts.add(contact);
     }
     return contacts;
@@ -249,7 +251,7 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
   public List<JID> getSelectedContactsWithSarosSupport() {
     List<JID> contacts = new ArrayList<JID>();
     for (Object element : getViewer().getCheckedElements()) {
-      JID contact = (JID) ((ITreeElement) element).getAdapter(JID.class);
+      JID contact = ((ITreeElement) element).getAdapter(JID.class);
       boolean isSarosSupported =
           element instanceof RosterEntryElement
               && ((RosterEntryElement) element).isSarosSupported();
