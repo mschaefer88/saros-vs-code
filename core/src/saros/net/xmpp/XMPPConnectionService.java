@@ -235,6 +235,8 @@ public class XMPPConnectionService {
 
     if (isConnected()) disconnect();
 
+    XMPPContact.setConnectionService(this);
+
     initialzeNetworkComponents();
 
     Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
