@@ -1,6 +1,7 @@
 package saros.net.xmpp;
 
 import java.util.Objects;
+import java.util.Optional;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.packet.Presence;
@@ -71,6 +72,15 @@ public class XMPPContact {
     String nickname = XMPPUtils.getNickname(connectionService, jid, null);
     if (nickname == null || nickname.isEmpty()) return jid.getBase().toString();
     return String.format("%s (%s)", nickname, jid.getBase().toString());
+  }
+
+  /**
+   * Get the Nickname if available.
+   *
+   * @return Optional of String with Nickname if available
+   */
+  public Optional<String> getNickname() {
+    return Optional.ofNullable(XMPPUtils.getNickname(connectionService, jid, null));
   }
 
   /**

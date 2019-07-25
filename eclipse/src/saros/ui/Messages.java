@@ -321,7 +321,6 @@ public class Messages extends NLS {
   public static String SessionWithProjects_no_projects_in_workspace;
 
   public static String RenameContactAction_new_nickname_dialog_title;
-  public static String RenameContactAction_rename_current_nickname_message;
   public static String RenameContactAction_rename_message;
   public static String RenameContactAction_title;
   public static String RenameContactAction_tooltip;

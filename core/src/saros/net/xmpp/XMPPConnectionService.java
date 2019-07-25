@@ -582,4 +582,24 @@ public class XMPPConnectionService {
       throw new IllegalStateException("Removal of " + contact + " was not possible", e);
     }
   }
+
+  /**
+   * Rename a Contact on Roster.
+   *
+   * @param contact XMPPContact to rename on Roster
+   * @throws IllegalStateException if not connected or contact not found
+   */
+  public void renameContact(XMPPContact contact, String newName) {
+    Roster roster = getRoster();
+    if (roster == null) {
+      throw new IllegalStateException("Not connected");
+    }
+    RosterEntry entry = roster.getEntry(contact.getJid().getRAW());
+    if (entry == null) {
+      LOG.error("Rename of " + contact + " was not possible, RosterEntry not found!");
+      throw new IllegalStateException("Contact not found");
+    }
+
+    if (!entry.getName().equals(newName)) entry.setName(newName);
+  }
 }
