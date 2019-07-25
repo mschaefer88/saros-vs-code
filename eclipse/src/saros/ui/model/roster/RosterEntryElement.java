@@ -87,6 +87,10 @@ public class RosterEntryElement extends TreeElement {
     return jid;
   }
 
+  public XMPPContact getContact() {
+    return contact;
+  }
+
   public boolean isSarosSupported() {
     return hasSarosSupport;
   }

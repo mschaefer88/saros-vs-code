@@ -13,6 +13,7 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -560,5 +561,25 @@ public class XMPPConnectionService {
 
     socks5ProxyPort = -1;
     device = null;
+  }
+
+  /**
+   * Remove a Contact from Roster.
+   *
+   * @param contact XMPPContact to remove from Roster
+   * @throws IllegalStateException if not connected or remove was not possible
+   */
+  public void removeContact(XMPPContact contact) {
+    Roster roster = getRoster();
+    if (roster == null) {
+      throw new IllegalStateException("Not connected");
+    }
+    RosterEntry entry = roster.getEntry(contact.getJid().getRAW());
+    try {
+      roster.removeEntry(entry);
+    } catch (XMPPException e) {
+      LOG.error("Removal of " + contact + " was not possible", e);
+      throw new IllegalStateException("Removal of " + contact + " was not possible", e);
+    }
   }
 }

@@ -1405,6 +1405,9 @@
                type="org.jivesoftware.smack.RosterEntry">
          </adapter>
          <adapter
+               type="saros.net.xmpp.XMPPContact">
+         </adapter>
+         <adapter
                type="saros.net.xmpp.JID">
          </adapter>
       </factory>

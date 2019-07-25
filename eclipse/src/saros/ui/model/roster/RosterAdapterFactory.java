@@ -5,6 +5,7 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterGroup;
 import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPContact;
 
 /**
  * Provides adapters for {@link Roster} entities which are provided by {@link
@@ -32,7 +33,7 @@ public class RosterAdapterFactory implements IAdapterFactory {
   @Override
   @SuppressWarnings("rawtypes")
   public Class[] getAdapterList() {
-    return new Class[] {RosterGroup.class, RosterEntry.class, JID.class};
+    return new Class[] {RosterGroup.class, RosterEntry.class, XMPPContact.class, JID.class};
   }
 
   @Override
@@ -47,6 +48,8 @@ public class RosterAdapterFactory implements IAdapterFactory {
     if (adaptableObject instanceof RosterEntryElement) {
       if (adapterType == RosterEntry.class)
         return ((RosterEntryElement) adaptableObject).getRosterEntry();
+      else if (adapterType == XMPPContact.class)
+        return ((RosterEntryElement) adaptableObject).getContact();
       if (adapterType == JID.class) return ((RosterEntryElement) adaptableObject).getJID();
     }
 

@@ -63,6 +63,17 @@ public class XMPPContact {
   }
 
   /**
+   * Get the combination of Nickname (if available) and base JID of this Contact.
+   *
+   * @return String if nickname available in format "Nickname (base JID)" otherwise just base JID
+   */
+  public String getDisplayableNameLong() {
+    String nickname = XMPPUtils.getNickname(connectionService, jid, null);
+    if (nickname == null || nickname.isEmpty()) return jid.getBase().toString();
+    return String.format("%s (%s)", nickname, jid.getBase().toString());
+  }
+
+  /**
    * Get the latest available status information.
    *
    * @return current {@link ContactStatus}
