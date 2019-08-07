@@ -19,7 +19,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Tree;
 import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.RosterEntry;
 import saros.SarosPluginContext;
 import saros.net.ConnectionState;
 import saros.net.xmpp.IConnectionListener;
@@ -40,8 +39,7 @@ import saros.ui.widgets.viewer.roster.events.ContactSelectionListener;
 import saros.util.ArrayUtils;
 
 /**
- * This {@link Composite} displays {@link RosterEntry roster entries} and allows to check (via check
- * boxes) them.
+ * This {@link Composite} displays contact entries and allows to check (via check boxes) them.
  *
  * <p>This composite does <strong>NOT</strong> handle setting the layout.
  *
@@ -163,14 +161,8 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
             RosterEntryElement.class,
             Platform.getAdapterManager());
 
-    List<RosterEntryElement> elementsToCheck = new ArrayList<RosterEntryElement>();
-
-    // insert dummy values except the jid as those elements are never
-    // display anyways and only used for comparison
-    for (JID contact : contacts) elementsToCheck.add(new RosterEntryElement(null, contact, false));
-
     Map<RosterEntryElement, Boolean> checkStatesChanges =
-        calculateCheckStateDiff(allElements, checkedElements, elementsToCheck);
+        calculateCheckStateDiff(allElements, checkedElements, contacts);
 
     /*
      * Update the check state in the RosterCheckStateProvider
@@ -202,23 +194,21 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
    *
    * @param allRosterEntryElements
    * @param checkedRosterEntryElement {@link RosterEntryElement}s which are already checked
-   * @param rosterEntryElementToCheck {@link RosterEntryElement}s which have to be exclusively
-   *     checked
+   * @param contacts {@link List} of {@link JID JIDs} which have to be exclusively checked
    * @return {@link Map} of {@link RosterEntryElement} that must change their check state
    */
   protected Map<RosterEntryElement, Boolean> calculateCheckStateDiff(
       List<RosterEntryElement> allRosterEntryElements,
       List<RosterEntryElement> checkedRosterEntryElement,
-      List<RosterEntryElement> rosterEntryElementToCheck) {
+      List<JID> contacts) {
 
-    Map<RosterEntryElement, Boolean> checkStatesChanges =
-        new HashMap<RosterEntryElement, Boolean>();
+    Map<RosterEntryElement, Boolean> checkStatesChanges = new HashMap<>();
     for (RosterEntryElement rosterEntryElement : allRosterEntryElements) {
-      if (rosterEntryElementToCheck.contains(rosterEntryElement)
-          && !checkedRosterEntryElement.contains(rosterEntryElement)) {
+      boolean contactsContain = contacts.contains(rosterEntryElement.getJID());
+      boolean checkedContain = checkedRosterEntryElement.contains(rosterEntryElement);
+      if (contactsContain && !checkedContain) {
         checkStatesChanges.put(rosterEntryElement, true);
-      } else if (!rosterEntryElementToCheck.contains(rosterEntryElement)
-          && checkedRosterEntryElement.contains(rosterEntryElement)) {
+      } else if (!contactsContain && checkedContain) {
         checkStatesChanges.put(rosterEntryElement, false);
       }
     }
