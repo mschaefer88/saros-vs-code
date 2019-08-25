@@ -615,7 +615,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   public String getContent(final SPath path) {
     return Filesystem.runReadAction(
         () -> {
-          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+          VirtualFile virtualFile = intelliJReferencePointManager.getResource(path);
 
           if (virtualFile == null || !virtualFile.exists() || virtualFile.isDirectory()) {
 
@@ -969,7 +969,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       visibleFilePaths.add(virtualFile.getPath());
     }
 
-    VirtualFile passedFile = VirtualFileConverter.convertToVirtualFile(path);
+    VirtualFile passedFile = intelliJReferencePointManager.getResource(path);
 
     if (passedFile == null) {
       LOG.warn(
