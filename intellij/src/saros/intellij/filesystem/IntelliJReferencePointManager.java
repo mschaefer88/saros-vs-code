@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
 import saros.filesystem.IPath;
@@ -22,6 +23,7 @@ import saros.repackaged.picocontainer.annotations.Inject;
 public class IntelliJReferencePointManager {
 
   private final ConcurrentHashMap<IReferencePoint, Module> referencePointToModuleMapper;
+  private static final Logger log = Logger.getLogger(IntelliJReferencePointManager.class);
 
   public IntelliJReferencePointManager() {
     referencePointToModuleMapper = new ConcurrentHashMap<IReferencePoint, Module>();
@@ -82,6 +84,7 @@ public class IntelliJReferencePointManager {
    *     reference point is null
    */
   public void putIfAbsent(@NotNull IReferencePoint referencePoint, @NotNull Module module) {
+    log.debug("Added referencePoint " + module.getName());
     referencePointToModuleMapper.putIfAbsent(referencePoint, module);
   }
 
@@ -93,6 +96,7 @@ public class IntelliJReferencePointManager {
    * @exception IllegalArgumentException if the {@link IReferencePoint} reference point is null
    */
   public Module getModule(@NotNull IReferencePoint referencePoint) {
+    log.debug("Num of modules: " + referencePointToModuleMapper.size());
     Module module = referencePointToModuleMapper.get(referencePoint);
 
     return module;

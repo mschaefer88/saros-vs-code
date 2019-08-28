@@ -34,6 +34,7 @@ import saros.activities.IActivity;
 import saros.activities.SPath;
 import saros.filesystem.IFile;
 import saros.filesystem.IPath;
+import saros.filesystem.IResource;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
@@ -216,7 +217,11 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     SPath path = VirtualFileConverter.convertToSPath(project, file);
 
-    if (path == null || !session.isShared(path.getResource())) {
+    IResource resource =
+        intelliJReferencePointManager.getSarosResource(
+            path.getReferencePoint(), path.getProjectRelativePath());
+
+    if (path == null || !session.isShared(resource)) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource's contents change: " + file);
       }
@@ -274,7 +279,11 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     SPath path = VirtualFileConverter.convertToSPath(project, createdVirtualFile);
 
-    if (path == null || !session.isShared(path.getResource())) {
+    IResource resource =
+        intelliJReferencePointManager.getSarosResource(
+            path.getReferencePoint(), path.getProjectRelativePath());
+
+    if (path == null || !session.isShared(resource)) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource creation: " + createdVirtualFile);
       }
@@ -334,7 +343,11 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     SPath copyPath = VirtualFileConverter.convertToSPath(project, copy);
 
-    if (copyPath == null || !session.isShared(copyPath.getResource())) {
+    IResource resource =
+        intelliJReferencePointManager.getSarosResource(
+            copyPath.getReferencePoint(), copyPath.getProjectRelativePath());
+
+    if (copyPath == null || !session.isShared(resource)) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource copy: " + copy);
       }
@@ -379,7 +392,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
             intelliJReferencePointManager.getSarosResource(
                 path.getReferencePoint(), path.getProjectRelativePath());
 
-    if (path == null || !session.isShared(path.getResource())) {
+    if (path == null || !session.isShared(file)) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource deletion: " + deletedVirtualFile);
       }
@@ -486,11 +499,17 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     SPath oldPath = VirtualFileConverter.convertToSPath(project, oldFile);
     SPath newParentPath = VirtualFileConverter.convertToSPath(project, newParent);
 
+    IResource oldResource =
+        intelliJReferencePointManager.getSarosResource(
+            oldPath.getReferencePoint(), oldPath.getProjectRelativePath());
+    IResource newParentResource =
+        intelliJReferencePointManager.getSarosResource(
+            newParentPath.getReferencePoint(), newParentPath.getProjectRelativePath());
+
     User user = session.getLocalUser();
 
-    boolean oldPathIsShared = oldPath != null && session.isShared(oldPath.getResource());
-    boolean newPathIsShared =
-        newParentPath != null && session.isShared(newParentPath.getResource());
+    boolean oldPathIsShared = oldPath != null && session.isShared(oldResource);
+    boolean newPathIsShared = newParentPath != null && session.isShared(newParentResource);
 
     if (!oldPathIsShared && !newPathIsShared) {
       if (LOG.isTraceEnabled()) {
@@ -805,7 +824,11 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
           SPath path = VirtualFileConverter.convertToSPath(project, file);
 
-          if (path != null && session.isShared(path.getResource())) {
+          IResource resource =
+              intelliJReferencePointManager.getSarosResource(
+                  path.getReferencePoint(), path.getProjectRelativePath());
+
+          if (path != null && session.isShared(resource)) {
             LOG.error(
                 "Renamed resource is a root directory. "
                     + "Such an activity can not be shared through Saros.");
