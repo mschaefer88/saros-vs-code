@@ -933,8 +933,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           }
 
           for (SPath editorPath : editorPaths) {
-            if (referencePoint == null
-                || referencePoint.equals(editorPath.getProject().getReferencePoint())) {
+            if (referencePoint == null || referencePoint.equals(editorPath.getReferencePoint())) {
 
               saveDocument(editorPath);
             }
@@ -972,7 +971,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     Set<String> visibleFilePaths = new HashSet<>();
 
-    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Project project =
+        intelliJReferencePointManager.getModule(path.getReferencePoint()).getProject();
 
     for (VirtualFile virtualFile : ProjectAPI.getSelectedFiles(project)) {
       visibleFilePaths.add(virtualFile.getPath());
