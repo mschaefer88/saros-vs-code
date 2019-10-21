@@ -75,3 +75,6 @@ vscode*/.project
 vscode*/build
 vscode*/package-lock.json
 vscode*/.vscode
+*.vscode
+*.code-workspace
+*.vscodeignore
