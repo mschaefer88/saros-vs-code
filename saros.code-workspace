@@ -1,0 +1,89 @@
+{
+	"folders": [
+		{
+			"path": "core",
+			"name": "Core"
+		},
+		{
+			"path": "eclipse",
+			"name": "Eclipse Plugin"
+		},		
+		{
+			"path": "intellij",
+			"name": "Intellij Plugin"
+		},
+		{
+			"path": "vscode",
+			"name": "VS Code Plugin"			
+		},
+		{
+			"path": "server",
+			"name": "Saros Server"
+		},
+		{
+			"path": "lsp",
+			"name": "Saros Language Server"			
+		},
+		{
+			"path": "whiteboard",
+			"name": "Whiteboard"
+		},
+		{
+			"path": "stf",
+			"name": "STF"
+		},
+		{
+			"path": "stf.test",
+			"name": "STF Tests"
+		},
+		{
+			"path": "docs",
+			"name": "Documentation"
+		}
+	],
+	"settings": {
+		"workbench.editor.labelFormat": "short",
+		"files.exclude": {
+			"**/.classpath": true,
+			"**/.project": true,
+			"**/.settings": true,
+			"**/.factorypath": true,
+			"**/build": true,
+			"**/.vscode": true,
+			"**/bin": true,
+			"**/lib": true
+		},
+		"workbench.colorCustomizations": {
+			"activityBar.background": "#b30000",
+			"activityBar.activeBorder": "#009f00",
+			"activityBar.foreground": "#e7e7e7",
+			"activityBar.inactiveForeground": "#e7e7e799",
+			"activityBarBadge.background": "#009f00",
+			"activityBarBadge.foreground": "#e7e7e7",
+			"titleBar.activeBackground": "#800000",
+			"titleBar.inactiveBackground": "#80000099",
+			"titleBar.activeForeground": "#e7e7e7",
+			"titleBar.inactiveForeground": "#e7e7e799",
+			"statusBar.background": "#800000",
+			"statusBarItem.hoverBackground": "#b30000",
+			"statusBar.foreground": "#e7e7e7"
+		},
+		"peacock.color": "#800000"
+	},
+	"launch": {
+		"compounds": [
+			{
+				"name": "Compound",
+				"configurations": ["Run Extension"]				
+			}
+		]
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-vscode.vscode-typescript-tslint-plugin",
+			"vscjava.vscode-java-pack",
+			"madhavd1.javadoc-tools",
+			"joelday.docthis"
+		]
+	}
+}

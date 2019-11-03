@@ -2,6 +2,9 @@ import * as vscode from 'vscode';
 import { Disposable } from 'vscode-jsonrpc';
 import { sarosExtensionInstance } from './core/saros-extension';
 import { activateAccounts } from './account/activator';
+import { activateContacts } from './contact/activator';
+import { activateConnection } from './session/activator';
+import { SarosView } from './core/saros-view';
 
 /**
  * Activation function of the extension.
@@ -15,30 +18,32 @@ export function activate(context: vscode.ExtensionContext) {
 						.init()
 						.then(() => {
 							activateAccounts(sarosExtensionInstance);
+							activateContacts(sarosExtensionInstance);
+							activateConnection(sarosExtensionInstance);
+							
+							context.subscriptions.push(new SarosView(sarosExtensionInstance));
 
 							console.log('Extension "Saros" is now active!');
 						})
 						.catch(reason => {
 							vscode.window.showErrorMessage('Saros extension did not start propertly.'
 														+ 'Reason: ' + reason); //TODO: restart feature
-						});	
-	
-	context.subscriptions.push(createStatusBar());
+						});
 }
 
-/**
- * Creates the status bar.
- *
- * @returns {Disposable} The status bar item as [disposable](#Disposable)
- */
-function createStatusBar(): Disposable {
-
-	let statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Number.MAX_VALUE);
-    statusBarItem.text = "Saros";
-    statusBarItem.command = "saros.start";
-	statusBarItem.show();
+class SarosTreeDataProvider implements vscode.TreeDataProvider<string>
+{
+	onDidChangeTreeData?: vscode.Event<string | null | undefined> | undefined;	
 	
-	return statusBarItem;
+	getTreeItem(element: string): vscode.TreeItem | Thenable<vscode.TreeItem> {
+		return new vscode.TreeItem(element);
+	}
+
+	getChildren(element?: string | undefined): vscode.ProviderResult<string[]> {
+		return [""];
+	}
+
+
 }
 
 /**
@@ -47,5 +52,5 @@ function createStatusBar(): Disposable {
  * @export
  */
 export function deactivate() {
-	console.log("deactivated");
+	sarosExtensionInstance.deactivate();
 }

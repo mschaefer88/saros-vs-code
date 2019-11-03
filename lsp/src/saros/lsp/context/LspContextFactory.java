@@ -1,0 +1,53 @@
+package saros.lsp.context;
+
+import saros.communication.connection.IProxyResolver;
+import saros.context.AbstractContextFactory;
+import saros.editor.IEditorManager;
+import saros.filesystem.IChecksumCache;
+import saros.filesystem.IPathFactory;
+import saros.lsp.SarosLanguageServer;
+import saros.lsp.extensions.ISarosLanguageServer;
+import saros.lsp.extensions.client.ISarosLanguageClient;
+import saros.lsp.extensions.path.PathFactory;
+import saros.lsp.extensions.server.CancelManager;
+import saros.lsp.extensions.server.account.AccountService;
+import saros.lsp.extensions.server.account.IAccountService;
+import saros.lsp.extensions.server.session.ISessionService;
+import saros.lsp.extensions.server.session.SessionService;
+import saros.lsp.extensions.server.ui.UISynchronizerImpl;
+import saros.lsp.monitoring.ProgressMonitor;
+import saros.monitoring.IProgressMonitor;
+import saros.lsp.extensions.server.contact.ContactService;
+import saros.lsp.extensions.server.contact.IContactService;
+import saros.lsp.extensions.server.editor.EditorManager;
+import saros.lsp.extensions.server.eventhandler.NegotiationHandler;
+import saros.lsp.extensions.server.net.SubscriptionAuthorizer;
+import saros.repackaged.picocontainer.MutablePicoContainer;
+import saros.session.INegotiationHandler;
+import saros.session.ISarosSessionContextFactory;
+import saros.synchronize.UISynchronizer;
+
+public class LspContextFactory extends AbstractContextFactory {
+
+  @Override
+  public void createComponents(MutablePicoContainer container) { // TODO: in sinneinheiten aufteilen und kommentieren
+    container.addComponent(ISarosLanguageServer.class, SarosLanguageServer.class);
+    container.addComponent(IAccountService.class, AccountService.class);
+    container.addComponent(IContactService.class, ContactService.class);
+    container.addComponent(ISessionService.class, SessionService.class);
+    container.addComponent(INegotiationHandler.class, NegotiationHandler.class); // TODO: needed for session
+    container.addComponent(UISynchronizer.class, UISynchronizerImpl.class); // TODO: needed for session
+    container.addComponent(ISarosSessionContextFactory.class, LspSessionContextFactory.class); // TODO: needed for
+                                                                                               // session start -
+                                                                                               // otherwise
+                                                                                               // nullexception!
+    container.addComponent(IEditorManager.class, EditorManager.class); // TODO: needed for start session
+    container.addComponent(IPathFactory.class, PathFactory.class); // TODO: needed for start session
+
+    // TODO: needed to get rid of subscription pending
+    container.addComponent(SubscriptionAuthorizer.class);
+
+    container.addComponent(new CancelManager());
+    container.addComponent(IProgressMonitor.class, ProgressMonitor.class);
+  }
+}

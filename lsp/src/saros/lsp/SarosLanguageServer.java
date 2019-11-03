@@ -1,53 +1,84 @@
 package saros.lsp;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
+import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
+
+import org.eclipse.lsp4j.WorkDoneProgressCreateParams;
+import org.eclipse.lsp4j.ProgressParams;
+import org.eclipse.lsp4j.WorkDoneProgressBegin;
+import org.eclipse.lsp4j.WorkDoneProgressReport;
+import org.eclipse.lsp4j.WorkDoneProgressEnd;
+
 import saros.lsp.extensions.ISarosLanguageServer;
 import saros.lsp.extensions.client.ISarosLanguageClient;
-import saros.lsp.extensions.client.ISarosLanguageClientAware;
-import saros.lsp.extensions.server.account.AccountService;
+import saros.lsp.extensions.server.CancelManager;
 import saros.lsp.extensions.server.account.IAccountService;
+import saros.lsp.extensions.server.session.ISessionService;
+import saros.lsp.extensions.server.contact.IContactService;
 import saros.lsp.service.DocumentServiceStub;
 import saros.lsp.service.WorkspaceServiceStub;
 
 /** Implmenentation of the Saros language server. */
-public class SarosLanguageServer implements ISarosLanguageServer, ISarosLanguageClientAware {
+public class SarosLanguageServer implements ISarosLanguageServer {
 
   private static final Logger LOG = Logger.getLogger(SarosLauncher.class);
 
-  private ISarosLanguageClient languageClient;
+  private IAccountService accountService;
+
+  private IContactService contactService;
+
+  private ISessionService sessionService;
+
+  private CancelManager cancelManager;
+
+  private ISarosLanguageClient client;
+
+  public SarosLanguageServer(IAccountService accountService, IContactService contactService, 
+  ISessionService sessionService, CancelManager cancelManager, ISarosLanguageClient client) {
+    this.accountService = accountService;
+    this.contactService = contactService;
+    this.sessionService = sessionService;
+    this.cancelManager = cancelManager;
+    this.client = client;
+  }
 
   @Override
   public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
+
     return CompletableFuture.completedFuture(new InitializeResult(this.createCapabilities()));
   }
 
   /**
    * Creates the language capabilities of the server.
    *
-   * Capabilities are language related features like:
-   *  * syntax highlighting
-   *  * code lens
-   *  * hover
-   *  * code completition
+   * Capabilities are language related features like: * syntax highlighting * code
+   * lens * hover * code completition
    * 
-   * The capabilities are being evaluated by the IDE
-   * that uses the server in order to know which
-   * features can be used.
+   * The capabilities are being evaluated by the IDE that uses the server in order
+   * to know which features can be used.
    * 
-   * Since this server isn't processing any programming
-   * language in the original sense all features will
-   * default to false.
+   * Since this server isn't processing any programming language in the original
+   * sense all features will default to false.
    * 
    * @return ServerCapabilities capabilities of the server
    */
   private ServerCapabilities createCapabilities() {
     ServerCapabilities capabilities = new ServerCapabilities();
+
+    capabilities.setExperimental(true);
+
+    // StaticProgressOptions opts = new StaticProgressOptions();
+    // opts.setWorkDoneProgress(true);
+    // capabilities.setWindow(opts);
 
     return capabilities;
   }
@@ -60,8 +91,14 @@ public class SarosLanguageServer implements ISarosLanguageServer, ISarosLanguage
 
   @Override
   public void exit() {
-    LOG.info("exit");
+    LOG.info("exit");    
   }
+
+  // @JsonNotification("window/workDoneProgress/cancel")
+  // public void progressCancel(WorkDoneProgressCreateParams p) {
+    
+  //   this.cancelManager.cancel(p.token);
+  // }
 
   @Override
   public TextDocumentService getTextDocumentService() {
@@ -74,12 +111,17 @@ public class SarosLanguageServer implements ISarosLanguageServer, ISarosLanguage
   }
 
   @Override
-  public void connect(ISarosLanguageClient client) {
-    this.languageClient = client;
+  public IAccountService getSarosAccountService() {
+    return this.accountService;
   }
 
   @Override
-  public IAccountService getSarosAccountService() {
-    return new AccountService();
+  public IContactService getSarosContactService() {
+    return this.contactService;
+  }
+
+  @Override
+  public ISessionService getSarosConnectionService() {
+    return this.sessionService;
   }
 }

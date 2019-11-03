@@ -262,6 +262,7 @@ public class XMPPContactsService implements Disposable {
   public void renameContact(XMPPContact contact, String newName) {
     contactsExecutor.execute(
         () -> {
+          log.debug("RENAME START");
           if (roster == null) return;
 
           RosterEntry entry = roster.getEntry(contact.getBareJid().getRAW());
@@ -276,6 +277,7 @@ public class XMPPContactsService implements Disposable {
             if ("".equals(changeTo)) changeTo = null;
           }
           if (!Objects.equals(entry.getName(), changeTo)) entry.setName(changeTo);
+          log.debug("RENAME END");
         });
   }
 
