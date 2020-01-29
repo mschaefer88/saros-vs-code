@@ -62,7 +62,7 @@ public class NegotiationHandler implements INegotiationHandler {
         // TODO Auto-generated method stub
         LOG.info("handleOutgoingSessionNegotiation");
 
-        //Executors.newCachedThreadPool().submit(() -> {
+        Executors.newCachedThreadPool().submit(() -> {
 
             //TODO: why here start and somewhere else run?
             SessionNegotiation.Status status =
@@ -92,14 +92,14 @@ public class NegotiationHandler implements INegotiationHandler {
                         + negotiation.getPeer().toString());
                 break;
             }
-        //});
+        });
     }
 
     @Override
     public void handleIncomingSessionNegotiation(IncomingSessionNegotiation negotiation) {
         // TODO Auto-generated method stub
         LOG.info("handleIncomingSessionNegotiation");
-        
+        Executors.newCachedThreadPool().submit(() -> {
         SessionNegotiation.Status status = negotiation.accept(this.progressMonitor);
         switch (status) {
           case OK:
@@ -116,6 +116,7 @@ public class NegotiationHandler implements INegotiationHandler {
                 + negotiation.getPeer().toString());
             break;
         }
+      });
     }
 
     private static String getNickname(JID jid) {
@@ -136,7 +137,7 @@ public class NegotiationHandler implements INegotiationHandler {
         //TODO: negotiation.addCancelListener(listener);
         LOG.info("handleOutgoingProjectNegotiation");
       
-        
+        Executors.newCachedThreadPool().submit(() -> {
           ProjectNegotiation.Status status =
             negotiation.run(this.progressMonitor);
 
@@ -158,12 +159,12 @@ public class NegotiationHandler implements INegotiationHandler {
               this.sendNotification(String.format("%s had error '$s'", peerName, negotiation.getErrorMessage()), MessageType.Error);
               break;
           }
-        
+        });
     }
 
     @Override
     public void handleIncomingProjectNegotiation(AbstractIncomingProjectNegotiation negotiation) {
-       
+      Executors.newCachedThreadPool().submit(() -> {
         LOG.info("handleIncomingProjectNegotiation");
         //TODO: negotiation.addCancelListener(listener);
 
@@ -198,5 +199,6 @@ public class NegotiationHandler implements INegotiationHandler {
 
           ProjectNegotiation.Status status = negotiation.run(new HashMap<String, IProject>(), this.progressMonitor);
          LOG.info(status);
+        });
     }
 }
