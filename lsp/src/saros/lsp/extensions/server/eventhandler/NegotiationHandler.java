@@ -1,6 +1,7 @@
 package saros.lsp.extensions.server.eventhandler;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -61,7 +62,7 @@ public class NegotiationHandler implements INegotiationHandler {
         // TODO Auto-generated method stub
         LOG.info("handleOutgoingSessionNegotiation");
 
-        Executors.newCachedThreadPool().submit(() -> {
+        //Executors.newCachedThreadPool().submit(() -> {
 
             //TODO: why here start and somewhere else run?
             SessionNegotiation.Status status =
@@ -91,7 +92,7 @@ public class NegotiationHandler implements INegotiationHandler {
                         + negotiation.getPeer().toString());
                 break;
             }
-        });
+        //});
     }
 
     @Override
@@ -192,10 +193,10 @@ public class NegotiationHandler implements INegotiationHandler {
             //   }
             // }
       
-            // projectMapping.put(data.getProjectID(), project);
+            //projectMapping.put(data.getProjectID(), project);
           }
 
-          //negotiation.run(negotiation.getProjectNegotiationData("").getAdditionalProjectData(), this.progressMonitor);
-        
+          ProjectNegotiation.Status status = negotiation.run(new HashMap<String, IProject>(), this.progressMonitor);
+         LOG.info(status);
     }
 }
