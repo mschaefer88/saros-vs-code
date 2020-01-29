@@ -50,7 +50,7 @@ public class NegotiationHandler implements INegotiationHandler {
     sessionManager.setNegotiationHandler(this);
 
     this.sessionManager = sessionManager;
-    this.progressMonitor = progressMonitor;
+    this.progressMonitor = new NullProgressMonitor();
     this.client = client;
     
     LOG.info(String.format("Negotiation handler registered (%d)", sessionManager.hashCode()));

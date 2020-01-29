@@ -3,7 +3,9 @@ package saros.lsp.extensions.server.session;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
@@ -16,11 +18,14 @@ import saros.filesystem.IResource;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.SarosResponse;
 import saros.lsp.extensions.server.SarosResultResponse;
+import saros.lsp.extensions.server.contact.ContactService;
 import saros.lsp.extensions.server.session.dto.InviteDto;
 import saros.lsp.filesystem.LspProject;
 import saros.lsp.filesystem.LspWorkspace;
 import saros.net.ConnectionState;
 import saros.net.xmpp.JID;
+import saros.net.xmpp.contact.XMPPContact;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.server.filesystem.ServerPathImpl;
 import saros.server.filesystem.ServerProjectImpl;
 import saros.server.filesystem.ServerWorkspaceImpl;
@@ -29,20 +34,26 @@ import saros.session.ISarosSessionManager;
 import saros.session.ISessionLifecycleListener;
 import saros.session.SessionEndReason;
 
-public class SessionService implements ISessionService, IConnectionStateListener, ISessionLifecycleListener {//TODO: interfaces according to guidelines
+public class SessionService implements ISessionService, IConnectionStateListener, ISessionLifecycleListener {// TODO:
+                                                                                                             // interfaces
+                                                                                                             // according
+                                                                                                             // to
+                                                                                                             // guidelines
     private final ConnectionHandler connectionHandler;
     private final XMPPAccountStore accountStore;
     private final ISarosSessionManager sessionManager; // TODO: move to own service
     private final ISarosLanguageClient client;
+    private final XMPPContactsService contactService;
 
     private static final Logger LOG = Logger.getLogger(SessionService.class);
 
     public SessionService(ConnectionHandler connectionHandler, XMPPAccountStore accountStore,
-            ISarosSessionManager sessionManager, ISarosLanguageClient client) {
+            ISarosSessionManager sessionManager, ISarosLanguageClient client, XMPPContactsService contactService) {
         this.connectionHandler = connectionHandler;
         this.accountStore = accountStore;
         this.sessionManager = sessionManager;
         this.client = client;
+        this.contactService = contactService;
 
         this.connectionHandler.addConnectionStateListener(this);
         this.sessionManager.addSessionLifecycleListener(this);
@@ -99,7 +110,7 @@ public class SessionService implements ISessionService, IConnectionStateListener
 
         try {
 
-            this.sessionManager.stopSession(SessionEndReason.valueOf("Session Closed")); //TODO: correct?
+            this.sessionManager.stopSession(SessionEndReason.valueOf("Session Closed")); // TODO: correct?
 
         } catch (Exception e) {
             return CompletableFuture.completedFuture(new SarosResponse(e));
@@ -108,21 +119,35 @@ public class SessionService implements ISessionService, IConnectionStateListener
         return CompletableFuture.completedFuture(new SarosResponse());
     }
 
+    //TODO: join session
     @Override
     public CompletableFuture<SarosResponse> invite(InviteDto invite) { // TODO: hier und ähnliche nichts zurückgeben und
                                                                        // über listener Nachrichten schicken!
+        CompletableFuture<SarosResponse> c = new CompletableFuture<SarosResponse>();
 
-        LOG.info(String.format("Negotiation handler used: %d", sessionManager.hashCode()));
-        try {
-            JID jid = new JID(invite.id);
-            this.sessionManager.invite(jid, "VS Code Invitation");
-            this.sessionManager.startSharingProjects(jid);
+        Executors.newCachedThreadPool().submit(() -> {
+                                                               
+            try {
+                if(this.sessionManager.getSession() == null) {
+                    this.start().get(); //TODO: meh, do in client?
+                }
+    
+                XMPPContact contact = this.contactService.getContact(invite.id).get(); //TODO: check if there
+                JID jid = new JID(invite.id + "/Saros");
 
-        } catch (Exception e) {
-            return CompletableFuture.completedFuture(new SarosResponse(e));
-        }
-
-        return CompletableFuture.completedFuture(new SarosResponse());
+                LOG.info("using JID '" + jid.toString() + "'");
+                this.sessionManager.invite(jid, "VS Code Invitation");
+                //this.sessionManager.startSharingProjects(jid);
+                                                                                       
+                c.complete(new SarosResponse());
+            } catch (Exception e) {
+                 c.complete(new SarosResponse(e));
+            }
+                                                               
+            return null;
+        });
+                                                               
+        return c;
     }
 
     @Override
