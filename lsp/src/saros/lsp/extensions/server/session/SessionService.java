@@ -94,7 +94,7 @@ public class SessionService implements ISessionService, IConnectionStateListener
         try {
             Map<IProject, List<IResource>> map = new HashMap<IProject, List<IResource>>();
 
-            map.put(LspWorkspace.projects.get(0), null);
+            //map.put(LspWorkspace.projects.get(0), null);
 
             this.sessionManager.startSession(map);
 
@@ -133,7 +133,7 @@ public class SessionService implements ISessionService, IConnectionStateListener
                 }
     
                 XMPPContact contact = this.contactService.getContact(invite.id).get(); //TODO: check if there
-                JID jid = new JID(invite.id + "/Saros");
+                JID jid = new JID(invite.id);
 
                 LOG.info("using JID '" + jid.toString() + "'");
                 this.sessionManager.invite(jid, "VS Code Invitation");

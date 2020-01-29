@@ -1,5 +1,6 @@
 package saros.lsp.context; //TODO: move to other package! (is no real factory like the other)
 
+import saros.lsp.session.NegotiationHook;
 import saros.lsp.session.SessionStatusRequestHandler;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.server.session.JoinSessionRequestHandler;
@@ -15,6 +16,8 @@ public class LspSessionContextFactory extends SarosCoreSessionContextFactory {//
 
     container.addComponent(JoinSessionRequestHandler.class);
     container.addComponent(SessionStatusRequestHandler.class);
+
+    container.addComponent(NegotiationHook.class);
     // // IDE context wrapper
     // container.addComponent(SharedIDEContext.class);
     // container.addComponent(ApplicationEventHandlersFactory.class);

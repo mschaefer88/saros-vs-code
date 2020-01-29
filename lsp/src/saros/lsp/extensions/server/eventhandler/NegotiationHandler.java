@@ -66,8 +66,8 @@ public class NegotiationHandler implements INegotiationHandler {
 
             //TODO: why here start and somewhere else run?
             SessionNegotiation.Status status =
-            negotiation.start(this.progressMonitor); //TODO: use mine
-
+            negotiation.start(new NullProgressMonitor()); //TODO: use mine
+            LOG.info(status);
             //TODO: LOG to client
             switch (status) {
               case OK:
@@ -99,7 +99,7 @@ public class NegotiationHandler implements INegotiationHandler {
     public void handleIncomingSessionNegotiation(IncomingSessionNegotiation negotiation) {
         // TODO Auto-generated method stub
         LOG.info("handleIncomingSessionNegotiation");
-
+        
         SessionNegotiation.Status status = negotiation.accept(this.progressMonitor);
         switch (status) {
           case OK:
