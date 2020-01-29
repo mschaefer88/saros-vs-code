@@ -131,18 +131,19 @@ class MyErrorHandler implements ErrorHandler { //TODO: move to own file?! + bett
        
         let t = typeof(error);
 
-        if(error.code === "ECONNREFUSED") {
-            return ErrorAction.Shutdown;
-        }
+        return ErrorAction.Continue;
+        // if(error.code === "ECONNREFUSED") {
+        //     return ErrorAction.Continue;
+        // }
 
         //ECONNREFUSED
-        return ErrorAction.Continue;
+        return ErrorAction.Shutdown;
     }    
     
     closed(): CloseAction {
         console.log(`CLOSED!`);
 
-        return CloseAction.DoNotRestart;
+        return CloseAction.Restart;
     }
 
 

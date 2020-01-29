@@ -1,28 +1,24 @@
 package saros.lsp;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.ServerCapabilities;
+import org.eclipse.lsp4j.WorkspaceFolder;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
-import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 
-import org.eclipse.lsp4j.WorkDoneProgressCreateParams;
-import org.eclipse.lsp4j.ProgressParams;
-import org.eclipse.lsp4j.WorkDoneProgressBegin;
-import org.eclipse.lsp4j.WorkDoneProgressReport;
-import org.eclipse.lsp4j.WorkDoneProgressEnd;
-
+import saros.filesystem.IProject;
 import saros.lsp.extensions.ISarosLanguageServer;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.CancelManager;
 import saros.lsp.extensions.server.account.IAccountService;
 import saros.lsp.extensions.server.session.ISessionService;
+import saros.lsp.filesystem.LspProject;
+import saros.lsp.filesystem.LspWorkspace;
 import saros.lsp.extensions.server.contact.IContactService;
 import saros.lsp.service.DocumentServiceStub;
 import saros.lsp.service.WorkspaceServiceStub;
@@ -30,7 +26,7 @@ import saros.lsp.service.WorkspaceServiceStub;
 /** Implmenentation of the Saros language server. */
 public class SarosLanguageServer implements ISarosLanguageServer {
 
-  private static final Logger LOG = Logger.getLogger(SarosLauncher.class);
+  private static final Logger LOG = Logger.getLogger(SarosLanguageServer.class);
 
   private IAccountService accountService;
 
@@ -53,6 +49,10 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
   @Override
   public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
+
+    LOG.info(String.format("Client: %s", params.getClientName())); //TODO:ClientInfo impl.
+    
+    LspWorkspace.projects.add(new LspProject(params.getRootPath()));
 
     return CompletableFuture.completedFuture(new InitializeResult(this.createCapabilities()));
   }

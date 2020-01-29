@@ -4,7 +4,7 @@ plugins {
 
 repositories {
     maven {
-	  url "c:/Users/Michael/source/repos/lsp4j/build/maven-repository"
+	  url "./maven-repository"
     }
   }
 

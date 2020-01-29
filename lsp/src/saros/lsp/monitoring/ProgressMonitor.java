@@ -1,6 +1,8 @@
 package saros.lsp.monitoring;
 
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.WorkDoneProgressCreateParams;
@@ -15,6 +17,8 @@ import saros.monitoring.IProgressMonitor;
 public class ProgressMonitor implements IProgressMonitor {
 
     private static final Logger LOG = Logger.getLogger(ProgressMonitor.class);
+
+    private ExecutorService executor = Executors.newCachedThreadPool();
 
     private ISarosLanguageClient client;
 
@@ -104,36 +108,37 @@ public class ProgressMonitor implements IProgressMonitor {
 
     private void createProgress() {
 
-        WorkDoneProgressCreateParams c = new WorkDoneProgressCreateParams(this.token);
+            WorkDoneProgressCreateParams c = new WorkDoneProgressCreateParams(this.token);
 
-        this.client.create(c);
+            this.client.create(c);
     }
 
     private void beginProgress(String title) {
 
-        ProgressParams<WorkDoneProgressBegin> p 
-            = new ProgressParams<WorkDoneProgressBegin>(this.token, 
-                new WorkDoneProgressBegin(title, null, 0, false));
+            ProgressParams<WorkDoneProgressBegin> p 
+                = new ProgressParams<WorkDoneProgressBegin>(this.token, 
+                    new WorkDoneProgressBegin(title, null, 0, false));
 
-        this.client.progress(p);
+            this.client.progress(p);
     }
 
     private void reportProgress(int amount) {
 
-        ProgressParams<WorkDoneProgressReport> p 
-            = new ProgressParams<WorkDoneProgressReport>(this.token, 
-                new WorkDoneProgressReport(this.subTask, (int)Math.round(amount/(double)this.size*100), false));
+            ProgressParams<WorkDoneProgressReport> p 
+                = new ProgressParams<WorkDoneProgressReport>(this.token, 
+                    new WorkDoneProgressReport(this.subTask, (int)Math.round(amount/(double)this.size*100), false));
 
-        this.client.progress(p);
+            this.client.progress(p);
     }
 
     private void endProgress(String message) {
 
-        ProgressParams<WorkDoneProgressEnd> p 
-            = new ProgressParams<WorkDoneProgressEnd>(this.token, 
-                new WorkDoneProgressEnd(message));
+            ProgressParams<WorkDoneProgressEnd> p 
+                = new ProgressParams<WorkDoneProgressEnd>(this.token, 
+                    new WorkDoneProgressEnd(message));
 
-        this.client.progress(p);
+            this.client.progress(p);
+       
     }
 
 }

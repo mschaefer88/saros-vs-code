@@ -41,10 +41,21 @@ export class SarosServer {
      * @param {number} port - The port the server listens on for connection 
      * @memberof SarosServer
      */
-    public start(port: number): void {
+    public async start(port: number): Promise<void> {
 
         this.startProcess(port)
             .withDebug(true);
+
+        console.log("Wait.PRE")
+        for(var i = 0; i < 5; i++) {
+            console.log(`wait.${i}`);
+            await this.delay(1000);
+        }
+        console.log("wait.POST");
+    }
+
+    private delay(ms: number) {
+        return new Promise( resolve => setTimeout(resolve, ms) );
     }
 
     /**
