@@ -8,6 +8,7 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 
 import saros.communication.extensions.SessionStatusRequestExtension;
+import saros.communication.extensions.SessionStatusResponseExtension;
 import saros.filesystem.IProject;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
@@ -55,21 +56,20 @@ public class SessionStatusRequestHandler {
   }
 
   private void handleStatusRequest(JID from) {
-    return;
 
-    // ISarosSession session = sessionManager.getSession();
-    // SessionStatusResponseExtension response;
+    ISarosSession session = sessionManager.getSession();
+    SessionStatusResponseExtension response;
 
-    // if (session == null) {
-    //   response = new SessionStatusResponseExtension();
-    // } else {
-    //   // Don't count the server
-    //   int participants = session.getUsers().size() - 1;
+    if (session == null) {
+      response = new SessionStatusResponseExtension();
+    } else {
+      // Don't count the server
+      int participants = session.getUsers().size() - 1;
 
-    //   response = new SessionStatusResponseExtension(participants, getSessionDescription(session));
-    // }
+      response = new SessionStatusResponseExtension(participants, getSessionDescription(session));
+    }
 
-    // transmitter.sendPacketExtension(from, SessionStatusResponseExtension.PROVIDER.create(response));
+    transmitter.sendPacketExtension(from, SessionStatusResponseExtension.PROVIDER.create(response));
   }
 
   private String getSessionDescription(ISarosSession session) {
