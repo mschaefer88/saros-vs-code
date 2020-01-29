@@ -26,7 +26,6 @@ public class SarosLifecycle extends AbstractContextLifecycle {
     factories.add(new LspCoreContextFactory());
     factories.add(new LspContextFactory());
     factories.add(new LspProxyContextFactory(() -> this.client));
-    factories.add(new LspSessionContextFactory());
 
     return factories;
   }
