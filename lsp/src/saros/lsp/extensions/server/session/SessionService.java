@@ -17,6 +17,8 @@ import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.SarosResponse;
 import saros.lsp.extensions.server.SarosResultResponse;
 import saros.lsp.extensions.server.session.dto.InviteDto;
+import saros.lsp.filesystem.LspProject;
+import saros.lsp.filesystem.LspWorkspace;
 import saros.net.ConnectionState;
 import saros.net.xmpp.JID;
 import saros.server.filesystem.ServerPathImpl;
@@ -81,9 +83,7 @@ public class SessionService implements ISessionService, IConnectionStateListener
         try {
             Map<IProject, List<IResource>> map = new HashMap<IProject, List<IResource>>();
 
-            map.put(new ServerProjectImpl(
-                    new ServerWorkspaceImpl(ServerPathImpl.fromString("C:\\Users\\Michael\\workspace-alice-stf")),
-                    "TestProject (2)"), null);
+            map.put(LspWorkspace.projects.get(0), null);
 
             this.sessionManager.startSession(map);
 

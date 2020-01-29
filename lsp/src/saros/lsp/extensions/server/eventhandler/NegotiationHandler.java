@@ -24,6 +24,7 @@ import saros.negotiation.OutgoingSessionNegotiation;
 import saros.negotiation.ProjectNegotiation;
 import saros.negotiation.ProjectNegotiationData;
 import saros.negotiation.SessionNegotiation;
+import saros.negotiation.Negotiation.Status;
 import saros.net.util.XMPPUtils;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
@@ -65,7 +66,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
             //TODO: why here start and somewhere else run?
             SessionNegotiation.Status status =
-            negotiation.start(new NullProgressMonitor()); //TODO: use mine
+            negotiation.start(this.progressMonitor); //TODO: use mine
 
             //TODO: LOG to client
             switch (status) {
@@ -99,7 +100,22 @@ public class NegotiationHandler implements INegotiationHandler {
         // TODO Auto-generated method stub
         LOG.info("handleIncomingSessionNegotiation");
 
-        negotiation.accept(this.progressMonitor);
+        SessionNegotiation.Status status = negotiation.accept(this.progressMonitor);
+        switch (status) {
+          case OK:
+            break;
+          case CANCEL:
+          case ERROR:
+            showCancelMessage(
+                negotiation.getPeer(), negotiation.getErrorMessage(), CancelLocation.LOCAL);
+            break;
+          case REMOTE_CANCEL:
+          case REMOTE_ERROR:
+          LOG.info(
+            "Session negotiation was cancelled by remote: "
+                + negotiation.getPeer().toString());
+            break;
+        }
     }
 
     private static String getNickname(JID jid) {
