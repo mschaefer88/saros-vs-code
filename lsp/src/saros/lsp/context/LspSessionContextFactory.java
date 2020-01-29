@@ -1,5 +1,7 @@
 package saros.lsp.context; //TODO: move to other package! (is no real factory like the other)
 
+import org.apache.log4j.Logger;
+
 import saros.context.IContextFactory;
 import saros.lsp.session.NegotiationHook;
 import saros.lsp.session.SessionStatusRequestHandler;
@@ -12,10 +14,15 @@ import saros.session.SarosCoreSessionContextFactory;
 /** LSP implementation of the {@link ISarosSessionContextFactory} interface. */
 public class LspSessionContextFactory extends SarosCoreSessionContextFactory implements IContextFactory {//TODO: interface sinnvoll?
 
+
+  private static final Logger LOG = Logger.getLogger(LspSessionContextFactory.class);
   @Override
   public void createNonCoreComponents(ISarosSession session, MutablePicoContainer container) {
-    super.createNonCoreComponents(session, container);
-    //TODO:SUPER!
+    LOG.info("createNonCoreComponents");
+    container.addComponent(JoinSessionRequestHandler.class);
+    container.addComponent(SessionStatusRequestHandler.class);
+
+    container.addComponent(NegotiationHook.class);
     // // IDE context wrapper
     // container.addComponent(SharedIDEContext.class);
     // container.addComponent(ApplicationEventHandlersFactory.class);
@@ -40,16 +47,5 @@ public class LspSessionContextFactory extends SarosCoreSessionContextFactory imp
 
     // // User notifications
     // container.addComponent(FollowModeNotificationDispatcher.class);
-  }
-
-  @Override
-  public void createComponents(MutablePicoContainer container) {
-    container.addComponent(JoinSessionRequestHandler.class);
-    container.addComponent(SessionStatusRequestHandler.class);
-
-    container.addComponent(NegotiationHook.class);
-
-    //container.addComponent(ISarosSessionContextFactory.class, SarosCoreSessionContextFactory.class);
-
   }
 }

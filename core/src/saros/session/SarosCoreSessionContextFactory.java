@@ -1,5 +1,7 @@
 package saros.session;
 
+import org.apache.log4j.Logger;
+
 import saros.concurrent.management.ConcurrentDocumentClient;
 import saros.concurrent.management.ConcurrentDocumentServer;
 import saros.concurrent.management.HeartbeatDispatcher;
@@ -31,9 +33,10 @@ import saros.synchronize.StopManager;
  */
 public class SarosCoreSessionContextFactory implements ISarosSessionContextFactory {
 
+  private static final Logger LOG = Logger.getLogger(SarosCoreSessionContextFactory.class);
   @Override
   public final void createComponents(ISarosSession session, MutablePicoContainer container) {
-
+    LOG.info("createComponents");
     // Concurrent Editing
     if (session.isHost()) container.addComponent(ConcurrentDocumentServer.class);
 
