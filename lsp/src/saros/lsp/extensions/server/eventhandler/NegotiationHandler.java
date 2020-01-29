@@ -24,7 +24,6 @@ import saros.negotiation.OutgoingSessionNegotiation;
 import saros.negotiation.ProjectNegotiation;
 import saros.negotiation.ProjectNegotiationData;
 import saros.negotiation.SessionNegotiation;
-import saros.negotiation.Negotiation.Status;
 import saros.net.util.XMPPUtils;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
@@ -106,12 +105,12 @@ public class NegotiationHandler implements INegotiationHandler {
             break;
           case CANCEL:
           case ERROR:
-            showCancelMessage(
-                negotiation.getPeer(), negotiation.getErrorMessage(), CancelLocation.LOCAL);
+          LOG.error("Remote " + 
+                negotiation.getPeer() + ": " + negotiation.getErrorMessage());
             break;
           case REMOTE_CANCEL:
           case REMOTE_ERROR:
-          LOG.info(
+          LOG.error(
             "Session negotiation was cancelled by remote: "
                 + negotiation.getPeer().toString());
             break;
