@@ -14,8 +14,8 @@ public class LspSessionContextFactory extends SarosCoreSessionContextFactory imp
 
   @Override
   public void createNonCoreComponents(ISarosSession session, MutablePicoContainer container) {
-    
-    
+    super.createNonCoreComponents(session, container);
+    //TODO:SUPER!
     // // IDE context wrapper
     // container.addComponent(SharedIDEContext.class);
     // container.addComponent(ApplicationEventHandlersFactory.class);
@@ -49,7 +49,7 @@ public class LspSessionContextFactory extends SarosCoreSessionContextFactory imp
 
     container.addComponent(NegotiationHook.class);
 
-    container.addComponent(ISarosSessionContextFactory.class, LspSessionContextFactory.class);
+    //container.addComponent(ISarosSessionContextFactory.class, SarosCoreSessionContextFactory.class);
 
   }
 }
