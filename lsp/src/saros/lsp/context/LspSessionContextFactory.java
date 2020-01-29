@@ -1,5 +1,6 @@
 package saros.lsp.context; //TODO: move to other package! (is no real factory like the other)
 
+import saros.context.IContextFactory;
 import saros.lsp.session.NegotiationHook;
 import saros.lsp.session.SessionStatusRequestHandler;
 import saros.repackaged.picocontainer.MutablePicoContainer;
@@ -9,15 +10,12 @@ import saros.session.ISarosSessionContextFactory;
 import saros.session.SarosCoreSessionContextFactory;
 
 /** LSP implementation of the {@link ISarosSessionContextFactory} interface. */
-public class LspSessionContextFactory extends SarosCoreSessionContextFactory {//TODO: interface sinnvoll?
+public class LspSessionContextFactory extends SarosCoreSessionContextFactory implements IContextFactory {//TODO: interface sinnvoll?
 
   @Override
   public void createNonCoreComponents(ISarosSession session, MutablePicoContainer container) {
-
-    container.addComponent(JoinSessionRequestHandler.class);
-    container.addComponent(SessionStatusRequestHandler.class);
-
-    container.addComponent(NegotiationHook.class);
+    
+    
     // // IDE context wrapper
     // container.addComponent(SharedIDEContext.class);
     // container.addComponent(ApplicationEventHandlersFactory.class);
@@ -42,5 +40,14 @@ public class LspSessionContextFactory extends SarosCoreSessionContextFactory {//
 
     // // User notifications
     // container.addComponent(FollowModeNotificationDispatcher.class);
+  }
+
+  @Override
+  public void createComponents(MutablePicoContainer container) {
+    container.addComponent(JoinSessionRequestHandler.class);
+    container.addComponent(SessionStatusRequestHandler.class);
+
+    container.addComponent(NegotiationHook.class);
+
   }
 }

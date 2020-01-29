@@ -10,6 +10,7 @@ import saros.lsp.context.LspContextFactory;
 import saros.lsp.context.LspCoreContextFactory;
 import saros.lsp.context.LspOptionalContextFactory;
 import saros.lsp.context.LspProxyContextFactory;
+import saros.lsp.context.LspSessionContextFactory;
 import saros.lsp.extensions.ISarosLanguageServer;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 
@@ -25,6 +26,7 @@ public class SarosLifecycle extends AbstractContextLifecycle {
     factories.add(new LspCoreContextFactory());
     factories.add(new LspContextFactory());
     factories.add(new LspProxyContextFactory(() -> this.client));
+    factories.add(new LspSessionContextFactory());
 
     return factories;
   }
