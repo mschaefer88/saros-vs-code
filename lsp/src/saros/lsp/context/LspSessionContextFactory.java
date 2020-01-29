@@ -49,5 +49,7 @@ public class LspSessionContextFactory extends SarosCoreSessionContextFactory imp
 
     container.addComponent(NegotiationHook.class);
 
+    container.addComponent(ISarosSessionContextFactory.class, LspSessionContextFactory.class);
+
   }
 }
