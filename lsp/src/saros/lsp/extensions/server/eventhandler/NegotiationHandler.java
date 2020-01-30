@@ -187,6 +187,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
             String projectName = data.getProjectName();
             IProject project = new LspProject("C:\\Temp\\saros-workspace-test\\" + projectName);
+            
       
             // TODO: The file path is currently dictated by the name, potentially resulting in CONFLICTS
             if (!project.exists()) {
@@ -200,7 +201,7 @@ public class NegotiationHandler implements INegotiationHandler {
               }
             }
       
-            //projectMapping.put(data.getProjectID(), new LspProject("C:\\Temp\\saros-workspace-test\\" + data.getProjectName()));
+            projectMapping.put(data.getProjectID(), project);
           }
 
           ProjectNegotiation.Status status = negotiation.run(projectMapping, this.progressMonitor); //TODO: cancel

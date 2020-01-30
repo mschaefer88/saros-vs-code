@@ -6,9 +6,11 @@ import { SarosClient, ContactDto, SarosResultResponse, SessionStateNotification,
 export class SarosProvider implements vscode.TreeDataProvider<ContactDto> {
 
 	private client: SarosClient;
+	private context: vscode.ExtensionContext;
 
-	constructor(client: SarosClient) {
+	constructor(client: SarosClient, context: vscode.ExtensionContext) {
 		this.client = client;
+		this.context = context;
 	}
 
 	refresh(): void {
@@ -25,14 +27,14 @@ export class SarosProvider implements vscode.TreeDataProvider<ContactDto> {
 		if(element.isOnline) {
 			if(element.hasSarosSupport) {
 				console.log("SAROS");
-				contactItem.iconPath = "C:/Users/Michael/source/repos/saros-vs-code/vscode/media/obj16/contact_saros_obj.png";
+				contactItem.iconPath = this.context.asAbsolutePath("/media/obj16/contact_saros_obj.png");
 			} else {
 				console.log("ONLINE");
-				contactItem.iconPath = "C:/Users/Michael/source/repos/saros-vs-code/vscode/media/obj16/contact_obj.png";
+				contactItem.iconPath = this.context.asAbsolutePath("/media/obj16/contact_obj.png");
 			}
 		} else {
 			console.log("OFFLINE");
-			contactItem.iconPath = "C:/Users/Michael/source/repos/saros-vs-code/vscode/media/obj16/contact_offline_obj.png";
+			contactItem.iconPath = this.context.asAbsolutePath("/media/obj16/contact_offline_obj.png");
 		}
 
 		contactItem.tooltip = element.id;
@@ -81,9 +83,9 @@ export class SarosView implements Disposable{
 	}
 
 	constructor(extension: SarosExtension) {
-
+		
 		extension.client.onReady().then(() => {
-			const treeDataProvider = new SarosProvider(extension.client);
+			const treeDataProvider = new SarosProvider(extension.client, extension.context);
 			const contactsView = vscode.window.createTreeView('saros-contacts', { treeDataProvider });
 			const sessionView = vscode.window.createTreeView('saros-session', { treeDataProvider });
 

@@ -10,7 +10,7 @@ import { LanguageClientOptions, RevealOutputChannelOn, ErrorHandler, Message, Er
  * @class SarosExtension
  */
 export class SarosExtension {
-    private context!: ExtensionContext;
+    public context!: ExtensionContext;
     public client!: SarosClient;
 
     /**
