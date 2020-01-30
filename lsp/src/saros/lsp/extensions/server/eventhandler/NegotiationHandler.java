@@ -16,6 +16,7 @@ import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IWorkspace;
 import saros.lsp.extensions.client.ISarosLanguageClient;
+import saros.lsp.filesystem.LspProject;
 import saros.monitoring.IProgressMonitor;
 import saros.monitoring.NullProgressMonitor;
 import saros.negotiation.AbstractIncomingProjectNegotiation;
@@ -168,7 +169,7 @@ public class NegotiationHandler implements INegotiationHandler {
         LOG.info("handleIncomingProjectNegotiation");
         //TODO: negotiation.addCancelListener(listener);
 
-        
+          Map<String, IProject> projectMapping = new HashMap<>();
           //TODO: use abstraction?
           for (ProjectNegotiationData data : negotiation.getProjectNegotiationData()) {
 
@@ -194,10 +195,11 @@ public class NegotiationHandler implements INegotiationHandler {
             //   }
             // }
       
-            //projectMapping.put(data.getProjectID(), project);
+            projectMapping.put(data.getProjectID(), new LspProject("C:\\Temp\\saros-workspace-test\\" + data.getProjectName()));
           }
 
-          ProjectNegotiation.Status status = negotiation.run(new HashMap<String, IProject>(), this.progressMonitor);
+          ProjectNegotiation.Status status = negotiation.run(projectMapping, this.progressMonitor); //TODO: cancel
+          
          LOG.info(status);
         });
     }

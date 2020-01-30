@@ -14,7 +14,7 @@ public class LspProject extends ServerProjectImpl {
     }
 
     public LspProject(IPath rootPath) {
-        super(new ServerWorkspaceImpl(rootPath), rootPath.toString());
+        super(new ServerWorkspaceImpl(rootPath.removeLastSegments(1)), rootPath.lastSegment());
     }
     
     private static final Logger LOG = Logger.getLogger(LspProject.class);
