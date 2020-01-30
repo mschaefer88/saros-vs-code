@@ -1,5 +1,6 @@
 package saros.lsp.extensions.server.eventhandler;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,9 +27,11 @@ import saros.negotiation.OutgoingSessionNegotiation;
 import saros.negotiation.ProjectNegotiation;
 import saros.negotiation.ProjectNegotiationData;
 import saros.negotiation.SessionNegotiation;
+import saros.negotiation.NegotiationTools.CancelOption;
 import saros.net.util.XMPPUtils;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
+import saros.server.filesystem.ServerProjectImpl;
 import saros.session.INegotiationHandler;
 import saros.session.ISarosSessionManager;
 
@@ -173,29 +176,31 @@ public class NegotiationHandler implements INegotiationHandler {
           //TODO: use abstraction?
           for (ProjectNegotiationData data : negotiation.getProjectNegotiationData()) {
 
-            LOG.info(String.format("ID: %s, Name: %s", data.getProjectID(), data.getProjectName()));
+            LOG.debug(String.format("ID: %s, Name: %s", data.getProjectID(), data.getProjectName()));
             for(String file : data.getFileList().getPaths()) {
-              LOG.info(String.format("File: %s", file));
+              LOG.debug(String.format("File: %s", file));
             }
             Map<String,String> add = data.getAdditionalProjectData();
             add.forEach((k,v) -> {
-              LOG.info(String.format("Add: %s = %s", k, v));
+              LOG.debug(String.format("Add: %s = %s", k, v));
             });
-            // String projectName = data.getProjectName();
-            // IProject project = workspace.getProject(projectName);
+
+            String projectName = data.getProjectName();
+            IProject project = new LspProject("C:\\Temp\\saros-workspace-test\\" + projectName);
       
-            // // TODO: The file path is currently dictated by the name, potentially resulting in CONFLICTS
-            // if (!project.exists()) {
-            //   try {
-            //     project.adaptTo(ServerProjectImpl.class).create();
-            //   } catch (IOException e) {
-            //     negotiation.localCancel(
-            //         "Error creating project folder", NegotiationTools.CancelOption.NOTIFY_PEER);
-            //     return;
-            //   }
-            // }
+            // TODO: The file path is currently dictated by the name, potentially resulting in CONFLICTS
+            if (!project.exists()) {
+              try {
+                project.adaptTo(ServerProjectImpl.class).create();
+              } catch (IOException e) {
+                negotiation.localCancel(
+                    "Error creating project folder", CancelOption.NOTIFY_PEER);
+                    LOG.error(e);
+                return;
+              }
+            }
       
-            projectMapping.put(data.getProjectID(), new LspProject("C:\\Temp\\saros-workspace-test\\" + data.getProjectName()));
+            //projectMapping.put(data.getProjectID(), new LspProject("C:\\Temp\\saros-workspace-test\\" + data.getProjectName()));
           }
 
           ProjectNegotiation.Status status = negotiation.run(projectMapping, this.progressMonitor); //TODO: cancel
