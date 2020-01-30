@@ -60,7 +60,7 @@ export class SarosExtension {
 
                         self.client.onNotification(OpenProjectNotification.type, async project => {
                             let uri = Uri.file(project.result);
-                            let result = await commands.executeCommand('vscode.openFolder', uri);
+                            let result = await commands.executeCommand('vscode.openFolder', uri, false);//false -> dont open new vscode
                             console.log(`Open Project Result: ${result}`);
                         });
                         //TODO: just for testing!!!                      
