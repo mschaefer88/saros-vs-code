@@ -94,7 +94,7 @@ public class SessionService implements ISessionService, IConnectionStateListener
         try {
             Map<IProject, List<IResource>> map = new HashMap<IProject, List<IResource>>();
 
-            //map.put(LspWorkspace.projects.get(0), null);
+            map.put(LspWorkspace.projects.get(0), null);
 
             this.sessionManager.startSession(map);
 

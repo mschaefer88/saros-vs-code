@@ -133,7 +133,6 @@ public class XMPPReceiver implements IReceiver, IBinaryXMPPExtensionReceiver {
 
   @Override
   public void processPacket(final Packet packet) {
-    LOG.info("processPacket");
     dispatchThreadContext.executeAsDispatch(
         new Runnable() {
           @Override
@@ -161,7 +160,6 @@ public class XMPPReceiver implements IReceiver, IBinaryXMPPExtensionReceiver {
 
   @Override
   public void receive(BinaryXMPPExtension extension) {
-    LOG.info("receive bare");
     dispatchThreadContext.executeAsDispatch(
         new Runnable() {
 
@@ -169,7 +167,7 @@ public class XMPPReceiver implements IReceiver, IBinaryXMPPExtensionReceiver {
           public void run() {
 
             Packet packet = convertBinaryXMPPExtension(extension);
-            LOG.info(String.format("bare is null = %b", packet == null));
+
             if (packet != null) forwardPacket(packet);
           }
         });
@@ -182,22 +180,19 @@ public class XMPPReceiver implements IReceiver, IBinaryXMPPExtensionReceiver {
    */
   private void forwardPacket(Packet packet) {
     Map<PacketListener, PacketFilter> copy;
-LOG.debug("forwardPacket");
+    
     synchronized (listeners) {
       copy = new HashMap<PacketListener, PacketFilter>(listeners);
     }
-    int n = 0;
+   
     for (Entry<PacketListener, PacketFilter> entry : copy.entrySet()) {
       PacketListener listener = entry.getKey();
       PacketFilter filter = entry.getValue();
 
       if (filter == null || filter.accept(packet)) {
-        LOG.debug("processPacket");
-        n++;
         listener.processPacket(packet);
       }
     }
-    LOG.debug(String.format("Processed by %d", n));
   }
 
   /**
