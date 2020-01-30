@@ -1,6 +1,6 @@
-import { ExtensionContext, workspace, window, ProgressLocation, commands } from "vscode"; //TODO: überall so machen!
+import { ExtensionContext, workspace, window, ProgressLocation, commands, Uri } from "vscode"; //TODO: überall so machen!
 import { SarosServer } from "./saros-server";
-import { SarosClient } from "./saros-client";
+import { SarosClient, OpenProjectNotification } from "./saros-client";
 import { LanguageClientOptions, RevealOutputChannelOn, ErrorHandler, Message, ErrorAction, CloseAction, InitializationFailedHandler, WorkDoneProgressParams } from "vscode-languageclient";
 
 /**
@@ -58,6 +58,11 @@ export class SarosExtension {
                 
                     self.client.onReady().then(() => {
 
+                        self.client.onNotification(OpenProjectNotification.type, async project => {
+                            let uri = Uri.file(project.result);
+                            let result = await commands.executeCommand('vscode.openFolder', uri);
+                            console.log(`Open Project Result: ${result}`);
+                        });
                         //TODO: just for testing!!!                      
 						commands.registerCommand("saros.test", () => {
                             let t: WorkDoneProgressParams ={workDoneToken: "TESTEST"};

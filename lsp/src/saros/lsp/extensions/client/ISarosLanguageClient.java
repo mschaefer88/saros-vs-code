@@ -18,7 +18,7 @@ import saros.lsp.extensions.server.contact.dto.ContactDto;
  * All client features that aren't covered by
  * the lsp protocol have to be specified here.
  */
-public interface ISarosLanguageClient extends LanguageClient {    
+public interface ISarosLanguageClient extends LanguageClient {     //TODO: adapter/bridge for better function access aka openProject(string) etc.
 
     @JsonNotification("saros/session/state") //TODO: naming!
     void sendStateSession(SarosResultResponse<Boolean> r); //TODO: use own notification/type!
@@ -28,4 +28,7 @@ public interface ISarosLanguageClient extends LanguageClient {
 
     @JsonNotification("saros/contact/state") //TODO: naming!
     void sendStateContact(ContactDto r); //TODO: is Contact here really necessary? Void?
+
+    @JsonNotification("saros/editor/open") //TODO: request? what if couldn't open?
+    void openProject(SarosResultResponse<String> path); //TODO: own dto
 }

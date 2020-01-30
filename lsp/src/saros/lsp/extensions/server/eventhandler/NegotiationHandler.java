@@ -17,6 +17,7 @@ import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IWorkspace;
 import saros.lsp.extensions.client.ISarosLanguageClient;
+import saros.lsp.extensions.server.SarosResultResponse;
 import saros.lsp.filesystem.LspProject;
 import saros.monitoring.IProgressMonitor;
 import saros.monitoring.NullProgressMonitor;
@@ -206,7 +207,10 @@ public class NegotiationHandler implements INegotiationHandler {
 
           ProjectNegotiation.Status status = negotiation.run(projectMapping, this.progressMonitor); //TODO: cancel
           
-         LOG.info(status);
+          //TODO: process state
+          if(status == ProjectNegotiation.Status.OK) {
+            this.client.openProject(new SarosResultResponse<String>("C:\\Temp\\saros-workspace-test\\"));
+          }
         });
     }
 }

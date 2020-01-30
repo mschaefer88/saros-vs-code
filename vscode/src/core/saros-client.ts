@@ -42,6 +42,11 @@ export interface InviteDto {
     description: string;
 }
 
+//TODO: use namespaces for grouping
+export namespace OpenProjectNotification {
+    export const type = new NotificationType<SarosResultResponse<string>, void>('saros/editor/open'); //TODO: naming
+}
+
 export namespace SessionStateNotification {
 	export const type = new NotificationType<SarosResultResponse<boolean>, void>('saros/session/state'); //TODO: naming
 }
