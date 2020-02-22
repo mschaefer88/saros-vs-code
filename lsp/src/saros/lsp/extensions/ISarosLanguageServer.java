@@ -1,5 +1,7 @@
 package saros.lsp.extensions;
 
+import java.util.concurrent.Callable;
+
 import org.eclipse.lsp4j.jsonrpc.services.JsonDelegate;
 import org.eclipse.lsp4j.services.LanguageServer;
 
@@ -28,4 +30,6 @@ public interface ISarosLanguageServer extends LanguageServer {
 
   @JsonDelegate
   ISessionService getSarosConnectionService();
+
+  void addExitHook(Runnable r);
 }

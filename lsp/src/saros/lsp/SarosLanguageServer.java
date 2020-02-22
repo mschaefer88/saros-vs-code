@@ -1,6 +1,8 @@
 package saros.lsp;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.log4j.Logger;
@@ -91,7 +93,18 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
   @Override
   public void exit() {
+    for (Runnable runnable : listeners) {
+      runnable.run();
+    }
     LOG.info("exit");    
+  }
+
+
+  private List<Runnable> listeners = new LinkedList<Runnable>();
+
+  @Override
+  public void addExitHook(Runnable r) {
+    this.listeners.add(r);
   }
 
   // @JsonNotification("window/workDoneProgress/cancel")

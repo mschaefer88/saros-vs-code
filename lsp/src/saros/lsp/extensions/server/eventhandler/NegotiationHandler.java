@@ -67,6 +67,7 @@ public class NegotiationHandler implements INegotiationHandler {
         // TODO Auto-generated method stub
         LOG.info("handleOutgoingSessionNegotiation");
 
+        //TODO: how to enfoce threading on super definition?!
         Executors.newCachedThreadPool().submit(() -> {
 
             //TODO: why here start and somewhere else run?
@@ -168,7 +169,7 @@ public class NegotiationHandler implements INegotiationHandler {
     }
 
     @Override
-    public void handleIncomingProjectNegotiation(AbstractIncomingProjectNegotiation negotiation) {
+    public void handleIncomingProjectNegotiation(AbstractIncomingProjectNegotiation negotiation) {//TODO: logic in own class
       Executors.newCachedThreadPool().submit(() -> {
         LOG.info("handleIncomingProjectNegotiation");
         //TODO: negotiation.addCancelListener(listener);

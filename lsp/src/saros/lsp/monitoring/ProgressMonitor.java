@@ -63,6 +63,7 @@ public class ProgressMonitor implements IProgressMonitor {
         LOG.debug(String.format("worked(%d)", amount));
 
         if(this.canceled) {
+            LOG.error("cancelling not supported");
             throw new UnsupportedOperationException();
         }
         
@@ -74,6 +75,7 @@ public class ProgressMonitor implements IProgressMonitor {
         LOG.debug(String.format("setCanceled(%b)", canceled));
          
         if(this.canceled && !canceled) {
+            LOG.error("resuming not supported");
             throw new UnsupportedOperationException();
         }
 
@@ -96,6 +98,7 @@ public class ProgressMonitor implements IProgressMonitor {
         LOG.debug(String.format("beginTask('%s', %d)", name, size));
 
         if(this.canceled) {
+            LOG.error("resuming not supported");
             throw new UnsupportedOperationException();
         }
         
@@ -110,7 +113,7 @@ public class ProgressMonitor implements IProgressMonitor {
 
             WorkDoneProgressCreateParams c = new WorkDoneProgressCreateParams(this.token);
 
-            this.client.create(c);
+            this.client.createProgress(c);
     }
 
     private void beginProgress(String title) {

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { SarosExtension } from "../core/saros-extension";
 import { commands } from "vscode";
-import { SarosResponse, AccountDto, ContactDto, ConnectRequest, DisconnectRequest, IsOnlineRequest, StartSessionRequest, GetAllContactRequest, InviteContactRequest } from '../core/saros-client';
+import { SarosResponse, AccountDto, ContactDto, ConnectRequest, DisconnectRequest, IsOnlineRequest, StartSessionRequest, GetAllContactRequest, InviteContactRequest, StopSessionRequest } from '../core/saros-client';
 import { QuickPickItem } from '../core/types';
 
 /**

@@ -12,6 +12,8 @@ import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
+import saros.monitoring.IProgressMonitor;
+import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
 
 public class LspWorkspace implements IWorkspace {
 
@@ -19,14 +21,17 @@ public class LspWorkspace implements IWorkspace {
 
     public static List<IProject> projects = new LinkedList<IProject>();
 
-    public LspWorkspace(String root) {
-        
+    private final IProgressMonitor progressMonitor;
+
+    public LspWorkspace(String root, IProgressMonitor progressMonitor) {
+        LOG.info("Root is " + root);
+
+        this.progressMonitor = progressMonitor;
     }
 
     @Override
     public void run(IWorkspaceRunnable runnable) throws IOException, OperationCanceledException {
-        // TODO Auto-generated method stub
-        LOG.info("run`1");
+        this.run(runnable, null);
     }
 
     @Override
@@ -34,18 +39,23 @@ public class LspWorkspace implements IWorkspace {
         // TODO Auto-generated method stub
         LOG.info("run`2");
 
+        for (IResource resource : resources) {
+            LOG.info("Resource: " + resource.getName());
+        }
+
+        runnable.run(this.progressMonitor);
     }
 
     @Override
     public IProject getProject(String project) {
-        // TODO Auto-generated method stub
+        // TODO not supported (deprecated)
         LOG.info("getProject");
         return null;
     }
 
     @Override
     public IPath getLocation() {
-        // TODO Auto-generated method stub
+        // TODO not supported (deprecated)
         LOG.info("getLocation");
         return null;
     }

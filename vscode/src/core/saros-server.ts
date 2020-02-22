@@ -1,10 +1,17 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as process from 'child_process';
+import * as cp from 'child_process';
 import * as net from 'net';
 import { StreamInfo } from 'vscode-languageclient';
 import * as port from 'get-port';
 import getPort = require('get-port');
+import { createWriteStream } from 'fs';
+
+class SarosState {
+    port?: number;
+}
+
+const Used_Port_Key = "SAROS_PORT";
 
 /**
  * Encapsulation of the Saros server.
@@ -21,9 +28,11 @@ export class SarosServer {
      * @type {process.ChildProcess}
      * @memberof SarosServer
      */
-    private process?: process.ChildProcess;
+    private process?: cp.ChildProcess;
 
     private output!: vscode.OutputChannel;
+
+    private store: vscode.Memento;
 
     /**
      * Creates an instance of SarosServer.
@@ -32,7 +41,8 @@ export class SarosServer {
      * @memberof SarosServer
      */
     constructor(private context: vscode.ExtensionContext) {
-                
+
+        this.store = context.globalState;   
     }
 
     /**
@@ -70,12 +80,32 @@ export class SarosServer {
         let self = this;
         function createServer(): Promise<StreamInfo> {
             
+            let oldPort = self.store.get(Used_Port_Key);
+            self.store.update(Used_Port_Key, undefined);
+            if(oldPort) {
+                try {
+                    console.log(`Using old port ${oldPort} for server.`);
+                    let connectionInfo = {
+                        port: oldPort as number
+                    };
+                    let socket = net.connect(connectionInfo);
+                    let result: StreamInfo = {
+                        writer: socket,
+                        reader: socket
+                    };                
+
+                    return Promise.resolve(result);
+                } catch(error) {
+                    console.log(error);
+                }
+            }
+
             return getPort().then(async port => {
+
                 console.log(`Using port ${port} for server.`);
+                // self.store.update(Used_Port_Key, port);
 
                 await self.start(port);
-
-                console.log("RETURN");
 
                 let connectionInfo = {
                     port: port
@@ -87,7 +117,7 @@ export class SarosServer {
                 };                
 
                 return result;
-            });
+            });          
         }
 
         return createServer;
@@ -121,7 +151,30 @@ export class SarosServer {
             'saros.lsp.SarosLauncher',
             args,
             { encoding: 'utf8' }
-        ) as process.ChildProcess; 
+        ) as cp.ChildProcess; 
+
+        try {            
+
+            //var pathToFork = path.resolve(this.context.extensionPath, 'out', 'core', 'process-starter.js');//TODO: put aside jar
+            //console.log(pathToFork);
+            //this.process = process.fork(pathToFork, [`java -jar "${pathToJar}" ${args[0]}`], {detached: true, stdio: 'ignore'});
+            //this.process = process.fork(pathToFork, ['notepad'], {detached: true, stdio: 'ignore'});
+           
+
+
+            // let cp = require('child_process')
+            // var child = cp.spawn('notepad', [], {
+            //             detached: true,
+            //             stdio: 'ignore'
+            //             });
+            
+            //         console.log(`Server PID is ${child.pid}`);
+            //             child.unref();
+        }catch(err) {
+            console.log(err);
+        }
+        
+        console.log(`Server PID is ${this.process?.pid}`);
         
         return this;
     }

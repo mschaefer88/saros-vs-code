@@ -11,7 +11,7 @@ public class LspRemoteProgressIndicatorFactory implements IRemoteProgressIndicat
     public IRemoteProgressIndicator create(RemoteProgressManager remoteProgressManager, String remoteProgressID,
             User remoteUser) {
         
-        return new LspRemoteProgressIndicator();
+        return new LspRemoteProgressIndicator(); //TODO: manager muss hier drauf arbeiten
     }
 
 }
