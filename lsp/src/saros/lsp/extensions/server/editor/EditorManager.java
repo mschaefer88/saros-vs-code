@@ -1,8 +1,14 @@
 package saros.lsp.extensions.server.editor; //TODO: best package location?
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import saros.activities.SPath;
@@ -16,28 +22,33 @@ import saros.session.User;
 public class EditorManager implements IEditorManager {
 
     private static final Logger LOG = Logger.getLogger(EditorManager.class);
+    private Set<SPath> openEditors = Collections.synchronizedSet(new HashSet<SPath>());
 
     @Override
-    public void openEditor(SPath path, boolean activate) {
-        // TODO Auto-generated method stub
+    public void openEditor(SPath path, boolean activate) {//TODO: activate?
 
         LOG.info(String.format("openEditor(%s, %b)", path.toString(), activate));
+        this.openEditors.add(path);
+        //TODO: open in vscode
     }
 
     @Override
     public Set<SPath> getOpenEditors() {
-        // TODO Auto-generated method stub
 
         LOG.info("getOpenEditors()");
-        return Collections.emptySet();
+        return this.openEditors; //TODO: ask vscode?
     }
 
     @Override
-    public String getContent(SPath path) {
-        // TODO Auto-generated method stub
+    public String getContent(SPath path) {//TODO: get from vscode? or from file?
 
         LOG.info(String.format("getContent(%s)", path.toString()));
-        return null;
+        try {
+            return IOUtils.toString(path.getFile().getContents(), StandardCharsets.UTF_8.name());
+        } catch (IOException e) {
+            LOG.error(e);
+            return "";
+        }
     }
 
     @Override
@@ -50,9 +61,10 @@ public class EditorManager implements IEditorManager {
 
     @Override
     public void closeEditor(SPath path) {
-        // TODO Auto-generated method stub
 
         LOG.info(String.format("closeEditor(%s)", path.toString()));
+        this.openEditors.remove(path);
+        //TODO: close in vscode
     }
 
     @Override

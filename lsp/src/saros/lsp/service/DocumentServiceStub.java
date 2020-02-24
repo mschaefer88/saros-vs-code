@@ -49,7 +49,7 @@ public class DocumentServiceStub implements TextDocumentService {
   public void didOpen(DidOpenTextDocumentParams params) {
     TextDocumentItem i = params.getTextDocument();
     
-    System.out.println(String.format("Opened '%s' (%s, version %d)", path, i.getLanguageId(), i.getVersion()));
+    System.out.println(String.format("Opened '%s' (%s, version %d)", i.getUri(), i.getLanguageId(), i.getVersion()));
     this.editorManager.openEditor(this.getSPath(i.getUri()), true);//TODO: what bool value
   }
 
