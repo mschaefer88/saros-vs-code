@@ -1,4 +1,4 @@
-import { ExtensionContext, workspace, window, ProgressLocation, commands, Uri } from "vscode"; //TODO: überall so machen!
+import { ExtensionContext, workspace, window, ProgressLocation, commands, Uri, DocumentSelector, DocumentFilter } from "vscode"; //TODO: überall so machen!
 import { SarosServer } from "./saros-server";
 import { SarosClient, OpenProjectNotification } from "./saros-client";
 import { LanguageClientOptions, RevealOutputChannelOn, ErrorHandler, Message, ErrorAction, CloseAction, InitializationFailedHandler, WorkDoneProgressParams } from "vscode-languageclient";
@@ -104,12 +104,12 @@ export class SarosExtension {
     private createClientOptions(): LanguageClientOptions {
         let clientOptions: LanguageClientOptions = {
             // Register the server for plain text documents
-            documentSelector: ['plaintext'],
+            documentSelector: [{scheme: 'file'}],
             synchronize: {
                 // Synchronize the setting section 'languageServerExample' to the server
                 //configurationSection: 'sarosServer',
                 // Notify the server about file changes to '.clientrc files contain in the workspace
-                fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
+                fileEvents: workspace.createFileSystemWatcher('**/*')
             },
             outputChannel: window.createOutputChannel('Saros'),
             revealOutputChannelOn: RevealOutputChannelOn.Error, //TODO: set with config file

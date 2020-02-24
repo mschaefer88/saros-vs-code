@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.ServerCapabilities;
+import org.eclipse.lsp4j.TextDocumentSyncKind;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
@@ -38,15 +39,15 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
   private CancelManager cancelManager;
 
-  private ISarosLanguageClient client;
+  private DocumentServiceStub documentService;
 
   public SarosLanguageServer(IAccountService accountService, IContactService contactService, 
-  ISessionService sessionService, CancelManager cancelManager, ISarosLanguageClient client) {
+  ISessionService sessionService, CancelManager cancelManager, DocumentServiceStub documentService) {
     this.accountService = accountService;
     this.contactService = contactService;
     this.sessionService = sessionService;
     this.cancelManager = cancelManager;
-    this.client = client;
+    this.documentService = documentService;
   }
 
   @Override
@@ -77,6 +78,7 @@ public class SarosLanguageServer implements ISarosLanguageServer {
     ServerCapabilities capabilities = new ServerCapabilities();
 
     capabilities.setExperimental(true);
+    capabilities.setTextDocumentSync(TextDocumentSyncKind.Incremental);
 
     // StaticProgressOptions opts = new StaticProgressOptions();
     // opts.setWorkDoneProgress(true);
@@ -115,7 +117,7 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
   @Override
   public TextDocumentService getTextDocumentService() {
-    return new DocumentServiceStub();
+    return this.documentService;
   }
 
   @Override

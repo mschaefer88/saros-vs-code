@@ -29,6 +29,15 @@ export function activate(context: vscode.ExtensionContext) {
 							vscode.window.showErrorMessage('Saros extension did not start propertly.'
 														+ 'Reason: ' + reason); //TODO: restart feature
 						});
+
+	vscode.window.onDidChangeTextEditorSelection(l => {
+		console.log("Kind: " + l.kind?.toString()); 
+		l.selections.forEach(e => {
+			console.log(`Line ${e.active.line} Char ${e.active.character}`);
+		});
+		console.log("Selections: " + l.selections.length.toString());
+		console.log("Document: " + l.textEditor.document.fileName);
+	});
 }
 
 class SarosTreeDataProvider implements vscode.TreeDataProvider<string>

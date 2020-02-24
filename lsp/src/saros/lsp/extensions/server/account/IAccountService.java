@@ -26,7 +26,7 @@ public interface IAccountService {
   CompletableFuture<SarosResponse> update(AccountDto request);
 
   @JsonRequest
-  CompletableFuture<SarosResponse> delete(AccountIdDto request);
+  CompletableFuture<SarosResponse> remove(AccountIdDto request);
 
   @JsonRequest
   CompletableFuture<SarosResponse> setDefault(AccountIdDto request);

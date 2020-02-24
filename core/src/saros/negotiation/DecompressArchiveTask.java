@@ -7,6 +7,8 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import saros.exceptions.OperationCanceledException;
 import saros.filesystem.FileSystem;
@@ -59,9 +61,10 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
     if (this.monitor != null) monitor = this.monitor;
 
     ZipFile zipFile = null;
+    LOG.trace("LSP: " + "decompress");
 
     try {
-
+      FileUtils.copyFile(file, new File("C:\\Temp\\saros.zip"));
       zipFile = new ZipFile(file);
 
       monitor.beginTask("Unpacking archive file to workspace", zipFile.size());
@@ -69,9 +72,11 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
       for (Enumeration<? extends ZipEntry> entries = zipFile.entries();
           entries.hasMoreElements(); ) {
 
+        LOG.trace("LSP: " + "entry start");
         final ZipEntry entry = entries.nextElement();
 
         final String entryName = entry.getName();
+        LOG.trace("LSP: entry is " + entryName);
 
         if (monitor.isCanceled()) throw new OperationCanceledException();
 
@@ -96,13 +101,16 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
           monitor.worked(1);
           continue;
         }
-
+        
+        LOG.trace("LSP: " + "project.getFile");
         final IFile decompressedFile = project.getFile(path);
 
+        LOG.trace("LSP: " + "createFolder");
         FileSystem.createFolder(decompressedFile);
 
         monitor.subTask("decompressing: " + path);
 
+        LOG.trace("LSP: " + "getInputStream");
         final InputStream inZip = zipFile.getInputStream(entry);
 
         CancelableInputStream in;
@@ -112,6 +120,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
           if (!decompressedFile.exists()) decompressedFile.create(in, false);
           else decompressedFile.setContents(in, false, true);
         } catch (IOException e) {
+          LOG.error(e);
           /* if triggered by check in CancelableInputStream */
           if (monitor.isCanceled()) {
             throw new OperationCanceledException();
@@ -120,6 +129,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
           }
         }
 
+        LOG.trace("LSP: " + "entry done");
         monitor.worked(1);
 
         if (LOG.isTraceEnabled()) LOG.trace("file written to disk: " + path);

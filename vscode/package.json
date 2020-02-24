@@ -26,8 +26,8 @@
 				"category": "Saros"
 			},
 			{
-				"command": "saros.account.delete",
-				"title": "Delete Account",
+				"command": "saros.account.remove",
+				"title": "Remove Account",
 				"category": "Saros"
 			},
 			{
