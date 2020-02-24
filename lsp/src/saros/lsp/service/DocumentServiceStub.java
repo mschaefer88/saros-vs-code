@@ -1,6 +1,8 @@
 package saros.lsp.service;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
@@ -28,39 +30,50 @@ public class DocumentServiceStub implements TextDocumentService {
     this.editorManager = editorManager;
   }
 
-  //TODO: Own class like ServerPathImpl.fromString(root)
-  private String FromUriToPathString(String uri) {//TODO: not null
-    //file:///c%3A/Temp/saros-workspace-test/workspace-alice-stf/textX/src/textX/Saros.java
+  // TODO: Own class like ServerPathImpl.fromString(root)
+  private String fromUriToPathString(String uri) {// TODO: not null
+    // file:///c%3A/Temp/saros-workspace-test/workspace-alice-stf/textX/src/textX/Saros.java
     return uri.replaceAll("[a-z]+:/{3}", "");
+  }
+
+  private SPath getSPath(String uri) {
+    String path = this.fromUriToPathString(uri);
+    IProject p = LspWorkspace.projects.get(0);
+    System.out.println("A");
+    IFile f = p.getFile(path);
+
+    return new SPath(p, f.getProjectRelativePath());
   }
 
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     TextDocumentItem i = params.getTextDocument();
-    String path = new File(i.getUri()).getAbsolutePath();
+    
     System.out.println(String.format("Opened '%s' (%s, version %d)", path, i.getLanguageId(), i.getVersion()));
-
-    //TODO: do different
-    IProject p = LspWorkspace.projects.get(0);
-    IFile f = p.getFile(path);
-    this.editorManager.openEditor(new SPath(p, f.getLocation()), true);//TODO: what bool value
+    this.editorManager.openEditor(this.getSPath(i.getUri()), true);//TODO: what bool value
   }
 
   @Override
   public void didChange(DidChangeTextDocumentParams params) {
     VersionedTextDocumentIdentifier i = params.getTextDocument();
     System.out.println(String.format("Changed '%s' (version %d)", i.getUri(), i.getVersion()));
+
+    //TODO: how? this.editorManager.
   }
 
   @Override
   public void didClose(DidCloseTextDocumentParams params) {
     TextDocumentIdentifier i = params.getTextDocument();
     System.out.println(String.format("Closed '%s'", i.getUri()));
+
+    this.editorManager.closeEditor(this.getSPath(i.getUri()));
   }
 
   @Override
   public void didSave(DidSaveTextDocumentParams params) {
     TextDocumentIdentifier i = params.getTextDocument();
     System.out.println(String.format("Saved '%s'", i.getUri()));
+
+    this.editorManager.saveEditors(LspWorkspace.projects.get(0)); //TODO: selective saving?
   }
 }
