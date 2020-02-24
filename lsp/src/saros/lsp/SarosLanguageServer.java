@@ -39,10 +39,10 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
   private CancelManager cancelManager;
 
-  private DocumentServiceStub documentService;
+  private TextDocumentService documentService;
 
   public SarosLanguageServer(IAccountService accountService, IContactService contactService, 
-  ISessionService sessionService, CancelManager cancelManager, DocumentServiceStub documentService) {
+  ISessionService sessionService, CancelManager cancelManager, TextDocumentService documentService) {
     this.accountService = accountService;
     this.contactService = contactService;
     this.sessionService = sessionService;
