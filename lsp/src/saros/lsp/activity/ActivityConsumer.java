@@ -32,16 +32,19 @@ public class ActivityConsumer extends AbstractActivityConsumer implements Starta
     private final ISarosSession session;
 
     public ActivityConsumer(ISarosSession session) {
+        LOG.info("ActivityConsumer constructed");
         this.session = session;
     }
 
     @Override
     public void start() {
+        LOG.info("ActivityConsumer start");
         this.session.addActivityConsumer(this, Priority.ACTIVE);
     }
 
     @Override
     public void stop() {
+        LOG.info("ActivityConsumer stop");
         this.session.removeActivityConsumer(this);
     }
 

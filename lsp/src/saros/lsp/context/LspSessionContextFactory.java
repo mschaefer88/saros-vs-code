@@ -3,6 +3,8 @@ package saros.lsp.context; //TODO: move to other package! (is no real factory li
 import org.apache.log4j.Logger;
 
 import saros.context.IContextFactory;
+import saros.lsp.activity.ActivityConsumer;
+import saros.lsp.activity.ActivityProducer;
 import saros.lsp.session.NegotiationHook;
 import saros.lsp.session.SessionStatusRequestHandler;
 import saros.repackaged.picocontainer.MutablePicoContainer;
@@ -23,6 +25,11 @@ public class LspSessionContextFactory extends SarosCoreSessionContextFactory{//T
     container.addComponent(SessionStatusRequestHandler.class);
 
     container.addComponent(NegotiationHook.class);
+
+    container.addComponent(ActivityConsumer.class);
+    container.addComponent(ActivityProducer.class);
+
+
     // // IDE context wrapper
     // container.addComponent(SharedIDEContext.class);
     // container.addComponent(ApplicationEventHandlersFactory.class);
