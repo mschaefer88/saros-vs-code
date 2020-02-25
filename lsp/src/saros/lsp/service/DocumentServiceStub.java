@@ -33,7 +33,7 @@ public class DocumentServiceStub implements TextDocumentService {
   // TODO: Own class like ServerPathImpl.fromString(root)
   private String fromUriToPathString(String uri) {// TODO: not null
     // file:///c%3A/Temp/saros-workspace-test/workspace-alice-stf/textX/src/textX/Saros.java
-    return uri.replaceAll("[a-z]+:/{3}", "");
+    return uri.replaceAll("[a-z]+:/{3}.*?saros-workspace-test/", "");
   }
 
   private SPath getSPath(String uri) {
@@ -41,6 +41,8 @@ public class DocumentServiceStub implements TextDocumentService {
     IProject p = LspWorkspace.projects.get(0);
     System.out.println("A");
     IFile f = p.getFile(path);
+
+    System.out.println(uri + " => " + path);
 
     return new SPath(p, f.getProjectRelativePath());
   }
