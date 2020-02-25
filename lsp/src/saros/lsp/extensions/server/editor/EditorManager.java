@@ -54,8 +54,6 @@ public class EditorManager implements IEditorManager {
 
     protected void initialize(ISarosSession session) {
         assert this.openEditors.size() == 0 : "Open editors were not correctly reset!";
-
-        session.addActivityConsumer(new ActivityConsumer(), Priority.ACTIVE);
     }
 
     @Override
