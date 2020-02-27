@@ -64,8 +64,8 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     public void receive(TextEditActivity textEditActivity) {
       super.receive(textEditActivity);
 
-      String uri = "file:///" + textEditActivity.getPath().getFullPath().toOSString();
-      TextDocument target = documents.values().iterator().next();
+      String uri = "file:///c%3A/Temp/saros-workspace-test/workspace-alice-stf/textX/src/textX/Saros.java";
+      TextDocument target = documents.get(uri);//TODO: better SPath as key
 
       ApplyWorkspaceEditParams p = new ApplyWorkspaceEditParams();
       LOG.info(textEditActivity);
@@ -74,9 +74,10 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
       te.setNewText(textEditActivity.getText());
       te.setRange(new Range(target.positionAt(offset),
           target.positionAt(offset + textEditActivity.getReplacedText().length())));
-      TextDocumentEdit tde = new TextDocumentEdit(new VersionedTextDocumentIdentifier("", 1),
+      TextDocumentEdit tde = new TextDocumentEdit(new VersionedTextDocumentIdentifier(uri, 1),//TODO: get from document
           Collections.singletonList(te));
       WorkspaceEdit e = new WorkspaceEdit(Collections.singletonList(Either.forLeft(tde)));
+      
       p.setEdit(e);
 
       try {
