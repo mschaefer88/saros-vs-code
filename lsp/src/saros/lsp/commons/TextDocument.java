@@ -97,7 +97,7 @@ public class TextDocument extends TextDocumentItem {//TODO: use generic for SPat
                 int startOffset = offsetAt(range.getStart());
 
                 if(user != null) { //TODO: do better!
-                    activities.add(new TextEditActivity(user, startOffset, this.getAt(startOffset, length), text, path));
+                    activities.add(new TextEditActivity(user, startOffset, text, this.getAt(startOffset, length), path));
                 }
                 buffer.replace(startOffset, startOffset + length, text);
             }

@@ -9,10 +9,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.ApplyWorkspaceEditParams;
+import org.eclipse.lsp4j.ApplyWorkspaceEditResponse;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 import org.eclipse.lsp4j.DidCloseTextDocumentParams;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
@@ -57,24 +59,33 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
   private static final Logger LOG = Logger.getLogger(DocumentServiceStub.class);
 
-  private final AbstractActivityConsumer consumer = new AbstractActivityConsumer(){
+  private final AbstractActivityConsumer consumer = new AbstractActivityConsumer() {
     @Override
     public void receive(TextEditActivity textEditActivity) {
-        super.receive(textEditActivity);
-        
-        String uri = "file:///" + textEditActivity.getPath().getFullPath().toOSString();
-        TextDocument target = documents.get(uri);
+      super.receive(textEditActivity);
 
-        ApplyWorkspaceEditParams p = new ApplyWorkspaceEditParams();
+      String uri = "file:///" + textEditActivity.getPath().getFullPath().toOSString();
+      TextDocument target = documents.values().iterator().next();
 
-        int offset = textEditActivity.getOffset();
-        TextEdit te = new TextEdit();
-        te.setNewText(textEditActivity.getText());
-        te.setRange(new Range(target.positionAt(offset), target.positionAt(offset+textEditActivity.getReplacedText().length())));
-        TextDocumentEdit tde = new TextDocumentEdit(new VersionedTextDocumentIdentifier("", 1), Collections.singletonList(te));
-        WorkspaceEdit e = new WorkspaceEdit(Collections.singletonList(Either.forLeft(tde)));
-        p.setEdit(e);
-        client.applyEdit(p);
+      ApplyWorkspaceEditParams p = new ApplyWorkspaceEditParams();
+      LOG.info(textEditActivity);
+      int offset = textEditActivity.getOffset();
+      TextEdit te = new TextEdit();
+      te.setNewText(textEditActivity.getText());
+      te.setRange(new Range(target.positionAt(offset),
+          target.positionAt(offset + textEditActivity.getReplacedText().length())));
+      TextDocumentEdit tde = new TextDocumentEdit(new VersionedTextDocumentIdentifier("", 1),
+          Collections.singletonList(te));
+      WorkspaceEdit e = new WorkspaceEdit(Collections.singletonList(Either.forLeft(tde)));
+      p.setEdit(e);
+
+      try {
+        ApplyWorkspaceEditResponse r = client.applyEdit(p).get();
+        LOG.info(String.format("Edit Result: %b", r.isApplied()));
+      } catch (InterruptedException | ExecutionException e1) {
+        // TODO Auto-generated catch block
+        e1.printStackTrace();
+      }
     }
   };
 
