@@ -163,40 +163,6 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     if(this.session != null) {
       activities.forEach(activity -> this.fireActivity(activity));
     }
-
-
-
-    Executors.newCachedThreadPool().execute(() -> {
-      LOG.info("ping");
-      String uri = "file:///c%3A/Temp/saros-workspace-test/workspace-alice-stf/textX/src/textX/Saros.java";
-      TextDocument target = documents.get(uri);//TODO: better SPath as key
-
-      TextDocumentContentChangeEvent a = params.getContentChanges().get(0);
-      LOG.info("pong? " + a.getText());
-      if(a.getText().equalsIgnoreCase("a")) {
-        LOG.info("pong!");
-        ApplyWorkspaceEditParams p = new ApplyWorkspaceEditParams();
-      
-      int offset = this.documents.get(i.getUri()).offsetAt(a.getRange().getStart())+1;
-      TextEdit te = new TextEdit();
-      te.setNewText("b");
-      te.setRange(new Range(target.positionAt(offset),
-          target.positionAt(offset)));
-      TextDocumentEdit tde = new TextDocumentEdit(new VersionedTextDocumentIdentifier(uri, i.getVersion()),//TODO: get from document
-          Collections.singletonList(te));
-      WorkspaceEdit e = new WorkspaceEdit(Collections.singletonList(Either.forLeft(tde)));
-      
-      p.setEdit(e);
-      p.setLabel("TEST");
-
-      try {
-        ApplyWorkspaceEditResponse r = client.applyEdit(p).get();
-        LOG.info(String.format("Edit Result: %b", r.isApplied()));
-      } catch (InterruptedException | ExecutionException e1) {
-        LOG.error(e1);
-      }
-      }
-    });
   }
 
   @Override
