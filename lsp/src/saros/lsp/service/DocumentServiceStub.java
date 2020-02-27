@@ -158,7 +158,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     List<TextEditActivity> activities = 
       this.documents.get(i.getUri()).apply(params.getContentChanges(), 
         this.session == null ? null : this.session.getLocalUser(),//TODO: do better!
-        this.getSPath(i.getUri()));    
+        this.getSPath(i.getUri()), i.getVersion());  
 
     if(this.session != null) {
       activities.forEach(activity -> this.fireActivity(activity));

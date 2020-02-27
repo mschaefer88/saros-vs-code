@@ -79,7 +79,7 @@ public class TextDocument extends TextDocumentItem {//TODO: use generic for SPat
         return offset + position.getCharacter();
 	}
 
-    public List<TextEditActivity> apply(List<TextDocumentContentChangeEvent> changes, User user, SPath path) {//TODO: set path in ctor
+    public List<TextEditActivity> apply(List<TextDocumentContentChangeEvent> changes, User user, SPath path, int version) {//TODO: set path in ctor
         synchronized (lock) {
             StringBuilder buffer = new StringBuilder(this.getText());
             List<TextEditActivity> activities = Collections.emptyList();
@@ -104,7 +104,7 @@ public class TextDocument extends TextDocumentItem {//TODO: use generic for SPat
             }
                 
             this.setText(buffer.toString());
-            this.setVersion(this.getVersion()+1);
+            this.setVersion(version);
 
             return activities;
         }
