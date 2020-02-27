@@ -5,21 +5,28 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.lsp4j.ApplyWorkspaceEditParams;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 import org.eclipse.lsp4j.DidCloseTextDocumentParams;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.DidSaveTextDocumentParams;
 import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
+import org.eclipse.lsp4j.TextDocumentEdit;
 import org.eclipse.lsp4j.TextDocumentIdentifier;
 import org.eclipse.lsp4j.TextDocumentItem;
+import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
+import org.eclipse.lsp4j.WorkspaceEdit;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 import saros.activities.SPath;
@@ -28,13 +35,16 @@ import saros.editor.IEditorManager;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
 import saros.lsp.commons.TextDocument;
+import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.filesystem.LspWorkspace;
 import saros.server.filesystem.ServerPathImpl;
+import saros.session.AbstractActivityConsumer;
 import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.session.ISessionLifecycleListener;
 import saros.session.SessionEndReason;
+import saros.session.IActivityConsumer.Priority;
 
 /** Empty implementation of the text document service. */
 public class DocumentServiceStub extends AbstractActivityProducer implements TextDocumentService {
@@ -43,8 +53,31 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
   private ISarosSession session;
 
   private final Map<String, TextDocument> documents = new HashMap<String, TextDocument>();
+  private final ISarosLanguageClient client;
 
   private static final Logger LOG = Logger.getLogger(DocumentServiceStub.class);
+
+  private final AbstractActivityConsumer consumer = new AbstractActivityConsumer(){
+    @Override
+    public void receive(TextEditActivity textEditActivity) {
+        super.receive(textEditActivity);
+        
+        String uri = "file:///" + textEditActivity.getPath().getFullPath().toOSString();
+        TextDocument target = documents.get(uri);
+
+        ApplyWorkspaceEditParams p = new ApplyWorkspaceEditParams();
+
+        int offset = textEditActivity.getOffset();
+        TextEdit te = new TextEdit();
+        te.setNewText(textEditActivity.getText());
+        te.setRange(new Range(target.positionAt(offset), target.positionAt(offset+textEditActivity.getReplacedText().length())));
+        TextDocumentEdit tde = new TextDocumentEdit(new VersionedTextDocumentIdentifier("", 1), Collections.singletonList(te));
+        WorkspaceEdit e = new WorkspaceEdit(Collections.singletonList(Either.forLeft(tde)));
+        p.setEdit(e);
+        client.applyEdit(p);
+    }
+  };
+
   private final ISessionLifecycleListener sessionLifecycleListener = new ISessionLifecycleListener() {
 
     @Override
@@ -58,20 +91,23 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     }
   };
 
-  public DocumentServiceStub(IEditorManager editorManager, ISarosSessionManager sessionManager) {
+  public DocumentServiceStub(IEditorManager editorManager, ISarosSessionManager sessionManager, ISarosLanguageClient client) {
     this.editorManager = editorManager;
+    this.client = client;
 
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
   }
 
   protected void uninitialize(ISarosSession session) {
     session.removeActivityProducer(this);
+    session.removeActivityConsumer(this.consumer);
 
     this.session = session;
   }
 
   protected void initialize(ISarosSession session) {
     session.addActivityProducer(this);
+    session.addActivityConsumer(this.consumer, Priority.ACTIVE);
 
     this.session = null;
   }

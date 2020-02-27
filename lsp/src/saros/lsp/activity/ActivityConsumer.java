@@ -1,6 +1,14 @@
 package saros.lsp.activity;
 
 import org.apache.log4j.Logger;
+import org.eclipse.lsp4j.ApplyWorkspaceEditParams;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.TextDocumentEdit;
+import org.eclipse.lsp4j.TextEdit;
+import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
+import org.eclipse.lsp4j.WorkspaceEdit;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 import saros.activities.ChangeColorActivity;
 import saros.activities.ChecksumActivity;
@@ -21,6 +29,7 @@ import saros.activities.StopFollowingActivity;
 import saros.activities.TextEditActivity;
 import saros.activities.TextSelectionActivity;
 import saros.activities.ViewportActivity;
+import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.session.AbstractActivityConsumer;
 import saros.session.ISarosSession;
 import saros.session.User;
