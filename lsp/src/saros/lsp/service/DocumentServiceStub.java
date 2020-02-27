@@ -163,6 +163,8 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     if(this.session != null) {
       activities.forEach(activity -> this.fireActivity(activity));
     }
+
+    LOG.info(String.format("AFTER_CHANGE.%d: '%s'", this.documents.get(i.getUri()).getVersion(), this.documents.get(i.getUri()).getText()));
   }
 
   @Override
