@@ -17,6 +17,8 @@ public class ActivityProducer extends AbstractActivityProducer implements Starta
     public ActivityProducer(ISarosSession session) {
         LOG.info("ActivityProducer constructed");
         this.session = session;
+
+        
     }
 
     @Override
