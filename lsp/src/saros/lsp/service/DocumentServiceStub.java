@@ -84,8 +84,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
         ApplyWorkspaceEditResponse r = client.applyEdit(p).get();
         LOG.info(String.format("Edit Result: %b", r.isApplied()));
       } catch (InterruptedException | ExecutionException e1) {
-        // TODO Auto-generated catch block
-        e1.printStackTrace();
+        LOG.error(e1);
       }
     }
   };

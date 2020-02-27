@@ -48,7 +48,7 @@ public class TextDocument extends TextDocumentItem {//TODO: use generic for SPat
 
 	public Position positionAt(int offset) {
         String[] lines = this.getLines();
-        Position position = new Position(1, 0);
+        Position position = new Position(0, 0);
 
         for (String line : lines) {
             offset -= line.length();
@@ -65,12 +65,10 @@ public class TextDocument extends TextDocumentItem {//TODO: use generic for SPat
 	}
 
 	public int offsetAt(Position position) {
-        assert position.getLine() > 0;
-
         String[] lines = this.getLines();
         int offset = 0;
 
-        for (int l = 0; l < lines.length && l+1 < position.getLine(); l++) {
+        for (int l = 0; l < lines.length && l < position.getLine(); l++) {
 
             String line = lines[l];
 
