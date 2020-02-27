@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -67,6 +68,8 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
       String uri = "file:///c%3A/Temp/saros-workspace-test/workspace-alice-stf/textX/src/textX/Saros.java";
       TextDocument target = documents.get(uri);//TODO: better SPath as key
 
+      LOG.info(String.format("saros::URI: '%s'", textEditActivity.getPath().getFullPath().toOSString()));
+
       ApplyWorkspaceEditParams p = new ApplyWorkspaceEditParams();
       LOG.info(textEditActivity);
       int offset = textEditActivity.getOffset();
@@ -74,12 +77,12 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
       te.setNewText(textEditActivity.getText());
       te.setRange(new Range(target.positionAt(offset),
           target.positionAt(offset + textEditActivity.getReplacedText().length())));
-      TextDocumentEdit tde = new TextDocumentEdit(new VersionedTextDocumentIdentifier(uri, 1),//TODO: get from document
+      TextDocumentEdit tde = new TextDocumentEdit(target.getVersionedIdentifier(),
           Collections.singletonList(te));
       WorkspaceEdit e = new WorkspaceEdit(Collections.singletonList(Either.forLeft(tde)));
       
       p.setEdit(e);
-
+      p.setLabel(textEditActivity.getSource().toString());
       try {
         ApplyWorkspaceEditResponse r = client.applyEdit(p).get();
         LOG.info(String.format("Edit Result: %b", r.isApplied()));
@@ -160,6 +163,40 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     if(this.session != null) {
       activities.forEach(activity -> this.fireActivity(activity));
     }
+
+
+
+    Executors.newCachedThreadPool().execute(() -> {
+      LOG.info("ping");
+      String uri = "file:///c%3A/Temp/saros-workspace-test/workspace-alice-stf/textX/src/textX/Saros.java";
+      TextDocument target = documents.get(uri);//TODO: better SPath as key
+
+      TextDocumentContentChangeEvent a = params.getContentChanges().get(0);
+      LOG.info("pong? " + a.getText());
+      if(a.getText().equalsIgnoreCase("a")) {
+        LOG.info("pong!");
+        ApplyWorkspaceEditParams p = new ApplyWorkspaceEditParams();
+      
+      int offset = this.documents.get(i.getUri()).offsetAt(a.getRange().getStart())+1;
+      TextEdit te = new TextEdit();
+      te.setNewText("b");
+      te.setRange(new Range(target.positionAt(offset),
+          target.positionAt(offset)));
+      TextDocumentEdit tde = new TextDocumentEdit(new VersionedTextDocumentIdentifier(uri, i.getVersion()),//TODO: get from document
+          Collections.singletonList(te));
+      WorkspaceEdit e = new WorkspaceEdit(Collections.singletonList(Either.forLeft(tde)));
+      
+      p.setEdit(e);
+      p.setLabel("TEST");
+
+      try {
+        ApplyWorkspaceEditResponse r = client.applyEdit(p).get();
+        LOG.info(String.format("Edit Result: %b", r.isApplied()));
+      } catch (InterruptedException | ExecutionException e1) {
+        LOG.error(e1);
+      }
+      }
+    });
   }
 
   @Override

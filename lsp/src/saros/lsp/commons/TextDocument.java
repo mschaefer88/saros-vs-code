@@ -10,6 +10,7 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 import org.eclipse.lsp4j.TextDocumentItem;
+import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
 
 import saros.activities.SPath;
 import saros.activities.TextEditActivity;
@@ -102,9 +103,14 @@ public class TextDocument extends TextDocumentItem {//TODO: use generic for SPat
                 buffer.replace(startOffset, startOffset + length, text);
             }
                 
-            setText(buffer.toString());
+            this.setText(buffer.toString());
+            this.setVersion(this.getVersion()+1);
 
             return activities;
         }
+    }
+
+    public VersionedTextDocumentIdentifier getVersionedIdentifier() {
+        return new VersionedTextDocumentIdentifier(this.getUri(), this.getVersion());
     }
 }
