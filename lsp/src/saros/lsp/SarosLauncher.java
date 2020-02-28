@@ -6,6 +6,8 @@ import java.io.PrintStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
@@ -31,10 +33,13 @@ import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.jsonrpc.MessageConsumer;
 
+import saros.filesystem.IPath;
 import saros.lsp.connector.AsyncSocketConnector;
 import saros.lsp.connector.Connector;
 import saros.lsp.extensions.ISarosLanguageServer;
 import saros.lsp.extensions.client.ISarosLanguageClient;
+import saros.lsp.filesystem.LspPath;
+import saros.lsp.filesystem.LspWorkspace;
 import saros.lsp.log.LanguageClientAppender;
 import saros.lsp.log.LogOutputStream;
 
@@ -61,54 +66,60 @@ public class SarosLauncher {
     URL log4jProperties = SarosLauncher.class.getResource(LOGGING_CONFIG_FILE);
     PropertyConfigurator.configure(log4jProperties);
 
-    LogOutputStream los = new LogOutputStream(LOG, Level.DEBUG); //aka DEBUG
+    LogOutputStream los = new LogOutputStream(LOG, Level.DEBUG); // aka DEBUG
     PrintStream ps = new PrintStream(los);
     System.setOut(ps);
 
     int port = Integer.parseInt(args[0]);
     LOG.info("listening on port " + port);
 
-
     SarosLifecycle lifecycle = new SarosLifecycle();
 
-    
     Runtime.getRuntime().addShutdownHook(new Thread() {
       public void run() {
         // try {
-          //socket.close();
-          
-          LOG.info("shutdown from runtime detected");
-          lifecycle.stop();
+        // socket.close();
+
+        LOG.info("shutdown from runtime detected");
+        lifecycle.stop();
         // } catch (IOException e) {
-        //   // NOP
+        // // NOP
         // }
       }
     });
 
     lifecycle.start();
 
-    AsynchronousServerSocketChannel serverSocket = AsynchronousServerSocketChannel.open().bind(new InetSocketAddress("localhost", port));
+    AsynchronousServerSocketChannel serverSocket = AsynchronousServerSocketChannel.open()
+        .bind(new InetSocketAddress("localhost", port));
     startLanguageServer(lifecycle, serverSocket);
   }
 
   private static void startLanguageServer(SarosLifecycle lifecycle, AsynchronousServerSocketChannel serverSocket)
       throws IOException, InterruptedException, ExecutionException {
 
-
-    ISarosLanguageServer langSvr = lifecycle.createLanguageServer();    
+    ISarosLanguageServer langSvr = lifecycle.createLanguageServer();
     AsynchronousSocketChannel socket = createSocket(serverSocket);
-    
 
-    
     LOG.info("starting...");
 
     Launcher<ISarosLanguageClient> l = createSocketLauncher(langSvr, ISarosLanguageClient.class, socket);
     ISarosLanguageClient langClt = lifecycle.registerLanguageClient(l.getRemoteProxy());
-    
+
     Appender a = new LanguageClientAppender(langClt);
     LOG.addAppender(a);
+
+    langSvr.onInitialize(params -> {
+
+      try {
+        IPath root = LspPath.fromUri(new URI(params.getRootUri()));
+        lifecycle.registerWorkspace(new LspWorkspace(root));
+      } catch (URISyntaxException e) {
+        LOG.error(e);
+      }
+    });
     
-    langSvr.addExitHook(() ->{
+    langSvr.onExit(() ->{
     
       try {
           

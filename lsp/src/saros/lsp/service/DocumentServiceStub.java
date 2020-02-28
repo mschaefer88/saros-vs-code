@@ -25,6 +25,7 @@ import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
+import saros.filesystem.IWorkspace;
 import saros.lsp.adapter.EditorString;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.editor.EditorManager;
@@ -46,6 +47,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
   private ISarosSession session;
 
   private final ISarosLanguageClient client;
+  private final IWorkspace workspace;
 
   private static final Logger LOG = Logger.getLogger(DocumentServiceStub.class);
 
@@ -100,9 +102,11 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
   };
 
 
-  public DocumentServiceStub(EditorManager editorManager, ISarosSessionManager sessionManager, ISarosLanguageClient client) {
+  public DocumentServiceStub(EditorManager editorManager, ISarosSessionManager sessionManager, ISarosLanguageClient client,
+    IWorkspace workspace) {
     this.editorManager = editorManager;
     this.client = client;
+    this.workspace = workspace;
 
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
   }
@@ -129,11 +133,9 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
   private SPath getSPath(String uri) {
     String path = this.fromUriToPathString(uri);
-    IProject p = LspWorkspace.projects.get(0);
-    IFile f = p.getFile(path);
-
-    //TODO: f.getProjectRelativePath() has error (doubled folder)
-    return new SPath(p, f.getFullPath());
+    IProject p = this.workspace.getProject("");
+    
+    return new SPath(p.getFile(path));
   }
 
   @Override

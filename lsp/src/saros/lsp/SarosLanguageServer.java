@@ -1,9 +1,15 @@
 package saros.lsp;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.InitializeParams;
@@ -43,8 +49,8 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
   private TextDocumentService documentService;
 
-  public SarosLanguageServer(IAccountService accountService, IContactService contactService, 
-  ISessionService sessionService, CancelManager cancelManager, TextDocumentService documentService) {
+  public SarosLanguageServer(IAccountService accountService, IContactService contactService,
+      ISessionService sessionService, CancelManager cancelManager, TextDocumentService documentService) {
     this.accountService = accountService;
     this.contactService = contactService;
     this.sessionService = sessionService;
@@ -54,11 +60,8 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
   @Override
   public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
-    
-    LOG.info("Root: " + params.getRootUri());
 
-    IPath p = LspPath.fromString(params.getRootPath());
-    LspWorkspace.projects.add(new LspProject(p));
+    this.initializeListeners.forEach(listener -> listener.accept(params));  
 
     return CompletableFuture.completedFuture(new InitializeResult(this.createCapabilities()));
   }
@@ -98,18 +101,23 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
   @Override
   public void exit() {
-    for (Runnable runnable : listeners) {
-      runnable.run();
-    }
+    this.exitListeners.forEach(listener -> listener.run());
+    
     LOG.info("exit");    
   }
 
 
-  private List<Runnable> listeners = new LinkedList<Runnable>();
+  private List<Runnable> exitListeners = new ArrayList<>();
+  private List<Consumer<InitializeParams>> initializeListeners = new ArrayList<>();
 
   @Override
-  public void addExitHook(Runnable r) {
-    this.listeners.add(r);
+  public void onInitialize(Consumer<InitializeParams> consumer) {
+    this.initializeListeners.add(consumer);
+  }
+
+  @Override
+  public void onExit(Runnable runnable) {
+    this.exitListeners.add(runnable);
   }
 
   // @JsonNotification("window/workDoneProgress/cancel")

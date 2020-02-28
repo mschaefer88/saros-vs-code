@@ -7,30 +7,20 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import saros.exceptions.OperationCanceledException;
-import saros.filesystem.IContainer;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
-import saros.filesystem.IWorkspaceRoot;
 import saros.filesystem.IWorkspaceRunnable;
-import saros.monitoring.IProgressMonitor;
 import saros.monitoring.NullProgressMonitor;
-import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
 
 public class LspWorkspace implements IWorkspace {
 
     private static final Logger LOG = Logger.getLogger(LspWorkspace.class);
 
-    public static List<IProject> projects = new LinkedList<IProject>();
-
-    public LspWorkspace(String root) {// TODO: experimental
-        this(LspPath.fromString(root));
-        LOG.info("created workspace");
-    }
-
     public LspWorkspace(IPath root) {
         LOG.info("Root is " + root.toString());
+        LOG.info("Hash is " + this.hashCode());
         this.location = root;
     }
 

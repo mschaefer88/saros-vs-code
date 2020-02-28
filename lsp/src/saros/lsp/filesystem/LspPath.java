@@ -1,6 +1,7 @@
 package saros.lsp.filesystem;
 
 import java.io.File;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -11,18 +12,25 @@ import saros.filesystem.IPath;
 public class LspPath implements IPath {
     private Path delegate;
 
-  public static final IPath EMPTY = new LspPath(Paths.get(""));
+    public static final IPath EMPTY = new LspPath(Paths.get(""));
 
-  private static final Logger LOG = Logger.getLogger(LspPath.class);
+    private static final Logger LOG = Logger.getLogger(LspPath.class);
 
-  public static IPath fromString(String pathString) {
-    if (pathString == null || pathString.isEmpty()) {
-      return EMPTY;
+    public static IPath fromString(String pathString) {
+        if (pathString == null || pathString.isEmpty()) {
+            return EMPTY;
+        }
+
+        return new LspPath(Paths.get(pathString));
     }
 
-    LOG.info(String.format("fromString: '%s'", pathString));
-    return new LspPath(Paths.get(pathString));
-  }
+    public static IPath fromUri(URI uri) {
+    if (uri == null) {
+        return EMPTY;
+      }
+  
+      return new LspPath(Paths.get(uri));
+    }
 
   private LspPath(Path delegate) {
     //LOG.info(String.format("tostring: %s", delegate.toString()));
