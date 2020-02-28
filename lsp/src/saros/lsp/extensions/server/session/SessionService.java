@@ -1,5 +1,6 @@
 package saros.lsp.extensions.server.session;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import saros.communication.connection.ConnectionHandler;
 import saros.communication.connection.IConnectionStateListener;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
+import saros.filesystem.IWorkspace;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.SarosResponse;
 import saros.lsp.extensions.server.SarosResultResponse;
@@ -44,16 +46,19 @@ public class SessionService implements ISessionService, IConnectionStateListener
     private final ISarosSessionManager sessionManager; // TODO: move to own service
     private final ISarosLanguageClient client;
     private final XMPPContactsService contactService;
+    private final IWorkspace workspace;
 
     private static final Logger LOG = Logger.getLogger(SessionService.class);
 
     public SessionService(ConnectionHandler connectionHandler, XMPPAccountStore accountStore,
-            ISarosSessionManager sessionManager, ISarosLanguageClient client, XMPPContactsService contactService) {
+            ISarosSessionManager sessionManager, ISarosLanguageClient client, XMPPContactsService contactService,
+            IWorkspace workspace) {
         this.connectionHandler = connectionHandler;
         this.accountStore = accountStore;
         this.sessionManager = sessionManager;
         this.client = client;
         this.contactService = contactService;
+        this.workspace = workspace;
 
         this.connectionHandler.addConnectionStateListener(this);
         this.sessionManager.addSessionLifecycleListener(this);
@@ -92,9 +97,7 @@ public class SessionService implements ISessionService, IConnectionStateListener
     public CompletableFuture<SarosResponse> start() {
 
         try {
-            Map<IProject, List<IResource>> map = new HashMap<IProject, List<IResource>>();
-
-            map.put(LspWorkspace.projects.get(0), null);
+            Map<IProject, List<IResource>> map = Collections.singletonMap(this.workspace.getProject(""), null);
 
             this.sessionManager.startSession(map);
 

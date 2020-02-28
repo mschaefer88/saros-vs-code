@@ -18,7 +18,7 @@ import saros.monitoring.IProgressMonitor;
 import saros.monitoring.NullProgressMonitor;
 import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
 
-public class LspWorkspace extends LspContainer implements IWorkspace, IWorkspaceRoot {
+public class LspWorkspace implements IWorkspace {
 
     private static final Logger LOG = Logger.getLogger(LspWorkspace.class);
 
@@ -30,7 +30,6 @@ public class LspWorkspace extends LspContainer implements IWorkspace, IWorkspace
     }
 
     public LspWorkspace(IPath root) {
-        super(, root);
         LOG.info("Root is " + root.toString());
         this.location = root;
     }
@@ -48,7 +47,7 @@ public class LspWorkspace extends LspContainer implements IWorkspace, IWorkspace
     @Override
     @Deprecated
     public IProject getProject(String name) {
-        return new LspProject(this.location, name);// TODO: return null?
+        return new LspProject(this.getLocation().append(name));
     }
 
     @Override

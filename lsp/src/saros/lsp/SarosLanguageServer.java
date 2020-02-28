@@ -54,11 +54,11 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
   @Override
   public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
-
-    LOG.info(String.format("Client: %s", params.getClientName())); //TODO:ClientInfo impl.
     
+    LOG.info("Root: " + params.getRootUri());
+
     IPath p = LspPath.fromString(params.getRootPath());
-    LspWorkspace.projects.add(new LspProject(p.removeLastSegments(1), p.lastSegment()));
+    LspWorkspace.projects.add(new LspProject(p));
 
     return CompletableFuture.completedFuture(new InitializeResult(this.createCapabilities()));
   }

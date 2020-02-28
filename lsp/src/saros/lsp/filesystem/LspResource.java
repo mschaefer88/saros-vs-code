@@ -3,6 +3,8 @@ package saros.lsp.filesystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.apache.log4j.Logger;
+
 import saros.filesystem.IContainer;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
@@ -12,6 +14,8 @@ import saros.filesystem.IWorkspace;
 public abstract class LspResource implements IResource {
     private IWorkspace workspace;
     private IPath path;
+
+    final Logger LOG = Logger.getLogger(LspResource.class);
   
     /**
      * Creates a ServerResourceImpl.
@@ -20,6 +24,10 @@ public abstract class LspResource implements IResource {
      * @param path the resource's path relative to the workspace's root
      */
     public LspResource(IWorkspace workspace, IPath path) {
+      assert !path.isAbsolute();
+
+      System.out.println(path);
+
       this.path = path;
       this.workspace = workspace;
     }

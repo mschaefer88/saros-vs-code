@@ -15,18 +15,13 @@ public class LspProject extends LspContainer implements IProject {
 
     private static final String DEFAULT_CHARSET = "UTF-8";
 
-    public LspProject(IWorkspace workspace, String name) {
-        super(workspace, LspPath.fromString(name));
-      }
+    public LspProject(String path) {
+        this(LspPath.fromString(path));
+    }
 
-      @Deprecated
-      public LspProject(String path, String name) {//TODO: experimental
-          this(new LspWorkspace(path), name);
-      }
-
-      public LspProject(IPath path, String name) {//TODO: experimental
-          this(new LspWorkspace(path), name);
-      }
+    public LspProject(IPath path) {
+        super(new LspWorkspace(path), LspPath.EMPTY);
+    }
     
       @Override
       public int getType() {
