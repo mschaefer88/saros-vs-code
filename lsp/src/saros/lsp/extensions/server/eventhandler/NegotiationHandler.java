@@ -188,7 +188,7 @@ public class NegotiationHandler implements INegotiationHandler {
             });
 
             String projectName = data.getProjectName();
-            IProject project = new LspProject("C:\\Temp\\saros-workspace-test\\" + projectName);
+            IProject project = new LspProject("C:\\Temp\\saros-workspace-test", projectName);
             
       
             // TODO: The file path is currently dictated by the name, potentially resulting in CONFLICTS

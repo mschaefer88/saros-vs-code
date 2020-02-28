@@ -132,7 +132,8 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     IProject p = LspWorkspace.projects.get(0);
     IFile f = p.getFile(path);
 
-    return new SPath(p, f.getProjectRelativePath());
+    //TODO: f.getProjectRelativePath() has error (doubled folder)
+    return new SPath(p, f.getFullPath());
   }
 
   @Override

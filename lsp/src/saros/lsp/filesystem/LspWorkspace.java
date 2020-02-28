@@ -13,6 +13,7 @@ import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
 import saros.monitoring.IProgressMonitor;
+import saros.monitoring.NullProgressMonitor;
 import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
 
 public class LspWorkspace implements IWorkspace {
@@ -21,43 +22,44 @@ public class LspWorkspace implements IWorkspace {
 
     public static List<IProject> projects = new LinkedList<IProject>();
 
-    private final IProgressMonitor progressMonitor;
-
-    public LspWorkspace(String root, IProgressMonitor progressMonitor) {
-        LOG.info("Root is " + root);
-
-        this.progressMonitor = progressMonitor;
+    public LspWorkspace(String root) {//TODO: experimental
+        this(LspPath.fromString(root));
     }
 
-    @Override
-    public void run(IWorkspaceRunnable runnable) throws IOException, OperationCanceledException {
-        this.run(runnable, null);
+    public LspWorkspace(IPath root) {
+        LOG.info("Root is " + root.toString());
+        this.location = root;
     }
 
-    @Override
-    public void run(IWorkspaceRunnable runnable, IResource[] resources) throws IOException, OperationCanceledException {
-        // TODO Auto-generated method stub
-        LOG.info("run`2");
+    private IPath location;
+    
+  /** @deprecated See {@link IWorkspace}. */
+  @Override
+  @Deprecated
+  public IPath getLocation() {
+    return location;
+  }
 
-        for (IResource resource : resources) {
-            LOG.info("Resource: " + resource.getName());
-        }
+  /** @deprecated See {@link IWorkspace}. */
+  @Override
+  @Deprecated
+  public IProject getProject(String name) {
+    return new LspProject(this.location, name);//TODO: return null?
+  }
 
-        runnable.run(this.progressMonitor);
+  @Override
+  public void run(IWorkspaceRunnable runnable) throws IOException, OperationCanceledException {
+
+    run(runnable, null);
+  }
+
+  @Override
+  public void run(IWorkspaceRunnable runnable, IResource[] resources)
+      throws IOException, OperationCanceledException {
+
+    synchronized (this) {
+      runnable.run(new NullProgressMonitor());//TODO: use my progressmonitor
     }
-
-    @Override
-    public IProject getProject(String project) {
-        // TODO not supported (deprecated)
-        LOG.info("getProject");
-        return null;
-    }
-
-    @Override
-    public IPath getLocation() {
-        // TODO not supported (deprecated)
-        LOG.info("getLocation");
-        return null;
-    }
+  }
 
 }

@@ -14,12 +14,14 @@ import org.eclipse.lsp4j.WorkspaceFolder;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
+import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.lsp.extensions.ISarosLanguageServer;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.CancelManager;
 import saros.lsp.extensions.server.account.IAccountService;
 import saros.lsp.extensions.server.session.ISessionService;
+import saros.lsp.filesystem.LspPath;
 import saros.lsp.filesystem.LspProject;
 import saros.lsp.filesystem.LspWorkspace;
 import saros.lsp.extensions.server.contact.IContactService;
@@ -55,7 +57,8 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
     LOG.info(String.format("Client: %s", params.getClientName())); //TODO:ClientInfo impl.
     
-    LspWorkspace.projects.add(new LspProject(params.getRootPath()));
+    IPath p = LspPath.fromString(params.getRootPath());
+    LspWorkspace.projects.add(new LspProject(p.removeLastSegments(1), p.lastSegment()));
 
     return CompletableFuture.completedFuture(new InitializeResult(this.createCapabilities()));
   }
