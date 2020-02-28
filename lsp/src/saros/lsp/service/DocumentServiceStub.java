@@ -130,8 +130,14 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     this.session = null;
   }
 
-  private SPath getSPath(String uri) throws URISyntaxException {
-    IPath path = LspPath.fromUri(new URI(uri));
+  private SPath getSPath(String uri) {
+    IPath path;
+    try {
+      path = LspPath.fromUri(new URI(uri));
+    } catch (URISyntaxException e) {
+      LOG.error(e);
+      return null;
+    }
     IProject p = this.workspace.getProject("");
     
     return new SPath(p.getFile(path));
@@ -142,11 +148,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     TextDocumentItem i = params.getTextDocument();
 
     System.out.println(String.format("Opened '%s' (%s, version %d)", i.getUri(), i.getLanguageId(), i.getVersion()));
-    try {
-      this.editorManager.openEditor(this.getSPath(i.getUri()), false);
-    } catch (URISyntaxException e) {
-      LOG.error(e);
-    }
+    this.editorManager.openEditor(this.getSPath(i.getUri()), false);
   }
 
   @Override
