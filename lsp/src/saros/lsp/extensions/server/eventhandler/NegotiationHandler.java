@@ -210,7 +210,7 @@ public class NegotiationHandler implements INegotiationHandler {
           
           //TODO: process state
           if(status == ProjectNegotiation.Status.OK) {
-            this.client.openProject(new SarosResultResponse<String>("C:\\Temp\\saros-workspace-test\\"));
+            //TODO: this.client.openProject(new SarosResultResponse<String>("C:\\Temp\\saros-workspace-test\\"));
           }
         });
     }

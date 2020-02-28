@@ -1,18 +1,8 @@
 package saros.lsp.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.ApplyWorkspaceEditParams;
 import org.eclipse.lsp4j.ApplyWorkspaceEditResponse;
@@ -20,7 +10,6 @@ import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 import org.eclipse.lsp4j.DidCloseTextDocumentParams;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.DidSaveTextDocumentParams;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 import org.eclipse.lsp4j.TextDocumentEdit;
@@ -34,57 +23,62 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 
 import saros.activities.SPath;
 import saros.activities.TextEditActivity;
-import saros.editor.IEditorManager;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
-import saros.lsp.commons.TextDocument;
+import saros.lsp.adapter.EditorString;
 import saros.lsp.extensions.client.ISarosLanguageClient;
+import saros.lsp.extensions.server.editor.EditorManager;
 import saros.lsp.filesystem.LspWorkspace;
-import saros.server.filesystem.ServerPathImpl;
+import saros.net.xmpp.JID;
 import saros.session.AbstractActivityConsumer;
 import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.session.ISessionLifecycleListener;
 import saros.session.SessionEndReason;
+import saros.session.User;
 import saros.session.IActivityConsumer.Priority;
 
 /** Empty implementation of the text document service. */
 public class DocumentServiceStub extends AbstractActivityProducer implements TextDocumentService {
 
-  private IEditorManager editorManager;
+  private EditorManager editorManager;
   private ISarosSession session;
 
-  private final Map<String, TextDocument> documents = new HashMap<String, TextDocument>();
   private final ISarosLanguageClient client;
 
   private static final Logger LOG = Logger.getLogger(DocumentServiceStub.class);
 
   private final AbstractActivityConsumer consumer = new AbstractActivityConsumer() {
     @Override
-    public void receive(TextEditActivity textEditActivity) {
-      super.receive(textEditActivity);
+    public void receive(TextEditActivity activity) {
+      super.receive(activity);
 
-      String uri = "file:///c%3A/Temp/saros-workspace-test/workspace-alice-stf/textX/src/textX/Saros.java";
-      TextDocument target = documents.get(uri);//TODO: better SPath as key
+      LOG.info(activity);
 
-      LOG.info(String.format("saros::URI: '%s'", textEditActivity.getPath().getFullPath().toOSString()));
+      String uri = "file:///" + activity.getPath().getFullPath().toString();
 
-      ApplyWorkspaceEditParams p = new ApplyWorkspaceEditParams();
-      LOG.info(textEditActivity);
-      int offset = textEditActivity.getOffset();
-      TextEdit te = new TextEdit();
-      te.setNewText(textEditActivity.getText());
-      te.setRange(new Range(target.positionAt(offset),
-          target.positionAt(offset + textEditActivity.getReplacedText().length())));
-      TextDocumentEdit tde = new TextDocumentEdit(target.getVersionedIdentifier(),
-          Collections.singletonList(te));
-      WorkspaceEdit e = new WorkspaceEdit(Collections.singletonList(Either.forLeft(tde)));
+      EditorString content = new EditorString(editorManager.getContent(activity.getPath()));      
+
+      LOG.info(String.format("saros::URI: '%s'", uri));
+
+      ApplyWorkspaceEditParams workspaceEditParams = new ApplyWorkspaceEditParams();
       
-      p.setEdit(e);
-      p.setLabel(textEditActivity.getSource().toString());
+      int offset = activity.getOffset();
+
+      TextEdit edit = new TextEdit();
+      edit.setNewText(activity.getText());
+      edit.setRange(new Range(content.getPosition(offset), content.getPosition(offset + activity.getReplacedText().length())));
+
+      TextDocumentEdit documentEdit = new TextDocumentEdit(new VersionedTextDocumentIdentifier(uri, editorManager.getVersion(activity.getPath())),
+          Collections.singletonList(edit));
+      WorkspaceEdit e = new WorkspaceEdit(Collections.singletonList(Either.forLeft(documentEdit)));
+      
+      workspaceEditParams.setEdit(e);
+      workspaceEditParams.setLabel(activity.getSource().toString());
+
       try {
-        ApplyWorkspaceEditResponse r = client.applyEdit(p).get();
+        ApplyWorkspaceEditResponse r = client.applyEdit(workspaceEditParams).get(); //TODO: use facade?
         LOG.info(String.format("Edit Result: %b", r.isApplied()));
       } catch (InterruptedException | ExecutionException e1) {
         LOG.error(e1);
@@ -105,7 +99,8 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     }
   };
 
-  public DocumentServiceStub(IEditorManager editorManager, ISarosSessionManager sessionManager, ISarosLanguageClient client) {
+
+  public DocumentServiceStub(EditorManager editorManager, ISarosSessionManager sessionManager, ISarosLanguageClient client) {
     this.editorManager = editorManager;
     this.client = client;
 
@@ -144,10 +139,8 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
   public void didOpen(DidOpenTextDocumentParams params) {
     TextDocumentItem i = params.getTextDocument();
 
-    this.documents.put(i.getUri(), new TextDocument(i.getText(), i.getUri()));
-
     System.out.println(String.format("Opened '%s' (%s, version %d)", i.getUri(), i.getLanguageId(), i.getVersion()));
-    this.editorManager.openEditor(this.getSPath(i.getUri()), true);// TODO: what bool value
+    this.editorManager.openEditor(this.getSPath(i.getUri()), false);
   }
 
   @Override
@@ -155,24 +148,28 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     VersionedTextDocumentIdentifier i = params.getTextDocument();
     System.out.println(String.format("Changed '%s' (version %d)", i.getUri(), i.getVersion()));
 
-    List<TextEditActivity> activities = 
-      this.documents.get(i.getUri()).apply(params.getContentChanges(), 
-        this.session == null ? null : this.session.getLocalUser(),//TODO: do better!
-        this.getSPath(i.getUri()), i.getVersion());  
+    User source = this.session != null ? this.session.getLocalUser() : this.getAnonymousUser();
+    
+    for (TextDocumentContentChangeEvent changeEvent : params.getContentChanges()) {
+      SPath path = this.getSPath(i.getUri());
+      EditorString content = new EditorString(this.editorManager.getContent(path));
+      TextEditActivity activity = new TextEditActivity(source, content.getOffset(changeEvent.getRange().getStart()), changeEvent.getText(), content.substring(changeEvent.getRange().getStart(), changeEvent.getRangeLength()), path);
 
-    if(this.session != null) {
-      activities.forEach(activity -> this.fireActivity(activity));
+      this.editorManager.applyTextEdit(activity);
+      if(this.session != null) {
+        this.fireActivity(activity); //TODO: do here or in editormanager?!
+      }
     }
+  }
 
-    LOG.info(String.format("AFTER_CHANGE.%d: '%s'", this.documents.get(i.getUri()).getVersion(), this.documents.get(i.getUri()).getText()));
+  private User getAnonymousUser() {
+    return new User(new JID("anonymous@local.user"), true, true, null);
   }
 
   @Override
   public void didClose(DidCloseTextDocumentParams params) {
     TextDocumentIdentifier i = params.getTextDocument();
     System.out.println(String.format("Closed '%s'", i.getUri()));
-
-    this.documents.remove(i.getUri());
 
     this.editorManager.closeEditor(this.getSPath(i.getUri()));
   }
@@ -182,6 +179,6 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     TextDocumentIdentifier i = params.getTextDocument();
     System.out.println(String.format("Saved '%s'", i.getUri()));
 
-    this.editorManager.saveEditors(LspWorkspace.projects.get(0)); //TODO: selective saving?
+    this.editorManager.saveEditor(this.getSPath(i.getUri())); //TODO: selective saving?
   }
 }

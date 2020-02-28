@@ -30,5 +30,5 @@ public interface ISarosLanguageClient extends LanguageClient {     //TODO: adapt
     void sendStateContact(ContactDto r); //TODO: is Contact here really necessary? Void?
 
     @JsonNotification("saros/editor/open") //TODO: request? what if couldn't open?
-    void openProject(SarosResultResponse<String> path); //TODO: own dto
+    void openEditor(SarosResultResponse<String> path); //TODO: own dto
 }

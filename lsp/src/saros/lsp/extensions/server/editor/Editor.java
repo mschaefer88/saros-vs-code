@@ -1,10 +1,10 @@
-package saros.lsp.commons;
+package saros.lsp.extensions.server.editor;
 
-import java.util.Collections;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
-import java.util.Scanner;
-import java.util.function.Consumer;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -14,26 +14,33 @@ import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
 
 import saros.activities.SPath;
 import saros.activities.TextEditActivity;
+import saros.filesystem.IFile;
 import saros.session.User;
 
-public class TextDocument extends TextDocumentItem {//TODO: use generic for SPath or IFile
+public class Editor extends TextDocumentItem {//TODO: use generic for SPath or IFile
 
-    public final static String[] DELIMITERS = { "\r", "\n", "\r\n" };
-
-    private static final Logger LOG = Logger.getLogger(TextDocument.class);
+    private static final Logger LOG = Logger.getLogger(Editor.class);
 
     private final Object lock = new Object();
 
-    public TextDocument(TextDocumentItem documentItem) {
+    public Editor(TextDocumentItem documentItem) {
         this(documentItem.getText(), documentItem.getUri());
 		super.setVersion(documentItem.getVersion());
 		super.setLanguageId(documentItem.getLanguageId());
     }
 
-	public TextDocument(String text, String uri) {
+	public Editor(String text, String uri) {
 		super.setUri(uri);
 		super.setText(text);
     }    
+
+    public Editor(IFile file) throws IOException {
+        super.setUri("file:///" + file.getFullPath().toString());
+
+        try(InputStream stream = file.getContents()) {            
+            super.setText(IOUtils.toString(stream));
+        }
+    }
 
     private String[] getLines() {
         return this.getText().split("(?<=\n)");
@@ -77,12 +84,36 @@ public class TextDocument extends TextDocumentItem {//TODO: use generic for SPat
         }
 
         return offset + position.getCharacter();
-	}
+    }
+    
+    public TextEditActivity convert(TextDocumentContentChangeEvent changeEvent, User source, SPath path) {//TODO: set path in ctor
+        Range range = changeEvent.getRange();
+        int length = 0;
 
-    public List<TextEditActivity> apply(List<TextDocumentContentChangeEvent> changes, User user, SPath path, int version) {//TODO: set path in ctor
+        if (range != null) {
+            length = changeEvent.getRangeLength().intValue();
+        } else {
+            length = this.getText().length();
+            range = new Range(positionAt(0), positionAt(length));
+        }
+
+        int startOffset = offsetAt(range.getStart());
+        String text = changeEvent.getText();
+        String replacedText = this.getAt(startOffset, length);
+
+        return new TextEditActivity(source, startOffset, text, replacedText, path);
+    }
+
+    public TextDocumentContentChangeEvent convert(TextEditActivity editActivity) {
+        Position start = this.positionAt(editActivity.getOffset());
+        Position end = this.positionAt(editActivity.getOffset() + editActivity.getReplacedText().length());
+        Range range = new Range(start, end);
+        return new TextDocumentContentChangeEvent(range, editActivity.getReplacedText().length(), editActivity.getText());
+    }
+
+    public void apply(List<TextDocumentContentChangeEvent> changes, int version) {
         synchronized (lock) {
             StringBuilder buffer = new StringBuilder(this.getText());
-            List<TextEditActivity> activities = Collections.emptyList();
 
             for (TextDocumentContentChangeEvent changeEvent : changes) {
                 Range range = changeEvent.getRange();
@@ -96,21 +127,33 @@ public class TextDocument extends TextDocumentItem {//TODO: use generic for SPat
                 }
                 String text = changeEvent.getText();
                 int startOffset = offsetAt(range.getStart());
-
-                if(user != null) { //TODO: do better!
-                    activities.add(new TextEditActivity(user, startOffset, text, this.getAt(startOffset, length), path));
-                }
+                
                 buffer.replace(startOffset, startOffset + length, text);
             }
                 
             this.setText(buffer.toString());
             this.setVersion(version);
-
-            return activities;
         }
     }
 
-    public VersionedTextDocumentIdentifier getVersionedIdentifier() {
+    public void apply(TextEditActivity activity) {
+        synchronized (lock) {
+            StringBuilder buffer = new StringBuilder(this.getText());
+            int startOffset = activity.getOffset();
+            int length = activity.getReplacedText().length();
+            String text = activity.getText();
+
+            buffer.replace(startOffset, startOffset + length, text);
+
+            this.setText(buffer.toString());
+        }
+    }
+
+    public VersionedTextDocumentIdentifier toVersionedIdentifier() {
         return new VersionedTextDocumentIdentifier(this.getUri(), this.getVersion());
+    }
+
+    public void save() {
+
     }
 }
