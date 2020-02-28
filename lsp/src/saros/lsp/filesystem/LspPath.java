@@ -4,6 +4,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.log4j.Logger;
+
 import saros.filesystem.IPath;
 
 public class LspPath implements IPath {
@@ -11,14 +13,20 @@ public class LspPath implements IPath {
 
   public static final IPath EMPTY = new LspPath(Paths.get(""));
 
+  private static final Logger LOG = Logger.getLogger(LspPath.class);
+
   public static IPath fromString(String pathString) {
     if (pathString == null || pathString.isEmpty()) {
       return EMPTY;
     }
+
+    LOG.info(String.format("fromString: '%s'", pathString));
     return new LspPath(Paths.get(pathString));
   }
 
   private LspPath(Path delegate) {
+    //LOG.info(String.format("tostring: %s", delegate.toString()));
+    //LOG.info(String.format("absolute: %s", delegate.toAbsolutePath()));
     /*
      * OpenJDK 7 on Linux has a bug which causes normalize() to throw an
      * ArrayIndexOutOfBoundsException if called on the empty path.

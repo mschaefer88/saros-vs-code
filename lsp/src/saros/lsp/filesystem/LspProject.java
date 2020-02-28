@@ -10,7 +10,6 @@ import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
-import saros.server.filesystem.ServerPathImpl;
 
 public class LspProject extends LspContainer implements IProject {
 
@@ -60,12 +59,13 @@ public class LspProject extends LspContainer implements IProject {
     
       @Override
       public IFile getFile(IPath path) {
+          System.out.println(String.format("getFile(%s)", path));
         return new LspFile(getWorkspace(), getFullMemberPath(path));
       }
     
       @Override
       public IFile getFile(String pathString) {
-        return getFile(ServerPathImpl.fromString(pathString));
+        return getFile(LspPath.fromString(pathString));
       }
     
       @Override
@@ -75,7 +75,7 @@ public class LspProject extends LspContainer implements IProject {
     
       @Override
       public IFolder getFolder(String pathString) {
-        return getFolder(ServerPathImpl.fromString(pathString));
+        return getFolder(LspPath.fromString(pathString));
       }
     
       private IPath getFullMemberPath(IPath memberPath) {
