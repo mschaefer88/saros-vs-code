@@ -1,5 +1,7 @@
 package saros.lsp.service;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 
@@ -24,11 +26,13 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.filesystem.IFile;
+import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IWorkspace;
 import saros.lsp.adapter.EditorString;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.editor.EditorManager;
+import saros.lsp.filesystem.LspPath;
 import saros.lsp.filesystem.LspWorkspace;
 import saros.net.xmpp.JID;
 import saros.session.AbstractActivityConsumer;
@@ -60,27 +64,29 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
       String uri = "file:///" + activity.getPath().getFullPath().toString();
 
-      EditorString content = new EditorString(editorManager.getContent(activity.getPath()));      
+      EditorString content = new EditorString(editorManager.getContent(activity.getPath()));
 
       LOG.info(String.format("saros::URI: '%s'", uri));
 
       ApplyWorkspaceEditParams workspaceEditParams = new ApplyWorkspaceEditParams();
-      
+
       int offset = activity.getOffset();
 
       TextEdit edit = new TextEdit();
       edit.setNewText(activity.getText());
-      edit.setRange(new Range(content.getPosition(offset), content.getPosition(offset + activity.getReplacedText().length())));
+      edit.setRange(
+          new Range(content.getPosition(offset), content.getPosition(offset + activity.getReplacedText().length())));
 
-      TextDocumentEdit documentEdit = new TextDocumentEdit(new VersionedTextDocumentIdentifier(uri, editorManager.getVersion(activity.getPath())),
+      TextDocumentEdit documentEdit = new TextDocumentEdit(
+          new VersionedTextDocumentIdentifier(uri, editorManager.getVersion(activity.getPath())),
           Collections.singletonList(edit));
       WorkspaceEdit e = new WorkspaceEdit(Collections.singletonList(Either.forLeft(documentEdit)));
-      
+
       workspaceEditParams.setEdit(e);
       workspaceEditParams.setLabel(activity.getSource().toString());
 
       try {
-        ApplyWorkspaceEditResponse r = client.applyEdit(workspaceEditParams).get(); //TODO: use facade?
+        ApplyWorkspaceEditResponse r = client.applyEdit(workspaceEditParams).get(); // TODO: use facade?
         LOG.info(String.format("Edit Result: %b", r.isApplied()));
       } catch (InterruptedException | ExecutionException e1) {
         LOG.error(e1);
@@ -101,9 +107,8 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     }
   };
 
-
-  public DocumentServiceStub(EditorManager editorManager, ISarosSessionManager sessionManager, ISarosLanguageClient client,
-    IWorkspace workspace) {
+  public DocumentServiceStub(EditorManager editorManager, ISarosSessionManager sessionManager,
+      ISarosLanguageClient client, IWorkspace workspace) {
     this.editorManager = editorManager;
     this.client = client;
     this.workspace = workspace;
@@ -125,14 +130,8 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     this.session = null;
   }
 
-  // TODO: Own class like ServerPathImpl.fromString(root)
-  private String fromUriToPathString(String uri) {// TODO: not null
-    // file:///c%3A/Temp/saros-workspace-test/workspace-alice-stf/textX/src/textX/Saros.java
-    return uri.replaceAll("[a-z]+:/{3}.*?saros-workspace-test/", "");
-  }
-
-  private SPath getSPath(String uri) {
-    String path = this.fromUriToPathString(uri);
+  private SPath getSPath(String uri) throws URISyntaxException {
+    IPath path = LspPath.fromUri(new URI(uri));
     IProject p = this.workspace.getProject("");
     
     return new SPath(p.getFile(path));
@@ -143,7 +142,11 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     TextDocumentItem i = params.getTextDocument();
 
     System.out.println(String.format("Opened '%s' (%s, version %d)", i.getUri(), i.getLanguageId(), i.getVersion()));
-    this.editorManager.openEditor(this.getSPath(i.getUri()), false);
+    try {
+      this.editorManager.openEditor(this.getSPath(i.getUri()), false);
+    } catch (URISyntaxException e) {
+      LOG.error(e);
+    }
   }
 
   @Override
