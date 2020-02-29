@@ -31,11 +31,6 @@ public class LspCoreContextFactory extends AbstractCoreContextFactory {
     }
 
     @Override
-    protected Class<? extends IWorkspace> getWorkspaceClass() {
-        return LspWorkspace.class; //TODO: really needed?
-    }
-
-    @Override
     protected Class<? extends IRemoteProgressIndicatorFactory> getRemoteProgressIndicatorFactoryClass() {
         return LspRemoteProgressIndicatorFactory.class;
     }

@@ -16,8 +16,6 @@ public abstract class AbstractCoreContextFactory extends AbstractContextFactory 
 
   protected abstract Class<? extends Preferences> getPreferencesClass();
 
-  protected abstract Class<? extends IWorkspace> getWorkspaceClass();
-
   protected abstract Class<? extends IRemoteProgressIndicatorFactory> getRemoteProgressIndicatorFactoryClass();
 
   protected abstract String getVersion();
@@ -26,7 +24,6 @@ public abstract class AbstractCoreContextFactory extends AbstractContextFactory 
   public void createComponents(MutablePicoContainer container) {
     container.addComponent(IPreferenceStore.class, this.getPreferenceStoreClass());
     container.addComponent(Preferences.class, this.getPreferencesClass());
-    container.addComponent(IWorkspace.class, this.getWorkspaceClass());
     container.addComponent(IRemoteProgressIndicatorFactory.class, this.getRemoteProgressIndicatorFactoryClass());
 
     container.addComponent(
