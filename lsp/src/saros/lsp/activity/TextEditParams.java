@@ -41,7 +41,7 @@ public class TextEditParams extends ApplyWorkspaceEditParams {
     }
 
     private static String createFileUri(IWorkspace workspace, SPath path) {
-        return "file:///" + Paths.get(workspace.getLocation().append(path.getFullPath()).toString()).normalize();//TODO: do bettter!
+        return Paths.get(workspace.getLocation().append(path.getFullPath()).toString()).toUri().toString();//TODO: do bettter!
     }
 
     private static TextEdit createEdit(String content, TextEditActivity activity) {
