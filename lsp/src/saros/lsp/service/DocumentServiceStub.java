@@ -62,32 +62,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     public void receive(TextEditActivity activity) {
       //super.receive(activity); TODO: used?
 
-      LOG.info(activity);
-      // LOG.info(String.format("Received: offset = %d", activity.getOffset()));
-
-      // String uri = "file:///" + workspace.getLocation().append(activity.getPath().getFullPath()).toString();
-
-      // EditorString content = new EditorString(editorManager.getContent(activity.getPath()));//TODO: Fall geschlossene datei
-
-      // LOG.info(String.format("Received: line = %d, char = %d", content.getPosition(activity.getOffset()).getLine(), content.getPosition(activity.getOffset()).getCharacter()));
-      // LOG.info(String.format("saros::URI: '%s'", uri));
-
-      // ApplyWorkspaceEditParams workspaceEditParams = new ApplyWorkspaceEditParams();
-
-      // int offset = activity.getOffset();
-
-      // TextEdit edit = new TextEdit();
-      // edit.setNewText(activity.getText());
-      // edit.setRange(
-      //     new Range(content.getPosition(offset), content.getPosition(offset + activity.getReplacedText().length())));
-
-      // TextDocumentEdit documentEdit = new TextDocumentEdit(
-      //     new VersionedTextDocumentIdentifier(uri, editorManager.getVersion(activity.getPath())+1),
-      //     Collections.singletonList(edit));
-      // WorkspaceEdit e = new WorkspaceEdit(Collections.singletonList(Either.forLeft(documentEdit)));
-
-      // workspaceEditParams.setEdit(e);
-      // workspaceEditParams.setLabel(activity.getSource().toString());
+      LOG.info(String.format("Received activity: %s", activity));
 
       TextEditParams editParams = new TextEditParams(workspace, editorManager, activity);
 
@@ -171,6 +146,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
       this.editorManager.applyTextEdit(activity);
       if(this.session != null) {
+        LOG.info(String.format("Sending activity: %s", activity));
         this.fireActivity(activity); //TODO: do here or in editormanager?!
       }
     }

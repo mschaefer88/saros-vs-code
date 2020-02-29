@@ -12,7 +12,6 @@ public class PathFactory implements IPathFactory {//TODO: use factory where stat
 
     @Override
   public String fromPath(IPath path) {
-    LOG.info(String.format("fromPath(%s)", path.toString()));
 
     if (path == null) throw new NullPointerException("path is null");
 
@@ -21,7 +20,6 @@ public class PathFactory implements IPathFactory {//TODO: use factory where stat
 
   @Override
   public IPath fromString(String name) {
-    LOG.info(String.format("fromString(%s)", name));
 
     if (name == null) throw new NullPointerException("name is null");
 
