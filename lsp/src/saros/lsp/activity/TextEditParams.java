@@ -1,5 +1,6 @@
 package saros.lsp.activity;
 
+import java.nio.file.Paths;
 import java.util.Collections;
 
 import org.eclipse.lsp4j.ApplyWorkspaceEditParams;
@@ -40,7 +41,7 @@ public class TextEditParams extends ApplyWorkspaceEditParams {
     }
 
     private static String createFileUri(IWorkspace workspace, SPath path) {
-        return "file:///" + workspace.getLocation().append(path.getFullPath()).toString();
+        return "file:///" + Paths.get(workspace.getLocation().append(path.getFullPath()).toString()).normalize();//TODO: do bettter!
     }
 
     private static TextEdit createEdit(String content, TextEditActivity activity) {

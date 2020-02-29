@@ -49,13 +49,7 @@ public abstract class LspResource implements IResource {
   
     @Override
     public String getName() {
-      String name = getFullPath().lastSegment();
-
-      if(name == null || name.isEmpty()) {
-          return "no-name";
-      }
-
-      return name;
+        return getFullPath().lastSegment();
     }
   
     @Override

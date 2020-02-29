@@ -192,6 +192,7 @@ public class NegotiationHandler implements INegotiationHandler {
             });
 
             String projectName = data.getProjectName();
+            LOG.info(String.format("Retrieved project '%s'", projectName));
             IProject project = new LspProject(this.workspace, projectName);
             
       

@@ -36,7 +36,7 @@ public class Editor extends TextDocumentItem {//TODO: base class necessary?
     }    
 
     public Editor(IFile file) throws IOException {
-        super.setUri("file:///" + file.getFullPath().toString());
+        super.setUri("file:///" + file.getFullPath().toString());//TODO: might not be needed, also centralize!
 
         try(InputStream stream = file.getContents()) {            
             super.setText(IOUtils.toString(stream));
