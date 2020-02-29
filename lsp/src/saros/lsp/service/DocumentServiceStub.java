@@ -79,11 +79,13 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
     @Override
     public void sessionStarted(final ISarosSession session) {
+      LOG.info("Session started!");
       initialize(session);
     }
 
     @Override
     public void sessionEnded(final ISarosSession session, SessionEndReason reason) {
+      LOG.info("Session ended!");
       uninitialize(session);
     }
   };
@@ -101,14 +103,14 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     session.removeActivityProducer(this);
     session.removeActivityConsumer(this.consumer);
 
-    this.session = session;
+    this.session = null;
   }
 
   protected void initialize(ISarosSession session) {
     session.addActivityProducer(this);
     session.addActivityConsumer(this.consumer, Priority.ACTIVE);
 
-    this.session = null;
+    this.session = session;
   }
 
   private SPath getSPath(String uri) {
