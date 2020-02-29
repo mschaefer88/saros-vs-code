@@ -29,6 +29,7 @@ import saros.filesystem.IFile;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IWorkspace;
+import saros.lsp.activity.TextEditParams;
 import saros.lsp.adapter.EditorString;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.editor.EditorManager;
@@ -62,34 +63,36 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
       //super.receive(activity); TODO: used?
 
       LOG.info(activity);
-      LOG.info(String.format("Received: offset = %d", activity.getOffset()));
+      // LOG.info(String.format("Received: offset = %d", activity.getOffset()));
 
-      String uri = "file:///" + workspace.getLocation().append(activity.getPath().getFullPath()).toString();
+      // String uri = "file:///" + workspace.getLocation().append(activity.getPath().getFullPath()).toString();
 
-      EditorString content = new EditorString(editorManager.getContent(activity.getPath()));//TODO: Fall geschlossene datei
+      // EditorString content = new EditorString(editorManager.getContent(activity.getPath()));//TODO: Fall geschlossene datei
 
-      LOG.info(String.format("Received: line = %d, char = %d", content.getPosition(activity.getOffset()).getLine(), content.getPosition(activity.getOffset()).getCharacter()));
-      LOG.info(String.format("saros::URI: '%s'", uri));
+      // LOG.info(String.format("Received: line = %d, char = %d", content.getPosition(activity.getOffset()).getLine(), content.getPosition(activity.getOffset()).getCharacter()));
+      // LOG.info(String.format("saros::URI: '%s'", uri));
 
-      ApplyWorkspaceEditParams workspaceEditParams = new ApplyWorkspaceEditParams();
+      // ApplyWorkspaceEditParams workspaceEditParams = new ApplyWorkspaceEditParams();
 
-      int offset = activity.getOffset();
+      // int offset = activity.getOffset();
 
-      TextEdit edit = new TextEdit();
-      edit.setNewText(activity.getText());
-      edit.setRange(
-          new Range(content.getPosition(offset), content.getPosition(offset + activity.getReplacedText().length())));
+      // TextEdit edit = new TextEdit();
+      // edit.setNewText(activity.getText());
+      // edit.setRange(
+      //     new Range(content.getPosition(offset), content.getPosition(offset + activity.getReplacedText().length())));
 
-      TextDocumentEdit documentEdit = new TextDocumentEdit(
-          new VersionedTextDocumentIdentifier(uri, editorManager.getVersion(activity.getPath())+1),
-          Collections.singletonList(edit));
-      WorkspaceEdit e = new WorkspaceEdit(Collections.singletonList(Either.forLeft(documentEdit)));
+      // TextDocumentEdit documentEdit = new TextDocumentEdit(
+      //     new VersionedTextDocumentIdentifier(uri, editorManager.getVersion(activity.getPath())+1),
+      //     Collections.singletonList(edit));
+      // WorkspaceEdit e = new WorkspaceEdit(Collections.singletonList(Either.forLeft(documentEdit)));
 
-      workspaceEditParams.setEdit(e);
-      workspaceEditParams.setLabel(activity.getSource().toString());
+      // workspaceEditParams.setEdit(e);
+      // workspaceEditParams.setLabel(activity.getSource().toString());
+
+      TextEditParams editParams = new TextEditParams(workspace, editorManager, activity);
 
       try {
-        ApplyWorkspaceEditResponse r = client.applyEdit(workspaceEditParams).get(); // TODO: use facade?
+        ApplyWorkspaceEditResponse r = client.applyEdit(editParams).get(); // TODO: use facade?
         LOG.info(String.format("Edit Result: %b", r.isApplied()));
       } catch (InterruptedException | ExecutionException e1) {
         LOG.error(e1);

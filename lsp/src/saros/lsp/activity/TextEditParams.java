@@ -12,32 +12,46 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 import saros.activities.SPath;
 import saros.activities.TextEditActivity;
+import saros.filesystem.IWorkspace;
+import saros.lsp.adapter.EditorString;
+import saros.lsp.extensions.server.editor.EditorManager;
 import saros.session.User;
 
 public class TextEditParams extends ApplyWorkspaceEditParams {
 
-    // public TextEditParams(TextEditActivity activity) {
+    public TextEditParams(IWorkspace workspace, EditorManager editorManager, TextEditActivity activity) {
+        //TODO: replace workspace by project get full path!
         
+        String content = editorManager.getContent(activity.getPath());        
+        TextEdit edit = createEdit(content, activity);
 
-    //     TextEdit edit = createEdit(activity);
+        TextDocumentEdit documentEdit = new TextDocumentEdit(
+            this.createIdentifier(workspace, editorManager, activity),
+            Collections.singletonList(edit));
+        WorkspaceEdit e = new WorkspaceEdit(Collections.singletonList(Either.forLeft(documentEdit)));
 
-    //     TextDocumentEdit documentEdit = new TextDocumentEdit(
-    //         new VersionedTextDocumentIdentifier(uri, editorManager.getVersion(activity.getPath())+1),
-    //         Collections.singletonList(edit));
-    //     WorkspaceEdit e = new WorkspaceEdit(Collections.singletonList(Either.forLeft(documentEdit)));
+        this.setEdit(e);
+        this.setLabel(activity.getSource().toString());
+    }
 
-    //     this.setEdit(e);
-    //     this.setLabel(activity.getSource().toString());
-    // }
+    private VersionedTextDocumentIdentifier createIdentifier(IWorkspace workspace, EditorManager editorManager, TextEditActivity activity) {
+        String uri = createFileUri(workspace, activity.getPath());
+        return new VersionedTextDocumentIdentifier(uri, editorManager.getVersion(activity.getPath())+1);
+    }
 
-    // private static TextEdit createEdit(TextEditActivity activity) {
-    //     int offset = activity.getOffset();
+    private static String createFileUri(IWorkspace workspace, SPath path) {
+        return "file:///" + workspace.getLocation().append(path.getFullPath()).toString();
+    }
+
+    private static TextEdit createEdit(String content, TextEditActivity activity) {
+        int offset = activity.getOffset();
+        EditorString editorString = new EditorString(content);
         
-    //     TextEdit edit = new TextEdit();
-    //     edit.setNewText(activity.getText());
-    //     edit.setRange(
-    //         new Range(content.getPosition(offset), content.getPosition(offset + activity.getReplacedText().length())));
+        TextEdit edit = new TextEdit();
+        edit.setNewText(activity.getText());
+        edit.setRange(
+            new Range(editorString.getPosition(offset), editorString.getPosition(offset + activity.getReplacedText().length())));
 
-    //     return edit;
-    // }
+        return edit;
+    }
 }

@@ -2,6 +2,7 @@ package saros.lsp.extensions.server.editor;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -17,7 +18,7 @@ import saros.activities.TextEditActivity;
 import saros.filesystem.IFile;
 import saros.session.User;
 
-public class Editor extends TextDocumentItem {//TODO: use generic for SPath or IFile
+public class Editor extends TextDocumentItem {//TODO: base class necessary?
 
     private static final Logger LOG = Logger.getLogger(Editor.class);
 
