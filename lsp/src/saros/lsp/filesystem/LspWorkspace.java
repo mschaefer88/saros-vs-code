@@ -37,7 +37,7 @@ public class LspWorkspace implements IWorkspace {
     @Override
     @Deprecated
     public IProject getProject(String name) {
-        return new LspProject(this.getLocation().append(name));
+        return new LspProject(this, name);
     }
 
     @Override

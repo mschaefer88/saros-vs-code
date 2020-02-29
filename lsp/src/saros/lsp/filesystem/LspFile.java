@@ -27,6 +27,8 @@ public class LspFile extends LspResource implements IFile {
    */
   public LspFile(IWorkspace workspace, IPath path) {
     super(workspace, path);
+
+    LOG.info(String.format("File '%s' of type '%d' created in '%s' created", path, this.getType(), workspace.getLocation()));
   }
 
   /**

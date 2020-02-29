@@ -18,6 +18,7 @@ import saros.filesystem.IProject;
 import saros.filesystem.IWorkspace;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.SarosResultResponse;
+import saros.lsp.filesystem.LspPath;
 import saros.lsp.filesystem.LspProject;
 import saros.monitoring.IProgressMonitor;
 import saros.monitoring.NullProgressMonitor;
@@ -47,6 +48,8 @@ public class NegotiationHandler implements INegotiationHandler {
 
   private final ISarosLanguageClient client;
 
+  private final IWorkspace workspace;
+
   private ExecutorService executor = Executors.newCachedThreadPool();
 
   public NegotiationHandler(
@@ -58,6 +61,7 @@ public class NegotiationHandler implements INegotiationHandler {
     this.sessionManager = sessionManager;
     this.progressMonitor = new NullProgressMonitor();
     this.client = client;
+    this.workspace = workspace;
     
     LOG.info(String.format("Negotiation handler registered (%d)", sessionManager.hashCode()));
   }
@@ -188,7 +192,7 @@ public class NegotiationHandler implements INegotiationHandler {
             });
 
             String projectName = data.getProjectName();
-            IProject project = new LspProject("C:\\Temp\\saros-workspace-test\\" + projectName);
+            IProject project = new LspProject(this.workspace, projectName);
             
       
             // TODO: The file path is currently dictated by the name, potentially resulting in CONFLICTS

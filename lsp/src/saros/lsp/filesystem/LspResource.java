@@ -26,7 +26,7 @@ public abstract class LspResource implements IResource {
     public LspResource(IWorkspace workspace, IPath path) {
       assert !path.isAbsolute();
 
-      System.out.println(path);
+      LOG.info(String.format("Resource '%s' of type '%d' created in '%s' created", path, this.getType(), workspace.getLocation()));
 
       this.path = path;
       this.workspace = workspace;
@@ -48,7 +48,7 @@ public abstract class LspResource implements IResource {
   
     @Override
     public IPath getProjectRelativePath() {
-      return getFullPath().removeFirstSegments(1);
+      return getFullPath();
     }
   
     @Override
@@ -70,8 +70,7 @@ public abstract class LspResource implements IResource {
   
     @Override
     public IProject getProject() {
-      String projectName = getFullPath().segment(0);
-      return workspace.getProject(projectName);
+      return workspace.getProject("");
     }
   
     @Override

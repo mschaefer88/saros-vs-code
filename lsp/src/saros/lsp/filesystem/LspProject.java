@@ -15,12 +15,10 @@ public class LspProject extends LspContainer implements IProject {
 
     private static final String DEFAULT_CHARSET = "UTF-8";
 
-    public LspProject(String path) {
-        this(LspPath.fromString(path));
-    }
+    public LspProject(IWorkspace workspace, String name) {
+        super(workspace, LspPath.fromString(name));
 
-    public LspProject(IPath path) {
-        super(new LspWorkspace(path), LspPath.EMPTY);
+        LOG.info(String.format("Project '%s' in '%s' created", name, workspace.getLocation().toString()));
     }
     
       @Override
@@ -53,8 +51,12 @@ public class LspProject extends LspContainer implements IProject {
       }
     
       @Override
-      public IFile getFile(IPath path) {
-          System.out.println(String.format("getFile(%s)", path));
+      public IFile getFile(IPath path) {          
+
+        if(path.isAbsolute()) {
+           path = path.removeFirstSegments(this.getWorkspace().getLocation().segmentCount());//TODO: use proj. rel. path 
+        }
+
         return new LspFile(getWorkspace(), getFullMemberPath(path));
       }
     
