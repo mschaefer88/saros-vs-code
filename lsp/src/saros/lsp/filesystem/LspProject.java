@@ -17,8 +17,6 @@ public class LspProject extends LspContainer implements IProject {
 
     public LspProject(IWorkspace workspace, String name) {
         super(workspace, LspPath.fromString(name));
-
-        LOG.info(String.format("Project '%s' in '%s' created", name, workspace.getLocation().toString()));
     }
     
       @Override

@@ -14,8 +14,6 @@ import saros.filesystem.IWorkspace;
 public abstract class LspResource implements IResource {
     private IWorkspace workspace;
     private IPath path;
-
-    final Logger LOG = Logger.getLogger(LspResource.class);
   
     /**
      * Creates a ServerResourceImpl.
@@ -25,8 +23,6 @@ public abstract class LspResource implements IResource {
      */
     public LspResource(IWorkspace workspace, IPath path) {
       assert !path.isAbsolute();
-
-      LOG.info(String.format("Resource '%s' of type '%d' created in '%s' created", path, this.getType(), workspace.getLocation()));
 
       this.path = path;
       this.workspace = workspace;

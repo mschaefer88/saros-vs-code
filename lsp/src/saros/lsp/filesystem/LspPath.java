@@ -5,16 +5,12 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.apache.log4j.Logger;
-
 import saros.filesystem.IPath;
 
 public class LspPath implements IPath {
     private Path delegate;
 
     public static final IPath EMPTY = new LspPath(Paths.get(""));
-
-    private static final Logger LOG = Logger.getLogger(LspPath.class);
 
     public static IPath fromString(String pathString) {
         if (pathString == null || pathString.isEmpty()) {

@@ -16,11 +16,7 @@ import saros.monitoring.NullProgressMonitor;
 
 public class LspWorkspace implements IWorkspace {
 
-    private static final Logger LOG = Logger.getLogger(LspWorkspace.class);
-
     public LspWorkspace(IPath root) {
-        LOG.info("Root is " + root.toString());
-        LOG.info("Hash is " + this.hashCode());
         this.location = root;
     }
 

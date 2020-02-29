@@ -139,11 +139,6 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
       return null;
     }
     IProject p = this.workspace.getProject("");
-
-    LOG.info("TMP 1/4 -> " + p);
-    LOG.info("TMP 2/4 -> " + path);
-    LOG.info("TMP 3/4 -> " + p.getFile(path));
-    LOG.info("TMP 4/4 -> " + new SPath(p.getFile(path)));
     
     return new SPath(p.getFile(path));
   }

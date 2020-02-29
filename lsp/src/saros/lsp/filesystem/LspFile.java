@@ -15,7 +15,8 @@ import saros.filesystem.IPath;
 import saros.filesystem.IWorkspace;
 
 public class LspFile extends LspResource implements IFile {
-    private static final Logger LOG = Logger.getLogger(LspFile.class);
+
+    private final Logger LOG = Logger.getLogger(LspFile.class);
 
   private String charset;
 
@@ -27,8 +28,6 @@ public class LspFile extends LspResource implements IFile {
    */
   public LspFile(IWorkspace workspace, IPath path) {
     super(workspace, path);
-
-    LOG.info(String.format("File '%s' of type '%d' created in '%s' created", path, this.getType(), workspace.getLocation()));
   }
 
   /**
