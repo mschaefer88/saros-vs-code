@@ -37,6 +37,7 @@ import saros.lsp.filesystem.LspWorkspace;
 import saros.net.xmpp.JID;
 import saros.session.AbstractActivityConsumer;
 import saros.session.AbstractActivityProducer;
+import saros.session.IActivityConsumer;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.session.ISessionLifecycleListener;
@@ -55,17 +56,19 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
   private static final Logger LOG = Logger.getLogger(DocumentServiceStub.class);
 
-  private final AbstractActivityConsumer consumer = new AbstractActivityConsumer() {
+  private final IActivityConsumer consumer = new AbstractActivityConsumer() {
     @Override
     public void receive(TextEditActivity activity) {
-      super.receive(activity);
+      //super.receive(activity); TODO: used?
 
       LOG.info(activity);
+      LOG.info(String.format("Received: offset = %d", activity.getOffset()));
 
-      String uri = "file:///" + activity.getPath().getFullPath().toString();
+      String uri = "file:///" + workspace.getLocation().append(activity.getPath().getFullPath()).toString();
 
-      EditorString content = new EditorString(editorManager.getContent(activity.getPath()));
+      EditorString content = new EditorString(editorManager.getContent(activity.getPath()));//TODO: Fall geschlossene datei
 
+      LOG.info(String.format("Received: line = %d, char = %d", content.getPosition(activity.getOffset()).getLine(), content.getPosition(activity.getOffset()).getCharacter()));
       LOG.info(String.format("saros::URI: '%s'", uri));
 
       ApplyWorkspaceEditParams workspaceEditParams = new ApplyWorkspaceEditParams();
@@ -78,7 +81,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
           new Range(content.getPosition(offset), content.getPosition(offset + activity.getReplacedText().length())));
 
       TextDocumentEdit documentEdit = new TextDocumentEdit(
-          new VersionedTextDocumentIdentifier(uri, editorManager.getVersion(activity.getPath())),
+          new VersionedTextDocumentIdentifier(uri, editorManager.getVersion(activity.getPath())+1),
           Collections.singletonList(edit));
       WorkspaceEdit e = new WorkspaceEdit(Collections.singletonList(Either.forLeft(documentEdit)));
 

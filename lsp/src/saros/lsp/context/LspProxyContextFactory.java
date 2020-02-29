@@ -9,7 +9,6 @@ import java.util.function.Supplier;
 
 import saros.communication.connection.IProxyResolver;
 import saros.context.AbstractContextFactory;
-import saros.editor.IEditorManager;
 import saros.filesystem.IChecksumCache;
 import saros.filesystem.IPathFactory;
 import saros.lsp.SarosLanguageServer;

@@ -39,7 +39,7 @@ public class EditorManager implements IEditorManager {
     private final ISarosLanguageClient languageClient;
     
     
-    private List<ISharedEditorListener> listeners = new CopyOnWriteArrayList<>();
+    private List<ISharedEditorListener> listeners = new CopyOnWriteArrayList<>();//TODO: used?!
 
     private final ISessionLifecycleListener sessionLifecycleListener =
       new ISessionLifecycleListener() {
@@ -59,6 +59,8 @@ public class EditorManager implements IEditorManager {
         sessionManager.addSessionLifecycleListener(this.sessionLifecycleListener);
 
         this.languageClient = languageClient;
+
+        LOG.info(String.format("Init %d", this.hashCode()));
     }
 
     protected void uninitialize() {
@@ -75,8 +77,7 @@ public class EditorManager implements IEditorManager {
         LOG.debug(String.format("openEditor(%s, %b)", path.toString(), activate));
 
         try {
-            Editor editor = new Editor(path.getFile());
-            this.openEditors.put(path, editor);
+            Editor editor = this.openEditors.containsKey(path) ? this.openEditors.get(path) : this.openEditors.put(path, new Editor(path.getFile()));
         
             if(activate) {
                 this.languageClient.openEditor(new SarosResultResponse<String>(editor.getUri()));
@@ -88,9 +89,6 @@ public class EditorManager implements IEditorManager {
 
     @Override
     public Set<SPath> getOpenEditors() {
-
-        LOG.debug("getOpenEditors()");
-
         return this.openEditors.keySet();
     }
 
@@ -98,8 +96,17 @@ public class EditorManager implements IEditorManager {
     public String getContent(SPath path) {
 
         LOG.debug(String.format("getContent(%s)", path.toString()));
-        
-        return this.openEditors.get(path).getText();
+
+        if(this.openEditors.containsKey(path)) {
+            return this.openEditors.get(path).getText();
+        } else {
+            try {
+                return IOUtils.toString(path.getFile().getContents());
+            } catch (IOException e) {
+                LOG.error(e);
+                return null;
+            }
+        }
     }
 
     @Override
@@ -132,7 +139,6 @@ public class EditorManager implements IEditorManager {
         // TODO Auto-generated method stub
 
         LOG.info(String.format("jumpToUser(%s)", target.toString()));
-
     }
 
     @Override
@@ -161,7 +167,11 @@ public class EditorManager implements IEditorManager {
     }
     
     public int getVersion(SPath path) {
-        return this.openEditors.get(path).getVersion();
+        if(this.openEditors.containsKey(path)) {
+            return this.openEditors.get(path).getVersion();
+        } else {
+            return 0;
+        }
     }
 
     public void saveEditor(SPath path) {

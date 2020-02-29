@@ -1,6 +1,9 @@
 package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+import org.apache.log4j.Logger;
+
 import java.util.Objects;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;

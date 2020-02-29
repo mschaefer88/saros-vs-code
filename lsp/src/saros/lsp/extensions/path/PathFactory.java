@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 
 import saros.filesystem.IPath;
 import saros.filesystem.IPathFactory;
-import saros.server.filesystem.ServerPathImpl;
+import saros.lsp.filesystem.LspPath;
 
 public class PathFactory implements IPathFactory {//TODO: use factory where static was used!
 
@@ -25,7 +25,7 @@ public class PathFactory implements IPathFactory {//TODO: use factory where stat
 
     if (name == null) throw new NullPointerException("name is null");
 
-    return checkRelative(ServerPathImpl.fromString(name));
+    return checkRelative(LspPath.fromString(name));
   }
 
   private IPath checkRelative(IPath path) {

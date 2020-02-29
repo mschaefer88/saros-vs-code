@@ -5,6 +5,8 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.log4j.Logger;
+
 import saros.filesystem.IPath;
 
 public class LspPath implements IPath {
@@ -163,11 +165,10 @@ public class LspPath implements IPath {
 
   @Override
   public boolean equals(Object obj) {
-
     if (this == obj) return true;
 
     if (!(obj instanceof LspPath)) return false;
-
+    
     LspPath other = (LspPath) obj;
     return delegate.equals(other.delegate);
   }

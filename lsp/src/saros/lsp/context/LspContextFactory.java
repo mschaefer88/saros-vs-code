@@ -9,7 +9,6 @@ import saros.filesystem.IChecksumCache;
 import saros.filesystem.IPathFactory;
 import saros.lsp.SarosLanguageServer;
 import saros.lsp.activity.ActivityConsumer;
-import saros.lsp.activity.ActivityProducer;
 import saros.lsp.extensions.ISarosLanguageServer;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.path.PathFactory;
@@ -28,6 +27,7 @@ import saros.lsp.extensions.server.editor.EditorManager;
 import saros.lsp.extensions.server.eventhandler.NegotiationHandler;
 import saros.lsp.extensions.server.net.SubscriptionAuthorizer;
 import saros.repackaged.picocontainer.MutablePicoContainer;
+import saros.repackaged.picocontainer.Characteristics;
 import saros.session.INegotiationHandler;
 import saros.session.ISarosSessionContextFactory;
 import saros.synchronize.UISynchronizer;
@@ -46,7 +46,7 @@ public class LspContextFactory extends AbstractContextFactory {
                                                                                                // session start -
                                                                                                // otherwise
                                                                                                // nullexception!
-    container.addComponent(IEditorManager.class, EditorManager.class); // TODO: needed for start session
+    container.addComponent(IEditorManager.class, EditorManager.class);//.as(Characteristics.LOCK, Characteristics.CACHE); // TODO: needed for start session
     container.addComponent(IPathFactory.class, PathFactory.class); // TODO: needed for start session
 
     // TODO: needed to get rid of subscription pending
@@ -57,4 +57,8 @@ public class LspContextFactory extends AbstractContextFactory {
     
     container.addComponent(TextDocumentService.class, DocumentServiceStub.class);
   }
+
+  // private void registerSingletons() {
+  //   MutablePicoContainer singletonContainer = container.as(Characteristics.LOCK, Characteristics.CACHE);
+  // }
 }
