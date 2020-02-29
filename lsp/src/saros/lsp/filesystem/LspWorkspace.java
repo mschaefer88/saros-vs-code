@@ -16,6 +16,8 @@ import saros.monitoring.NullProgressMonitor;
 
 public class LspWorkspace implements IWorkspace {
 
+    private final Logger LOG = Logger.getLogger(LspWorkspace.class);
+
     public LspWorkspace(IPath root) {
         this.location = root;
     }
@@ -33,6 +35,7 @@ public class LspWorkspace implements IWorkspace {
     @Override
     @Deprecated
     public IProject getProject(String name) {
+        LOG.info(String.format("getProject('%s')", name));
         return new LspProject(this, name);
     }
 

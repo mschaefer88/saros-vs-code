@@ -3,6 +3,8 @@ package saros.lsp.service;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
@@ -57,6 +59,8 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
   private static final Logger LOG = Logger.getLogger(DocumentServiceStub.class);
 
+  private final Set<String> ignore = new HashSet<>();
+
   private final IActivityConsumer consumer = new AbstractActivityConsumer() {
     @Override
     public void receive(TextEditActivity activity) {
@@ -67,6 +71,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
       TextEditParams editParams = new TextEditParams(workspace, editorManager, activity);
 
       try {
+        editParams.getEdit().getDocumentChanges().forEach(e -> ignore.add(e.getLeft().getTextDocument().getUri()));
         ApplyWorkspaceEditResponse r = client.applyEdit(editParams).get(); // TODO: use facade?
         LOG.info(String.format("Edit Result: %b", r.isApplied()));
       } catch (InterruptedException | ExecutionException e1) {
@@ -147,6 +152,12 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
       TextEditActivity activity = new TextEditActivity(source, content.getOffset(changeEvent.getRange().getStart()), changeEvent.getText(), content.substring(changeEvent.getRange().getStart(), changeEvent.getRangeLength()), path);
 
       this.editorManager.applyTextEdit(activity);
+
+      if(ignore.contains(i.getUri())) {
+        ignore.remove(i.getUri());
+        return;
+      }
+
       if(this.session != null) {
         LOG.info(String.format("Sending activity: %s", activity));
         this.fireActivity(activity); //TODO: do here or in editormanager?!
