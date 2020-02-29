@@ -51,7 +51,7 @@ public abstract class LspResource implements IResource {
     public String getName() {
       String name = getFullPath().lastSegment();
 
-      if(name.isEmpty()) {
+      if(name == null || name.isEmpty()) {
           return "no-name";
       }
 
