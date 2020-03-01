@@ -35,7 +35,6 @@ public class LspWorkspace implements IWorkspace {
     @Override
     @Deprecated
     public IProject getProject(String name) {
-        LOG.info(String.format("getProject('%s')", name));
         return new LspProject(this, name);
     }
 
@@ -51,6 +50,16 @@ public class LspWorkspace implements IWorkspace {
         synchronized (this) {
             runnable.run(new NullProgressMonitor());// TODO: use my progressmonitor
         }
-    }
+    }    
+  
+    @Override
+    public final boolean equals(Object obj) {
+      if (this == obj) return true;
 
+      if (!(obj instanceof IWorkspace)) return false;
+  
+      IWorkspace other = (IWorkspace) obj;
+      
+      return this.getLocation().equals(other.getLocation());
+    }
 }

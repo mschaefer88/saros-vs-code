@@ -92,13 +92,12 @@ public abstract class LspResource implements IResource {
   
     @Override
     public final boolean equals(Object obj) {
-  
       if (this == obj) return true;
   
       if (!(obj instanceof LspResource)) return false;
   
       LspResource other = (LspResource) obj;
-  
+      
       return getType() == other.getType()
           && getWorkspace().equals(other.getWorkspace())
           && getFullPath().equals(other.getFullPath());
