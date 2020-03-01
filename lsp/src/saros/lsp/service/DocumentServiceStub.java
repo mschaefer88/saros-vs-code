@@ -105,7 +105,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
   };
 
   public DocumentServiceStub(EditorManager editorManager, ISarosSessionManager sessionManager,
-      ISarosLanguageClient client, IWorkspace workspace, ConsistencyWatchdogClient watchdog) {
+      ISarosLanguageClient client, IWorkspace workspace) {
     this.editorManager = editorManager;
     this.client = client;
     this.workspace = workspace;

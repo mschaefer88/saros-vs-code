@@ -57,6 +57,5 @@ public class LspContextFactory extends AbstractContextFactory {
     container.addComponent(IProgressMonitor.class, ProgressMonitor.class);
     
     container.addComponent(TextDocumentService.class, DocumentServiceStub.class);
-    container.addComponent(ChecksumErrorHandler.class);
   }
 }
