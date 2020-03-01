@@ -151,12 +151,14 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
   public void didChange(DidChangeTextDocumentParams params) {
     VersionedTextDocumentIdentifier i = params.getTextDocument();
 
+    boolean ig = false;
     if(ignore.contains(this.getSPath(i.getUri()))) {
       ignore.remove(this.getSPath(i.getUri()));
       this.editorManager.bumpVersion(this.getSPath(i.getUri()));
-      return;
+      ig = true;
     }
 
+    
     System.out.println(String.format("Changed '%s' (version %d)", i.getUri(), i.getVersion()));
 
     User source = this.session != null ? this.session.getLocalUser() : this.getAnonymousUser();
@@ -168,11 +170,13 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
       this.editorManager.applyTextEdit(activity);      
 
-      if(this.session != null) {
+      if(this.session != null && !ig) {
         LOG.info(String.format("Sending activity: %s", activity));
         this.fireActivity(activity); //TODO: do here or in editormanager?!
       }
     }
+  
+  //LOG.info(String.format("Content after change: \n\n'%s'\n\n", this.editorManager.getContent(this.getSPath(i.getUri()))));
   }
 
   private User getAnonymousUser() {
