@@ -21,12 +21,10 @@ public class ChecksumErrorHandler extends AbstractActivityConsumer implements St
     private final ISarosLanguageClient languageClient;
     private final IProgressMonitor progressMonitor;
 
-    public ConsistencyManager(ConsistencyWatchdogClient watchdogClient, ISarosLanguageClient languageClient, IProgressMonitor progressMonitor) {
+    public ChecksumErrorHandler(ConsistencyWatchdogClient watchdogClient, ISarosLanguageClient languageClient, IProgressMonitor progressMonitor) {
         this.watchdogClient = watchdogClient;
         this.languageClient = languageClient;
         this.progressMonitor = progressMonitor;
-
-        //this.watchdogClient.
     }
 
     @Override
