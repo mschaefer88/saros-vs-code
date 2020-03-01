@@ -37,7 +37,7 @@ public class TextEditParams extends ApplyWorkspaceEditParams {
 
     private VersionedTextDocumentIdentifier createIdentifier(IWorkspace workspace, EditorManager editorManager, TextEditActivity activity) {
         String uri = createFileUri(workspace, activity.getPath());
-        return new VersionedTextDocumentIdentifier(uri, editorManager.getVersion(activity.getPath())+1);
+        return new VersionedTextDocumentIdentifier(uri, editorManager.getVersion(activity.getPath()));
     }
 
     private static String createFileUri(IWorkspace workspace, SPath path) {

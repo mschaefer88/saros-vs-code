@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { LanguageClient, Message, ServerOptions, LanguageClientOptions, StreamInfo, VersionedTextDocumentIdentifier, NotificationHandler, NotificationType, RequestType } from "vscode-languageclient";
+import { LanguageClient, Message, ServerOptions, LanguageClientOptions, StreamInfo, VersionedTextDocumentIdentifier, NotificationHandler, NotificationType, RequestType, RPCMessageType } from "vscode-languageclient";
 
 /**
  * Response for adding new accounts.
@@ -121,6 +121,18 @@ export namespace StartSessionRequest {
 
 export namespace StopSessionRequest {
     export const type = new RequestType<void, SarosResponse, void>('saros/session/stop');
+}
+
+export interface AnnotationParams {
+    uri: string;
+
+    user: string;
+
+    range: vscode.Range;
+}
+
+export namespace AnnotationNotification {
+    export const type = new NotificationType<AnnotationParams, void>('saros/editor/annotate');
 }
 
 /**

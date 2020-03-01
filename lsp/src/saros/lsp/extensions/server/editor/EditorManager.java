@@ -162,7 +162,6 @@ public class EditorManager implements IEditorManager {
         Editor editor = this.openEditors.get(activity.getPath());
 
         editor.apply(activity);
-        editor.setVersion(editor.getVersion()+1);
 
         this.listeners.forEach(listener -> listener.textEdited(activity));
     }

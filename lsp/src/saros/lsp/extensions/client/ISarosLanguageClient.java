@@ -6,6 +6,7 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.services.LanguageClient;
 
+import saros.lsp.extensions.client.dto.AnnotationParams;
 import saros.lsp.extensions.server.SarosResultResponse;
 import saros.lsp.extensions.server.contact.dto.ContactDto;
 
@@ -31,4 +32,7 @@ public interface ISarosLanguageClient extends LanguageClient {     //TODO: adapt
 
     @JsonNotification("saros/editor/open") //TODO: request? what if couldn't open?
     void openEditor(SarosResultResponse<String> path); //TODO: own dto
+
+    @JsonNotification("saros/editor/annotate") //TODO: or request?
+    void sendAnnotation(AnnotationParams annotation);
 }

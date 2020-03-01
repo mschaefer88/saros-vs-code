@@ -12,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
+import org.eclipse.lsp4j.ColorProviderOptions;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.ServerCapabilities;
@@ -85,6 +86,8 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
     capabilities.setExperimental(true);
     capabilities.setTextDocumentSync(TextDocumentSyncKind.Incremental);
+    capabilities.setCodeLensProvider(true);
+    capabilities.setHoverProvider(true);
 
     // StaticProgressOptions opts = new StaticProgressOptions();
     // opts.setWorkDoneProgress(true);

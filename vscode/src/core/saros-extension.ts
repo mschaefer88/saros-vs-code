@@ -1,7 +1,8 @@
-import { ExtensionContext, workspace, window, ProgressLocation, commands, Uri, DocumentSelector, DocumentFilter } from "vscode"; //TODO: überall so machen!
+import { ExtensionContext, workspace, window, ProgressLocation, commands, Uri, DocumentSelector, DocumentFilter, OverviewRulerLane } from "vscode"; //TODO: überall so machen!
 import { SarosServer } from "./saros-server";
-import { SarosClient, OpenProjectNotification } from "./saros-client";
+import { SarosClient, OpenProjectNotification, AnnotationNotification } from "./saros-client";
 import { LanguageClientOptions, RevealOutputChannelOn, ErrorHandler, Message, ErrorAction, CloseAction, InitializationFailedHandler, WorkDoneProgressParams } from "vscode-languageclient";
+import { downloadAndUnzipVSCode } from "vscode-test";
 
 /**
  * The Saros extension.
@@ -64,6 +65,32 @@ export class SarosExtension {
                             //let result = await commands.executeCommand('vscode.openFolder', uri, newWindow);
                             //console.log(`Open Project Result: ${result}`);
                         });
+
+                        self.client.onNotification(AnnotationNotification.type, params => {
+                            console.log("Got annotation!");
+                            console.log(params);
+
+                            workspace.openTextDocument(Uri.file(params.uri))
+                            .then(document => {
+                                const smallNumberDecorationType = window.createTextEditorDecorationType({
+                                    borderWidth: '1px',
+                                    borderStyle: 'solid',
+                                    overviewRulerColor: 'blue',
+                                    overviewRulerLane: OverviewRulerLane.Right,
+                                    light: {
+                                        // this color will be used in light color themes
+                                        borderColor: 'darkblue'
+                                    },
+                                    dark: {
+                                        // this color will be used in dark color themes
+                                        borderColor: 'lightblue'
+                                    }
+                                });
+                                window.activeTextEditor?.setDecorations(smallNumberDecorationType, [params.range]);
+                            });
+
+                        });
+                        
                         //TODO: just for testing!!!                      
 						commands.registerCommand("saros.test", () => {
                             let t: WorkDoneProgressParams ={workDoneToken: "TESTEST"};
