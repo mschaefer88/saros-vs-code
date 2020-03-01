@@ -30,6 +30,7 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 
 import saros.activities.SPath;
 import saros.activities.TextEditActivity;
+import saros.concurrent.watchdog.ConsistencyWatchdogClient;
 import saros.filesystem.IFile;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
@@ -104,7 +105,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
   };
 
   public DocumentServiceStub(EditorManager editorManager, ISarosSessionManager sessionManager,
-      ISarosLanguageClient client, IWorkspace workspace) {
+      ISarosLanguageClient client, IWorkspace workspace, ConsistencyWatchdogClient watchdog) {
     this.editorManager = editorManager;
     this.client = client;
     this.workspace = workspace;

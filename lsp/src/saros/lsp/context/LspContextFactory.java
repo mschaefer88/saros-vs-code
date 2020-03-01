@@ -9,6 +9,7 @@ import saros.filesystem.IChecksumCache;
 import saros.filesystem.IPathFactory;
 import saros.lsp.SarosLanguageServer;
 import saros.lsp.activity.ActivityConsumer;
+import saros.lsp.activity.ChecksumErrorHandler;
 import saros.lsp.extensions.ISarosLanguageServer;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.path.PathFactory;
@@ -56,9 +57,6 @@ public class LspContextFactory extends AbstractContextFactory {
     container.addComponent(IProgressMonitor.class, ProgressMonitor.class);
     
     container.addComponent(TextDocumentService.class, DocumentServiceStub.class);
+    container.addComponent(ChecksumErrorHandler.class);
   }
-
-  // private void registerSingletons() {
-  //   MutablePicoContainer singletonContainer = container.as(Characteristics.LOCK, Characteristics.CACHE);
-  // }
 }
