@@ -1,7 +1,10 @@
 package saros.lsp.service;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -59,19 +62,24 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
   private static final Logger LOG = Logger.getLogger(DocumentServiceStub.class);
 
-  private final Set<String> ignore = new HashSet<>();
+  private final Set<SPath> ignore = new HashSet<>();
 
   private final IActivityConsumer consumer = new AbstractActivityConsumer() {
     @Override
     public void receive(TextEditActivity activity) {
-      //super.receive(activity); TODO: used?
+      // super.receive(activity); TODO: used?
 
       LOG.info(String.format("Received activity: %s", activity));
 
       TextEditParams editParams = new TextEditParams(workspace, editorManager, activity);
 
       try {
-        editParams.getEdit().getDocumentChanges().forEach(e -> ignore.add(e.getLeft().getTextDocument().getUri()));
+        editParams.getEdit().getDocumentChanges().forEach(e -> {
+          String uri = e.getLeft().getTextDocument().getUri();
+          
+          LOG.info(String.format("Add '%s' to ignore", uri));
+          ignore.add(getSPath(uri));
+        });
         ApplyWorkspaceEditResponse r = client.applyEdit(editParams).get(); // TODO: use facade?
         LOG.info(String.format("Edit Result: %b", r.isApplied()));
       } catch (InterruptedException | ExecutionException e1) {
@@ -143,11 +151,11 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
   public void didChange(DidChangeTextDocumentParams params) {
     VersionedTextDocumentIdentifier i = params.getTextDocument();
 
-    if(ignore.contains(i.getUri())) {
-      ignore.remove(i.getUri());
+    if(ignore.contains(this.getSPath(i.getUri()))) {
+      ignore.remove(this.getSPath(i.getUri()));
       return;
     }
-    
+
     System.out.println(String.format("Changed '%s' (version %d)", i.getUri(), i.getVersion()));
 
     User source = this.session != null ? this.session.getLocalUser() : this.getAnonymousUser();
