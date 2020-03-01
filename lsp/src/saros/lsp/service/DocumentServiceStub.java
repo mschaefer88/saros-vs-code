@@ -153,7 +153,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
     if(ignore.contains(this.getSPath(i.getUri()))) {
       ignore.remove(this.getSPath(i.getUri()));
-      this.editorManager.applyTextEdit(null);
+      this.editorManager.bumpVersion(this.getSPath(i.getUri()));
       return;
     }
 

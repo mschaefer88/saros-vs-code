@@ -161,11 +161,16 @@ public class EditorManager implements IEditorManager {
     public void applyTextEdit(TextEditActivity activity) {
         Editor editor = this.openEditors.get(activity.getPath());
 
-        if(activity != null) {
-            editor.apply(activity);
-            this.listeners.forEach(listener -> listener.textEdited(activity));
-        }
+        editor.apply(activity);
         editor.setVersion(editor.getVersion()+1);
+
+        this.listeners.forEach(listener -> listener.textEdited(activity));
+    }
+
+    public void bumpVersion(SPath path) { //TODO: experimental!
+        Editor e = this.openEditors.get(path);
+        
+        e.setVersion(e.getVersion()+1);
     }
     
     public int getVersion(SPath path) {
