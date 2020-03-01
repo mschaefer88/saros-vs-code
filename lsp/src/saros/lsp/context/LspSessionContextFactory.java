@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 
 import saros.context.IContextFactory;
 import saros.lsp.activity.ActivityConsumer;
-import saros.lsp.activity.ChecksumErrorHandler;
+import saros.lsp.activity.InconsistencyHandler;
 import saros.lsp.session.NegotiationHook;
 import saros.lsp.session.SessionStatusRequestHandler;
 import saros.repackaged.picocontainer.MutablePicoContainer;
@@ -27,7 +27,7 @@ public class LspSessionContextFactory extends SarosCoreSessionContextFactory{//T
     container.addComponent(NegotiationHook.class);
 
     container.addComponent(ActivityConsumer.class);
-    container.addComponent(ChecksumErrorHandler.class);
+    container.addComponent(InconsistencyHandler.class);
 
 
     // // IDE context wrapper
