@@ -142,6 +142,12 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
   @Override
   public void didChange(DidChangeTextDocumentParams params) {
     VersionedTextDocumentIdentifier i = params.getTextDocument();
+
+    if(ignore.contains(i.getUri())) {
+      ignore.remove(i.getUri());
+      return;
+    }
+    
     System.out.println(String.format("Changed '%s' (version %d)", i.getUri(), i.getVersion()));
 
     User source = this.session != null ? this.session.getLocalUser() : this.getAnonymousUser();
@@ -151,12 +157,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
       EditorString content = new EditorString(this.editorManager.getContent(path));
       TextEditActivity activity = new TextEditActivity(source, content.getOffset(changeEvent.getRange().getStart()), changeEvent.getText(), content.substring(changeEvent.getRange().getStart(), changeEvent.getRangeLength()), path);
 
-      this.editorManager.applyTextEdit(activity);
-
-      if(ignore.contains(i.getUri())) {
-        ignore.remove(i.getUri());
-        return;
-      }
+      this.editorManager.applyTextEdit(activity);      
 
       if(this.session != null) {
         LOG.info(String.format("Sending activity: %s", activity));
