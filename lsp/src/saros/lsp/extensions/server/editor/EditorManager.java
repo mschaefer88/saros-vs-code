@@ -167,10 +167,10 @@ public class EditorManager implements IEditorManager {
         this.listeners.forEach(listener -> listener.textEdited(activity));
     }
 
-    public void bumpVersion(SPath path) { //TODO: experimental!
+    public void setVersion(SPath path, int version) { //TODO: experimental!
         Editor e = this.openEditors.get(path);
         
-        e.setVersion(e.getVersion()+1);
+        e.setVersion(version);
     }
     
     public int getVersion(SPath path) {

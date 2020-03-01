@@ -12,6 +12,7 @@ import saros.activities.IActivity;
 import saros.activities.SPath;
 import saros.concurrent.watchdog.ConsistencyWatchdogClient;
 import saros.concurrent.watchdog.IsInconsistentObservable;
+import saros.filesystem.IResource;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.monitoring.IProgressMonitor;
 import saros.observables.ValueChangeListener;
@@ -54,10 +55,10 @@ public class InconsistencyHandler extends AbstractActivityConsumer implements St
         this.isInconsistentObservable = isInconsistentObservable;
     }
 
-    private void handleConsistencyChange(Boolean isConsistent) {
-        LOG.info(String.format("Consistency changed: %b", isConsistent));
+    private void handleConsistencyChange(Boolean isInconsistent) {
+        LOG.info(String.format("Consistency changed: isInconsistent = %b", isInconsistent));
 
-        if(!isConsistent) {
+        if(isInconsistent) {
             if(!this.session.isHost()) {
                 ConsistencyWatchdogClient client = this.session.getComponent(ConsistencyWatchdogClient.class);
                 Set<SPath> paths = client.getPathsWithWrongChecksums();
@@ -84,16 +85,40 @@ public class InconsistencyHandler extends AbstractActivityConsumer implements St
     }
 
     private void handleInconsistency(Set<SPath> files, ConsistencyWatchdogClient watchdogClient) {
-        String message = "These files have become unsynchronized with the host:\n {0} \n\nPress the inconsistency recovery button to synchronize your project. \nYou may wish to backup those file(s) in case important changes are overwritten.";
-        String fileList = String.join(", ", (CharSequence[]) files.stream()
-                .map(path -> path.getFile().getName()).toArray());
-        this.languageClient.showMessageRequest(new ShowMessageParams(MessageType.Warning, "Inconsistency Detected", MessageFormat.format(message, files), "Yes", "No"))
+        String message = "These files have become unsynchronized with the host:{1} {0} {1}{1}Do you want to synchronize your project? \nYou may wish to backup those file(s) in case important changes are overwritten.";
+        String fileList = this.createInconsistentPathsMessage(files);
+        this.languageClient.showMessageRequest(new ShowMessageParams(MessageType.Warning, "Inconsistency Detected", MessageFormat.format(message, files, System.lineSeparator()), "Yes", "No"))
         .thenAccept(action -> {
             if(action.getTitle().equals("Yes")) {
                 watchdogClient.runRecovery(this.progressMonitor);
             }
+            this.isConsistencyListener.setValue(false);
         });
     }
+
+    private String createInconsistentPathsMessage(Set<SPath> paths) {
+        StringBuilder sb = new StringBuilder();
+    
+        for (SPath path : paths) {
+          IResource resource = path.getResource();
+    
+          if (resource == null) {
+            LOG.warn("Inconsistent resource " + path + " could not be " + "found.");
+    
+            continue;
+          }
+    
+          if (sb.length() > 0) {
+            sb.append(", ");
+          }
+    
+          sb.append(resource.getProject().getName())
+              .append(" - ")
+              .append(resource.getProjectRelativePath().lastSegment());
+        }
+    
+        return sb.toString();
+      }
 
     // @Override
     // public void receive(ChecksumErrorActivity checksumErrorActivity) {

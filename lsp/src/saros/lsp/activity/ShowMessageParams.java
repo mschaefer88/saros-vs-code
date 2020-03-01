@@ -13,7 +13,7 @@ public class ShowMessageParams extends ShowMessageRequestParams{
     public ShowMessageParams(MessageType type, String title, String message, String... actions) {
 
         this.setType(type);
-        this.setMessage(String.format("%s\n\n%s", title, message));
+        this.setMessage(String.format("%s%s%s%s", title, System.lineSeparator(), System.lineSeparator(), message));
 
         if(actions.length > 0) {
             this.setActions(createActionItemList(actions));

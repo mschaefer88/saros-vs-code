@@ -155,7 +155,6 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     boolean ig = false;
     if(ignore.contains(this.getSPath(i.getUri()))) {
       ignore.remove(this.getSPath(i.getUri()));
-      this.editorManager.bumpVersion(this.getSPath(i.getUri()));
       ig = true;
     }
 
@@ -164,6 +163,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
     User source = this.session != null ? this.session.getLocalUser() : this.getAnonymousUser();
     
+    this.editorManager.setVersion(this.getSPath(i.getUri()), i.getVersion());
     for (TextDocumentContentChangeEvent changeEvent : params.getContentChanges()) {
       SPath path = this.getSPath(i.getUri());
       EditorString content = new EditorString(this.editorManager.getContent(path));
@@ -176,6 +176,8 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
         this.fireActivity(activity); //TODO: do here or in editormanager?!
       }
     }
+
+
   
   //LOG.info(String.format("Content after change: \n\n'%s'\n\n", this.editorManager.getContent(this.getSPath(i.getUri()))));
   }
