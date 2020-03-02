@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.eclipse.lsp4j.CodeLens;
 import org.eclipse.lsp4j.CodeLensParams;
 import org.eclipse.lsp4j.Color;
 import org.eclipse.lsp4j.ColorInformation;
+import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 import org.eclipse.lsp4j.DidCloseTextDocumentParams;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
@@ -112,11 +114,15 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
           }
           else {
             AnnotationParams ap = new AnnotationParams(activity, workspace, editorManager);
-            client.sendAnnotation(ap);//TODO: wording apply?
+            client.sendAnnotation(ap);//TODO: wording apply?   
+            
+            annotations.add(ap);
           }
         }); // TODO: use facade?
     }
   };
+
+  private Set<AnnotationParams> annotations = new HashSet<>();
 
   private final ISessionLifecycleListener sessionLifecycleListener = new ISessionLifecycleListener() {
 
@@ -251,11 +257,34 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
   @Override
   public CompletableFuture<List<? extends CodeLens>> codeLens(CodeLensParams params) {
-		throw new UnsupportedOperationException();
+    
+    List<CodeLens> lenses = new ArrayList<>();
+
+    for (AnnotationParams annotation : annotations) {
+      CodeLens cl = new CodeLens();
+      cl.setRange(annotation.range);
+      cl.setData("TEST");
+
+      Command c = new Command();
+      c.setTitle(annotation.user);
+      cl.setCommand(c);  
+    }
+    
+
+    return CompletableFuture.completedFuture(lenses);
 	}
 
 	@Override
 	public CompletableFuture<CodeLens> resolveCodeLens(CodeLens unresolved) {
-		throw new UnsupportedOperationException();
+    LOG.info("RESOLVE");
+		CodeLens cl = new CodeLens();
+    cl.setRange(new Range(new Position(4, 4), new Position(4, 10)));
+    cl.setData("TEST");
+
+    Command c = new Command();
+    c.setTitle("LOCAL USER");
+    cl.setCommand(c);
+    
+    return CompletableFuture.completedFuture(cl);
 	}
 }

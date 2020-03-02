@@ -14,7 +14,7 @@ public class AnnotationManager {
 
     public void annotate(TextEditActivity activity) {
 
-        AnnotationParams annotation = new AnnotationParams();
-        this.languageClient.sendAnnotation(annotation);
+        // AnnotationParams annotation = new AnnotationParams();
+        // this.languageClient.sendAnnotation(annotation);
     }
 }
