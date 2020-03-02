@@ -113,6 +113,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
             });
           }
           else {
+            LOG.info(String.format("Annotate... (%d)", annotations.size()));
             AnnotationParams ap = new AnnotationParams(activity, workspace, editorManager);
             client.sendAnnotation(ap);//TODO: wording apply?   
             
@@ -241,23 +242,38 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
   }
 
   @Override
-  public CompletableFuture<Hover> hover(TextDocumentPositionParams position) {
+  public CompletableFuture<Hover> hover(TextDocumentPositionParams position) {//TODO: check URI!
     
-    Hover h = new Hover();
-    MarkupContent c = new MarkupContent();
-    
-    c.setKind(MarkupKind.MARKDOWN);
-    c.setValue("### Edited by `local-user`");
+    Position r = position.getPosition();
+    for (AnnotationParams annotation : annotations) {
 
-    h.setRange(new Range(new Position(0, 5), new Position(0, 10)));
-    h.setContents(c);
+      Position start = annotation.range.getStart();
+      Position end = annotation.range.getEnd();
 
-    return CompletableFuture.completedFuture(h);
+      if((r.getLine() == start.getLine() && r.getCharacter() >= start.getCharacter())
+        || (r.getLine() == end.getLine() && r.getCharacter() <= end.getCharacter())
+        || (r.getLine() > start.getLine() && r.getLine() < end.getLine())) {
+
+          Hover h = new Hover();
+          MarkupContent c = new MarkupContent();
+          
+          c.setKind(MarkupKind.MARKDOWN);
+          c.setValue(String.format("Edited by `%s`", annotation.user));
+
+          h.setRange(annotation.range);
+          h.setContents(c);          
+
+          return CompletableFuture.completedFuture(h);
+      }      
+    }    
+
+    return CompletableFuture.completedFuture(null);
 	}
 
   @Override
   public CompletableFuture<List<? extends CodeLens>> codeLens(CodeLensParams params) {
     
+    LOG.info(String.format("codeLens... (%d)", annotations.size()));
     List<CodeLens> lenses = new ArrayList<>();
 
     for (AnnotationParams annotation : annotations) {
@@ -267,7 +283,9 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
       Command c = new Command();
       c.setTitle(annotation.user);
-      cl.setCommand(c);  
+      cl.setCommand(c); 
+      
+      lenses.add(cl);
     }
     
 

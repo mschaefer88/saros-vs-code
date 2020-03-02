@@ -70,25 +70,40 @@ export class SarosExtension {
                             console.log("Got annotation!");
                             console.log(params);
 
-                            workspace.openTextDocument(Uri.file(params.uri))
-                            .then(document => {
-                                const smallNumberDecorationType = window.createTextEditorDecorationType({
-                                    borderWidth: '1px',
-                                    borderStyle: 'solid',
-                                    overviewRulerColor: 'blue',
-                                    overviewRulerLane: OverviewRulerLane.Right,
-                                    light: {
-                                        // this color will be used in light color themes
-                                        borderColor: 'darkblue'
-                                    },
-                                    dark: {
-                                        // this color will be used in dark color themes
-                                        borderColor: 'lightblue'
-                                    }
-                                });
-                                window.activeTextEditor?.setDecorations(smallNumberDecorationType, [params.range]);
+                            // workspace.openTextDocument(Uri.file(params.uri))
+                            // .then(document => {
+                            //     const smallNumberDecorationType = window.createTextEditorDecorationType({
+                            //         borderWidth: '1px',
+                            //         borderStyle: 'solid',
+                            //         overviewRulerColor: 'blue',
+                            //         overviewRulerLane: OverviewRulerLane.Right,
+                            //         light: {
+                            //             // this color will be used in light color themes
+                            //             borderColor: 'darkblue'
+                            //         },
+                            //         dark: {
+                            //             // this color will be used in dark color themes
+                            //             borderColor: 'lightblue'
+                            //         }
+                            //     });
+                            //     window.activeTextEditor?.setDecorations(smallNumberDecorationType, [params.range]);
+                            // });
+                            const smallNumberDecorationType = window.createTextEditorDecorationType({
+                                borderWidth: '1px',
+                                borderStyle: 'solid',
+                                overviewRulerColor: 'blue',
+                                overviewRulerLane: OverviewRulerLane.Right,
+                                light: {
+                                    // this color will be used in light color themes
+                                    borderColor: 'darkblue'
+                                },
+                                dark: {
+                                    // this color will be used in dark color themes
+                                    borderColor: 'lightblue'
+                                }
                             });
-
+                            console.log(window.activeTextEditor);
+                            window.activeTextEditor?.setDecorations(smallNumberDecorationType, [params.range]);
                         });
                         
                         //TODO: just for testing!!!                      
