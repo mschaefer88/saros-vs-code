@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { Disposable } from 'vscode-languageclient';
 import { SarosExtension } from './saros-extension';
 import { SarosClient, ContactDto, SarosResultResponse, SessionStateNotification, ContactStateNotification, IsOnlineRequest, GetAllContactRequest, ConnectedStateNotification } from './saros-client';
+import { messages } from './messages';
 
 export class SarosProvider implements vscode.TreeDataProvider<ContactDto> {
 
@@ -72,47 +73,41 @@ export class SarosProvider implements vscode.TreeDataProvider<ContactDto> {
 
 }
 
-export class SarosView implements Disposable{
+export class SarosContactView implements Disposable{
 
-	private disposables: Disposable[] = [];
+    private provider!: SarosProvider;
+    private view!: vscode.TreeView<ContactDto>;
 
 	dispose(): void {
-		this.disposables.forEach(disposable => {
-			disposable.dispose();
-		});
+		this.view.dispose();
 	}
 
 	constructor(extension: SarosExtension) {
 		
 		extension.client.onReady().then(() => {
-			const treeDataProvider = new SarosProvider(extension.client, extension.context);
-			const contactsView = vscode.window.createTreeView('saros-contacts', { treeDataProvider });
-			const sessionView = vscode.window.createTreeView('saros-session', { treeDataProvider });
+			this.provider = new SarosProvider(extension.client, extension.context);
+            this.view = vscode.window.createTreeView('saros-contacts', { treeDataProvider: this.provider });
 
-			extension.client.onNotification(ConnectedStateNotification.type, isOnline => {
-				treeDataProvider.refresh();				
-				this.setOnline(isOnline.result);
-			});
+			this.setOnline(false);
 
-			extension.client.onNotification(SessionStateNotification.type, inSession => {
-							
-				this.setSession(inSession.result);
+			extension.client.onConnectionChanged(isOnline => {
+				this.provider.refresh();						
+				this.setOnline(isOnline);
 			});
 
 			//TODO: do better!
 			extension.client.onNotification(ContactStateNotification.type, (contact: ContactDto) => {
-				treeDataProvider.refresh();
+				this.provider.refresh();
 			});
-
-			this.disposables.push(contactsView);
 		});
 	}
 
 	private setOnline(isOnline: boolean): void { //TODO: use Boolean or boolean consistently or as required, here it cant be null -> boolean!
-		vscode.commands.executeCommand('setContext', 'connected', isOnline);
-	}
-
-	private setSession(inSession: boolean): void {
-		vscode.commands.executeCommand('setContext', 'inSession', inSession);
+		if(!isOnline) {
+			this.view.message = messages.NOT_CONNECTED;
+		} else {
+			this.view.message = '';
+		}
+		vscode.commands.executeCommand('setContext', 'connected', isOnline);		
 	}
 }

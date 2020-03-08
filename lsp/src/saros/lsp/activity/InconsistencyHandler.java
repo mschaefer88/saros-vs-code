@@ -85,6 +85,11 @@ public class InconsistencyHandler extends AbstractActivityConsumer implements St
     }
 
     private void handleInconsistency(Set<SPath> files, ConsistencyWatchdogClient watchdogClient) {
+
+        if(files.isEmpty()) {
+            return;
+        }
+
         String message = "These files have become unsynchronized with the host:{1} {0} {1}{1}Do you want to synchronize your project? \nYou may wish to backup those file(s) in case important changes are overwritten.";
         String fileList = this.createInconsistentPathsMessage(files);
         this.languageClient.showMessageRequest(new ShowMessageParams(MessageType.Warning, "Inconsistency Detected", MessageFormat.format(message, files, System.lineSeparator()), "Yes", "No"))

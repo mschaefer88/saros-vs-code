@@ -1,5 +1,7 @@
 package saros.lsp.annotation;
 
+import org.apache.log4j.Logger;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import saros.activities.TextEditActivity;
@@ -12,6 +14,8 @@ public class Annotation {
 
     private User source;
 
+    private int version;
+
     public Range getRange() {
         return this.range;
     }
@@ -20,30 +24,32 @@ public class Annotation {
         return this.source;
     }
 
-    public Annotation(Range range, User source) {
+    public int getVersion() {
+        return this.version;
+    }
+
+    public Annotation(Range range, User source, int version) {
         this.range = range;
         this.source = source;
+        this.version = version;
     }
 
-    public boolean isPredecessor(Annotation other, EditorString content) {
-        if(!this.getSource().equals(other.getSource())) {
-            return false;
-        }
+    public boolean isAfter(Annotation other) {
+        
+        Range a = this.getRange();
+        Range b = other.getRange();
 
-        return this.isPredecessor(this.range, other.range, content);
+        return b.getStart().getLine() > a.getEnd().getLine() 
+            || (b.getStart().getLine() == a.getEnd().getLine() && b.getStart().getCharacter() < a.getEnd().getCharacter());
     }
 
-    private boolean isPredecessor(Range a, Range b, EditorString content) {        
-        return (a.getEnd().getLine() == b.getStart().getLine() && a.getEnd().getCharacter() == b.getStart().getCharacter())
-            || (a.getEnd().getLine() == b.getStart().getLine() - 1 && b.getStart().getCharacter() == 0 && a.getEnd().getCharacter() == content.getLength(b.getStart().getLine())); //TODO: get length of line
-    }
+    private static final Logger LOG = Logger.getLogger(Annotation.class);
 
-    private boolean isIntercepting(Annotation other) {
-
-        return false;
-    }
-
-    public void merge(Annotation successor) {//TODO: check? at least warning!
-        this.range = new Range(this.range.getStart(), successor.range.getEnd());
+    public void move(int offset) {
+        Position start = this.getRange().getStart();
+        Position end = this.getRange().getEnd();
+        
+        start.setCharacter(start.getCharacter()+offset);
+        end.setCharacter(end.getCharacter()+offset);
     }
 }

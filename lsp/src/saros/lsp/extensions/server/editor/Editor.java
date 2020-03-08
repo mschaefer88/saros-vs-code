@@ -3,10 +3,14 @@ package saros.lsp.extensions.server.editor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -28,6 +32,8 @@ public class Editor extends TextDocumentItem {//TODO: base class necessary?
     private static final Logger LOG = Logger.getLogger(Editor.class);
 
     private final Object lock = new Object();
+
+    static final int MAX_HISTORY_LENGTH = 5;//20;
 
     public Editor(TextDocumentItem documentItem) {
         this(documentItem.getText(), documentItem.getUri());
@@ -163,21 +169,32 @@ public class Editor extends TextDocumentItem {//TODO: base class necessary?
         
         EditorString es = new EditorString(this.getText());
         Range range = new Range(es.getPosition(activity.getOffset()), es.getPosition(activity.getOffset() + activity.getText().length()));
-        Annotation recent = new Annotation(range, activity.getSource());
-        Optional<Annotation> pre = this.annotations.stream().filter(a -> a.isPredecessor(recent, es)).findFirst();
+        Annotation recent = new Annotation(range, activity.getSource(), this.getVersion());
+        Annotation[] after = this.annotations.stream().filter(a -> a.isAfter(recent)).toArray(size -> new Annotation[size]);
+        for (Annotation annotation : after) {
+            annotation.move(1);
+        }
+        this.annotations.add(recent);
 
-        if(pre.isPresent()) {
-            LOG.info("Annotation is present!");
-            Annotation p = pre.get();
+        Map<User, List<Annotation>> history = this.annotations.stream().collect(Collectors.groupingBy(Annotation::getSource));
 
-            LOG.info(String.format("User pre: %s, User this: %s", p.getSource(), recent.getSource()));
+        for (Entry<User, List<Annotation>> group : history.entrySet()) {
+            List<Annotation> annotationsForUser = group.getValue();
+            if(annotationsForUser.size() > MAX_HISTORY_LENGTH) {
 
-            p.merge(recent);
-        } else {
+                int removeCount = group.getValue().size() - MAX_HISTORY_LENGTH;                         
+                annotationsForUser.sort(new Comparator<Annotation>() {
 
-            Optional<Annotation> inter = this.annotations.stream().filter(a -> a.isIntercepting(recent)).findFirst();
-            LOG.info("Annotation is new!");
-            this.annotations.add(recent);
+                    @Override
+                    public int compare(Annotation o1, Annotation o2) {
+                        return o1.getVersion() - o2.getVersion();
+                    }
+                    
+                });
+                for(int i = 0; i < removeCount; i++) {
+                    this.annotations.remove(annotationsForUser.get(i));
+                }
+            }
         }
     }
 

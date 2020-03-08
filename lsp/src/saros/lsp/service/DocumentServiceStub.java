@@ -92,6 +92,8 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
   private final Map<SPath, TextEditActivity> ignore = new HashMap<>();
 
+  private Object lock = new Object();
+
   private final IActivityConsumer consumer = new AbstractActivityConsumer() {
     @Override
     public void receive(TextEditActivity activity) {
@@ -99,16 +101,20 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
       LOG.info(String.format("Received activity: %s", activity));
 
-      TextEditParams editParams = new TextEditParams(workspace, editorManager, activity);
+      synchronized (lock) {
+        LOG.info(String.format("Executing activity: %s", activity));
+        TextEditParams editParams = new TextEditParams(workspace, editorManager, activity);
 
         editParams.getEdit().getDocumentChanges().forEach(e -> {
           String uri = e.getLeft().getTextDocument().getUri();
-          
+
           LOG.info(String.format("Add '%s' to ignore", uri));
           ignore.put(getSPath(uri), activity);
         });
-        
-        client.applyEdit(editParams).thenAccept(r -> {
+
+        ApplyWorkspaceEditResponse r;
+        try {
+          r = client.applyEdit(editParams).get();
           if(!r.isApplied()) {
             LOG.info(String.format("Edit Result: %b", r.isApplied()));
             editParams.getEdit().getDocumentChanges().forEach(e -> {
@@ -118,7 +124,10 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
               ignore.remove(getSPath(uri));
             });
           }
-        }); // TODO: use facade?
+        } catch (InterruptedException | ExecutionException e1) {
+          LOG.error(e1);
+        }        
+      }
     }
   };
 

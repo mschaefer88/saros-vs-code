@@ -135,6 +135,10 @@ export namespace AnnotationNotification {
     export const type = new NotificationType<SarosResultResponse<AnnotationParams[]>, void>('saros/editor/annotate');
 }
 
+type BooleanCallback = (n: boolean) => void;
+
+type Callback<T> = (p: T) => void;
+
 /**
  * Custom language client for Saros protocol.
  *
@@ -144,7 +148,28 @@ export namespace AnnotationNotification {
  */
 export class SarosClient extends LanguageClient {
 
+    private connectionChangedListeners: Callback<boolean>[] = [];
+    private sessionChangedListeners: Callback<boolean>[] = [];
+
     constructor(serverOptions: (() => Promise<StreamInfo>), clientOptions: LanguageClientOptions) {
         super('saros', 'Saros Server', serverOptions, clientOptions, true);//TODO: get from config
+
+        this.onReady().then(() => {
+            this.onNotification(ConnectedStateNotification.type, isOnline => {
+                this.connectionChangedListeners.forEach(callback => callback(isOnline.result));
+            });
+    
+            this.onNotification(SessionStateNotification.type, inSession => {
+                this.sessionChangedListeners.forEach(callback => callback(inSession.result));
+            });
+        });
+    }
+
+    public onConnectionChanged(callback: Callback<boolean>) {
+        this.connectionChangedListeners.push(callback);
+    }
+
+    public onSessionChanged(callback: Callback<boolean>) {
+        this.sessionChangedListeners.push(callback);
     }
 }

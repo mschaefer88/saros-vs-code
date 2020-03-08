@@ -4,7 +4,8 @@ import { sarosExtensionInstance } from './core/saros-extension';
 import { activateAccounts } from './account/activator';
 import { activateContacts } from './contact/activator';
 import { activateConnection } from './session/activator';
-import { SarosView } from './core/saros-view';
+import { SarosContactView } from './core/saros-contact-view';
+import { SarosSessionView } from './core/saros-session-view';
 
 /**
  * Activation function of the extension.
@@ -21,7 +22,8 @@ export function activate(context: vscode.ExtensionContext) {
 							activateContacts(sarosExtensionInstance);
 							activateConnection(sarosExtensionInstance);
 							
-							context.subscriptions.push(new SarosView(sarosExtensionInstance));
+							context.subscriptions.push(new SarosContactView(sarosExtensionInstance));
+							context.subscriptions.push(new SarosSessionView(sarosExtensionInstance));
 
 							console.log('Extension "Saros" is now active!');
 						})

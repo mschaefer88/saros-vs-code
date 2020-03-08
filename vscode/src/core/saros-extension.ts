@@ -1,4 +1,4 @@
-import { ExtensionContext, workspace, window, ProgressLocation, commands, Uri, DocumentSelector, DocumentFilter, OverviewRulerLane, Range, ThemeColor, Color } from "vscode"; //TODO: überall so machen!
+import { ExtensionContext, workspace, window, ProgressLocation, commands, Uri, DocumentSelector, DocumentFilter, OverviewRulerLane, Range, ThemeColor, Color, TextEditorDecorationType } from "vscode"; //TODO: überall so machen!
 import { SarosServer } from "./saros-server";
 import { SarosClient, OpenProjectNotification, AnnotationNotification, AnnotationParams } from "./saros-client";
 import { LanguageClientOptions, RevealOutputChannelOn, ErrorHandler, Message, ErrorAction, CloseAction, InitializationFailedHandler, WorkDoneProgressParams } from "vscode-languageclient";
@@ -20,7 +20,11 @@ export class SarosExtension {
      * @memberof SarosExtension
      */
     constructor() {
-        
+        this.annotationType = window.createTextEditorDecorationType({
+            overviewRulerColor: '#00ffff',
+            overviewRulerLane: OverviewRulerLane.Left,
+            backgroundColor: '#00ffff'
+        });
     }
 
     /**
@@ -36,11 +40,7 @@ export class SarosExtension {
         return this;
     }
 
-    private annotationType = window.createTextEditorDecorationType({
-        overviewRulerColor: '#00ffff',
-        overviewRulerLane: OverviewRulerLane.Left,
-        backgroundColor: '#00ffff'
-    });
+    private annotationType: TextEditorDecorationType;
 
     /**
      * Initializes the extension.
