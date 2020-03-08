@@ -6,9 +6,12 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -56,9 +59,12 @@ import saros.filesystem.IProject;
 import saros.filesystem.IWorkspace;
 import saros.lsp.activity.TextEditParams;
 import saros.lsp.adapter.EditorString;
+import saros.lsp.annotation.Annotation;
 import saros.lsp.annotation.AnnotationManager;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.client.dto.AnnotationParams;
+import saros.lsp.extensions.server.SarosResultResponse;
+import saros.lsp.extensions.server.editor.Editor;
 import saros.lsp.extensions.server.editor.EditorManager;
 import saros.lsp.filesystem.LspPath;
 import saros.lsp.filesystem.LspWorkspace;
@@ -84,7 +90,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
   private static final Logger LOG = Logger.getLogger(DocumentServiceStub.class);
 
-  private final Set<SPath> ignore = new HashSet<>();
+  private final Map<SPath, TextEditActivity> ignore = new HashMap<>();
 
   private final IActivityConsumer consumer = new AbstractActivityConsumer() {
     @Override
@@ -99,7 +105,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
           String uri = e.getLeft().getTextDocument().getUri();
           
           LOG.info(String.format("Add '%s' to ignore", uri));
-          ignore.add(getSPath(uri));
+          ignore.put(getSPath(uri), activity);
         });
         
         client.applyEdit(editParams).thenAccept(r -> {
@@ -112,18 +118,9 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
               ignore.remove(getSPath(uri));
             });
           }
-          else {
-            LOG.info(String.format("Annotate... (%d)", annotations.size()));
-            AnnotationParams ap = new AnnotationParams(activity, workspace, editorManager);
-            client.sendAnnotation(ap);//TODO: wording apply?   
-            
-            annotations.add(ap);
-          }
         }); // TODO: use facade?
     }
   };
-
-  private Set<AnnotationParams> annotations = new HashSet<>();
 
   private final ISessionLifecycleListener sessionLifecycleListener = new ISessionLifecycleListener() {
 
@@ -191,16 +188,21 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
   public void didChange(DidChangeTextDocumentParams params) {
     VersionedTextDocumentIdentifier i = params.getTextDocument();
 
-    boolean ig = false;
-    if(ignore.contains(this.getSPath(i.getUri()))) {
-      ignore.remove(this.getSPath(i.getUri()));
-      ig = true;
+    TextEditActivity ig = null;
+    SPath docId = this.getSPath(i.getUri());
+    if(ignore.containsKey(docId)) {
+      ig = ignore.get(docId);
+      ignore.remove(docId);
     }
 
     
     System.out.println(String.format("Changed '%s' (version %d)", i.getUri(), i.getVersion()));
 
     User source = this.session != null ? this.session.getLocalUser() : this.getAnonymousUser();
+
+    if(ig != null) {
+      source = ig.getSource();
+    }
     
     this.editorManager.setVersion(this.getSPath(i.getUri()), i.getVersion());
     for (TextDocumentContentChangeEvent changeEvent : params.getContentChanges()) {
@@ -210,13 +212,21 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
       this.editorManager.applyTextEdit(activity);      
 
-      if(this.session != null && !ig) {
+      if(this.session != null && ig == null) {
         LOG.info(String.format("Sending activity: %s", activity));
         this.fireActivity(activity); //TODO: do here or in editormanager?!
       }
     }
 
 
+    if(this.session != null) {
+      
+      SPath p = this.getSPath(i.getUri());
+      Editor editor = this.editorManager.getEditor(p);
+      Annotation[] annotations = editor.getAnnotations();
+      AnnotationParams[] aps = Arrays.stream(annotations).map(a -> new AnnotationParams(a, this.workspace, p)).toArray(size -> new AnnotationParams[size]);
+      client.sendAnnotation(new SarosResultResponse<AnnotationParams[]>(aps));//TODO: wording apply? 
+    }
   
   //LOG.info(String.format("Content after change: \n\n'%s'\n\n", this.editorManager.getContent(this.getSPath(i.getUri()))));
   }
@@ -245,10 +255,16 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
   public CompletableFuture<Hover> hover(TextDocumentPositionParams position) {//TODO: check URI!
     
     Position r = position.getPosition();
-    for (AnnotationParams annotation : annotations) {
 
-      Position start = annotation.range.getStart();
-      Position end = annotation.range.getEnd();
+    SPath p = this.getSPath(position.getTextDocument().getUri());
+      Editor editor = this.editorManager.getEditor(p);
+      Annotation[] annotations = editor.getAnnotations();
+
+
+    for (Annotation annotation : annotations) {
+
+      Position start = annotation.getRange().getStart();
+      Position end = annotation.getRange().getEnd();
 
       if((r.getLine() == start.getLine() && r.getCharacter() >= start.getCharacter())
         || (r.getLine() == end.getLine() && r.getCharacter() <= end.getCharacter())
@@ -258,9 +274,9 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
           MarkupContent c = new MarkupContent();
           
           c.setKind(MarkupKind.MARKDOWN);
-          c.setValue(String.format("Edited by `%s`", annotation.user));
+          c.setValue(String.format("Edited by `%s`", "Michael Schäfer"));
 
-          h.setRange(annotation.range);
+          h.setRange(annotation.getRange());
           h.setContents(c);          
 
           return CompletableFuture.completedFuture(h);
@@ -273,16 +289,20 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
   @Override
   public CompletableFuture<List<? extends CodeLens>> codeLens(CodeLensParams params) {
     
-    LOG.info(String.format("codeLens... (%d)", annotations.size()));
     List<CodeLens> lenses = new ArrayList<>();
 
-    for (AnnotationParams annotation : annotations) {
+    SPath p = this.getSPath(params.getTextDocument().getUri());
+      Editor editor = this.editorManager.getEditor(p);
+      Annotation[] annotations = editor.getAnnotations();
+      LOG.info(String.format("codeLens... (%d)", annotations.length));
+
+    for (Annotation annotation : annotations) {
       CodeLens cl = new CodeLens();
-      cl.setRange(annotation.range);
+      cl.setRange(annotation.getRange());
       cl.setData("TEST");
 
       Command c = new Command();
-      c.setTitle(annotation.user);
+      c.setTitle("Michael Schäfer");
       cl.setCommand(c); 
       
       lenses.add(cl);

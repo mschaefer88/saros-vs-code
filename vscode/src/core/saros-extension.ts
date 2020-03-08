@@ -1,8 +1,8 @@
-import { ExtensionContext, workspace, window, ProgressLocation, commands, Uri, DocumentSelector, DocumentFilter, OverviewRulerLane } from "vscode"; //TODO: überall so machen!
+import { ExtensionContext, workspace, window, ProgressLocation, commands, Uri, DocumentSelector, DocumentFilter, OverviewRulerLane, Range, ThemeColor, Color } from "vscode"; //TODO: überall so machen!
 import { SarosServer } from "./saros-server";
-import { SarosClient, OpenProjectNotification, AnnotationNotification } from "./saros-client";
+import { SarosClient, OpenProjectNotification, AnnotationNotification, AnnotationParams } from "./saros-client";
 import { LanguageClientOptions, RevealOutputChannelOn, ErrorHandler, Message, ErrorAction, CloseAction, InitializationFailedHandler, WorkDoneProgressParams } from "vscode-languageclient";
-import { downloadAndUnzipVSCode } from "vscode-test";
+import * as _ from "lodash";
 
 /**
  * The Saros extension.
@@ -36,6 +36,12 @@ export class SarosExtension {
         return this;
     }
 
+    private annotationType = window.createTextEditorDecorationType({
+        overviewRulerColor: '#00ffff',
+        overviewRulerLane: OverviewRulerLane.Left,
+        backgroundColor: '#00ffff'
+    });
+
     /**
      * Initializes the extension.
      *
@@ -67,43 +73,16 @@ export class SarosExtension {
                         });
 
                         self.client.onNotification(AnnotationNotification.type, params => {
-                            console.log("Got annotation!");
-                            console.log(params);
+                            let user = _.groupBy(params.result, a => a.user);
 
-                            // workspace.openTextDocument(Uri.file(params.uri))
-                            // .then(document => {
-                            //     const smallNumberDecorationType = window.createTextEditorDecorationType({
-                            //         borderWidth: '1px',
-                            //         borderStyle: 'solid',
-                            //         overviewRulerColor: 'blue',
-                            //         overviewRulerLane: OverviewRulerLane.Right,
-                            //         light: {
-                            //             // this color will be used in light color themes
-                            //             borderColor: 'darkblue'
-                            //         },
-                            //         dark: {
-                            //             // this color will be used in dark color themes
-                            //             borderColor: 'lightblue'
-                            //         }
-                            //     });
-                            //     window.activeTextEditor?.setDecorations(smallNumberDecorationType, [params.range]);
-                            // });
-                            const smallNumberDecorationType = window.createTextEditorDecorationType({
-                                borderWidth: '1px',
-                                borderStyle: 'solid',
-                                overviewRulerColor: 'blue',
-                                overviewRulerLane: OverviewRulerLane.Right,
-                                light: {
-                                    // this color will be used in light color themes
-                                    borderColor: 'darkblue'
-                                },
-                                dark: {
-                                    // this color will be used in dark color themes
-                                    borderColor: 'lightblue'
+                            _.forEach(user, (as, u) => {
+                                
+                                if(u !== 'mschaefer88_u') {                                
+                                    let ranges = _.map(as, a => a.range);
+
+                                    window.activeTextEditor?.setDecorations(this.annotationType, ranges);
                                 }
                             });
-                            console.log(window.activeTextEditor);
-                            window.activeTextEditor?.setDecorations(smallNumberDecorationType, [params.range]);
                         });
                         
                         //TODO: just for testing!!!                      

@@ -3,7 +3,10 @@ package saros.lsp.extensions.server.editor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -16,6 +19,8 @@ import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
 import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.filesystem.IFile;
+import saros.lsp.adapter.EditorString;
+import saros.lsp.annotation.Annotation;
 import saros.session.User;
 
 public class Editor extends TextDocumentItem {//TODO: base class necessary?
@@ -137,6 +142,8 @@ public class Editor extends TextDocumentItem {//TODO: base class necessary?
         }
     }
 
+    private Set<Annotation> annotations = new HashSet<>();
+
     public void apply(TextEditActivity activity) {
         synchronized (lock) {
             StringBuilder buffer = new StringBuilder(this.getText());
@@ -147,8 +154,37 @@ public class Editor extends TextDocumentItem {//TODO: base class necessary?
             buffer.replace(startOffset, startOffset + length, text);
 
             this.setText(buffer.toString());
+
+            this.annotate(activity);
         }
     }
+
+    private void annotate(TextEditActivity activity) {
+        
+        EditorString es = new EditorString(this.getText());
+        Range range = new Range(es.getPosition(activity.getOffset()), es.getPosition(activity.getOffset() + activity.getText().length()));
+        Annotation recent = new Annotation(range, activity.getSource());
+        Optional<Annotation> pre = this.annotations.stream().filter(a -> a.isPredecessor(recent, es)).findFirst();
+
+        if(pre.isPresent()) {
+            LOG.info("Annotation is present!");
+            Annotation p = pre.get();
+
+            LOG.info(String.format("User pre: %s, User this: %s", p.getSource(), recent.getSource()));
+
+            p.merge(recent);
+        } else {
+
+            Optional<Annotation> inter = this.annotations.stream().filter(a -> a.isIntercepting(recent)).findFirst();
+            LOG.info("Annotation is new!");
+            this.annotations.add(recent);
+        }
+    }
+
+    public Annotation[] getAnnotations() {
+        return this.annotations.toArray(new Annotation[0]);
+    }
+    
 
     public VersionedTextDocumentIdentifier toVersionedIdentifier() {
         return new VersionedTextDocumentIdentifier(this.getUri(), this.getVersion());

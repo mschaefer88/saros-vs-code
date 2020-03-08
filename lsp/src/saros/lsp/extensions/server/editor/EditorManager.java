@@ -180,6 +180,10 @@ public class EditorManager implements IEditorManager {
         }
     }
 
+    public Editor getEditor(SPath path) {
+        return this.openEditors.get(path); //TODO: check
+    }
+
     public void saveEditor(SPath path) {
         try {
             path.getFile().setContents(IOUtils.toInputStream(this.openEditors.get(path).getText()), true, false);

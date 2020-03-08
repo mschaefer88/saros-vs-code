@@ -87,10 +87,10 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
     capabilities.setExperimental(true);
     capabilities.setTextDocumentSync(TextDocumentSyncKind.Incremental);
-    CodeLensOptions clo = new CodeLensOptions();
-    clo.setResolveProvider(true);
-    capabilities.setCodeLensProvider(clo);
-    capabilities.setHoverProvider(true);
+    // CodeLensOptions clo = new CodeLensOptions();
+    // clo.setResolveProvider(true);
+    // capabilities.setCodeLensProvider(clo);
+    // capabilities.setHoverProvider(true);
 
     // StaticProgressOptions opts = new StaticProgressOptions();
     // opts.setWorkDoneProgress(true);

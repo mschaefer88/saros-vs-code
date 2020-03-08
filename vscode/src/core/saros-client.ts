@@ -132,7 +132,7 @@ export interface AnnotationParams {
 }
 
 export namespace AnnotationNotification {
-    export const type = new NotificationType<AnnotationParams, void>('saros/editor/annotate');
+    export const type = new NotificationType<SarosResultResponse<AnnotationParams[]>, void>('saros/editor/annotate');
 }
 
 /**

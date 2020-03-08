@@ -34,5 +34,5 @@ public interface ISarosLanguageClient extends LanguageClient {     //TODO: adapt
     void openEditor(SarosResultResponse<String> path); //TODO: own dto
 
     @JsonNotification("saros/editor/annotate") //TODO: or request?
-    void sendAnnotation(AnnotationParams annotation);
+    void sendAnnotation(SarosResultResponse<AnnotationParams[]> annotations);
 }

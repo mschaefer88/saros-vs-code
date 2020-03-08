@@ -53,4 +53,14 @@ public class EditorString {
     public String substring(Position position, int length) {
         return this.substring(this.getOffset(position), length);
     }
+
+    public int getLength(int line) {
+        
+        String[] lines = this.getLines();
+        if(line < 0 || line >= lines.length) {
+            throw new IllegalArgumentException("line cannot be negative or be larger than content");
+        }
+
+        return lines[line].length();
+    }
 }
