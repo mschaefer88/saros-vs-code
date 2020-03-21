@@ -26,7 +26,6 @@ import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.lsp.extensions.ISarosLanguageServer;
 import saros.lsp.extensions.client.ISarosLanguageClient;
-import saros.lsp.extensions.server.CancelManager;
 import saros.lsp.extensions.server.account.IAccountService;
 import saros.lsp.extensions.server.session.ISessionService;
 import saros.lsp.filesystem.LspPath;
@@ -47,16 +46,13 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
   private ISessionService sessionService;
 
-  private CancelManager cancelManager;
-
   private TextDocumentService documentService;
 
   public SarosLanguageServer(IAccountService accountService, IContactService contactService,
-      ISessionService sessionService, CancelManager cancelManager, TextDocumentService documentService) {
+      ISessionService sessionService, TextDocumentService documentService) {
     this.accountService = accountService;
     this.contactService = contactService;
     this.sessionService = sessionService;
-    this.cancelManager = cancelManager;
     this.documentService = documentService;
   }
 

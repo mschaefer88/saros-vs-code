@@ -9,6 +9,7 @@ import org.eclipse.lsp4j.services.LanguageClient;
 import saros.lsp.extensions.client.dto.AnnotationParams;
 import saros.lsp.extensions.server.SarosResultResponse;
 import saros.lsp.extensions.server.contact.dto.ContactDto;
+import saros.lsp.extensions.server.session.dto.SessionUserDto;
 
 /** 
  * Interface of the Saros language client.
@@ -35,4 +36,16 @@ public interface ISarosLanguageClient extends LanguageClient {     //TODO: adapt
 
     @JsonNotification("saros/editor/annotate") //TODO: or request?
     void sendAnnotation(SarosResultResponse<AnnotationParams[]> annotations);
+
+    @JsonNotification("saros/session/user-joined")
+    void notifyUserJoinedSession(SessionUserDto user);
+
+    @JsonNotification("saros/session/user-left")
+    void notifyUserLeftSession(SarosResultResponse<String> user); //TODO: use own notification/type!
+
+    /**
+     * Do seperation like: ?
+     * @JsonDelegate
+  IAccountService getSarosAccountService();
+     */
 }

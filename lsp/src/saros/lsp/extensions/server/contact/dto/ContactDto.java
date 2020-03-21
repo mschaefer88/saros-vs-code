@@ -8,4 +8,8 @@ public class ContactDto {
     public boolean isOnline;
     
     public boolean hasSarosSupport;
+
+    public ContactDto() {
+
+    }
 }

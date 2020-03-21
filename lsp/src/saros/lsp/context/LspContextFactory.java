@@ -13,7 +13,6 @@ import saros.lsp.annotation.AnnotationManager;
 import saros.lsp.extensions.ISarosLanguageServer;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.path.PathFactory;
-import saros.lsp.extensions.server.CancelManager;
 import saros.lsp.extensions.server.account.AccountService;
 import saros.lsp.extensions.server.account.IAccountService;
 import saros.lsp.extensions.server.session.ISessionService;
@@ -53,7 +52,6 @@ public class LspContextFactory extends AbstractContextFactory {
     // TODO: needed to get rid of subscription pending
     container.addComponent(SubscriptionAuthorizer.class);
 
-    container.addComponent(new CancelManager());
     container.addComponent(IProgressMonitor.class, ProgressMonitor.class);
     
     container.addComponent(TextDocumentService.class, DocumentServiceStub.class);

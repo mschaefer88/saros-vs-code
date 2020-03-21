@@ -1,72 +1,76 @@
 import * as vscode from 'vscode';
 import { Disposable } from 'vscode-languageclient';
 import { SarosExtension } from './saros-extension';
-import { SarosClient, ContactDto, SarosResultResponse, SessionStateNotification, ContactStateNotification, IsOnlineRequest, GetAllContactRequest, ConnectedStateNotification } from './saros-client';
+import { SarosClient, ContactDto, IsOnlineRequest, GetAllContactRequest, UserJoinedSessionNotification, UserLeftSessionNotification, SessionUserDto } from './saros-client';
 import { messages } from './messages';
 
-export class SarosProvider implements vscode.TreeDataProvider<ContactDto> {
+export class SarosSessionProvider implements vscode.TreeDataProvider<SessionUserDto> {
 
 	private client: SarosClient;
 	private context: vscode.ExtensionContext;
+	private users: SessionUserDto[];
 
 	constructor(client: SarosClient, context: vscode.ExtensionContext) {
 		this.client = client;
 		this.context = context;
+		this.users = [];
+
+		this.client.onNotification(UserJoinedSessionNotification.type, user => {
+			vscode.window.showInformationMessage(`'${user.nickname}' joined the session.`);
+			this.users.push(user);
+			this.refresh();
+		});
+
+		this.client.onNotification(UserLeftSessionNotification.type, id => {
+			const user =  this.users.find(user => user.id === id.result);
+
+			if(!user) {
+				vscode.window.showErrorMessage('Couldn\'t determine user that has left the session.');
+				return;
+			}
+
+			vscode.window.showInformationMessage(`'${user.nickname}' left the session.`);
+			this.users.splice(this.users.indexOf(user), 1);
+			this.refresh();
+		});
 	}
 
 	refresh(): void {
 		this._onDidChangeTreeData.fire();
 	}
 
+	clear(): void {
+		this.users = [];
+		this.refresh();
+	}
+
     private _onDidChangeTreeData: vscode.EventEmitter<ContactDto | undefined> = new vscode.EventEmitter<ContactDto | undefined>();
 	readonly onDidChangeTreeData: vscode.Event<ContactDto | undefined> = this._onDidChangeTreeData.event;   
     
-    getTreeItem(element: ContactDto): vscode.TreeItem | Thenable<vscode.TreeItem> {
+    getTreeItem(element: SessionUserDto): vscode.TreeItem | Thenable<vscode.TreeItem> {
 				
 		let contactItem = new vscode.TreeItem(element.nickname);
-		
-		if(element.isOnline) {
-			if(element.hasSarosSupport) {
-				console.log("SAROS");
-				contactItem.iconPath = this.context.asAbsolutePath("/media/obj16/contact_saros_obj.png");
-			} else {
-				console.log("ONLINE");
-				contactItem.iconPath = this.context.asAbsolutePath("/media/obj16/contact_obj.png");
-			}
-		} else {
-			console.log("OFFLINE");
-			contactItem.iconPath = this.context.asAbsolutePath("/media/obj16/contact_offline_obj.png");
-		}
 
 		contactItem.tooltip = element.id;
 		contactItem.description = element.id;
-		contactItem.contextValue = "contact";
+		contactItem.contextValue = "user";
+		contactItem.iconPath = this.context.asAbsolutePath("/media/obj16/contact_saros_obj.png"); //TODO: host?
 
 		return contactItem;
 	}
 	
-    async getChildren(element?: ContactDto | undefined): Promise<ContactDto[]> {
+    getChildren(element?: SessionUserDto | undefined): SessionUserDto[] {
 
-		//TODO: use sent value instead?
-		if((await this.client.sendRequest(IsOnlineRequest.type, null)).result) {
-			if(!element) {
-				let contacts = await this.client.sendRequest(GetAllContactRequest.type, null);
+		if(!element) {
+			let contacts = this.users;
 
-				let sorted = contacts.result.sort((a, b) => {
-					let valA = +a.hasSarosSupport + +a.isOnline;
-					let valB = +b.hasSarosSupport + +b.isOnline;
+			let sorted = contacts.sort((a, b) => {
+				return a.nickname > b.nickname ? -1 : 1;
+			});
 
-					if(valA === valB) {
-						return a.nickname > b.nickname ? -1 : 1;
-					}
-
-					return valA > valB ? -1 : 1;
-				});
-
-				return sorted;
-			}
+			return sorted;
 		}
-		
+
 		return [];
     }
 
@@ -75,20 +79,23 @@ export class SarosProvider implements vscode.TreeDataProvider<ContactDto> {
 
 export class SarosSessionView implements Disposable{
 
-    private provider!: SarosProvider;
-    private view!: vscode.TreeView<ContactDto>;
+    private provider!: SarosSessionProvider;
+    private viewMain!: vscode.TreeView<SessionUserDto>;
+    private viewSub!: vscode.TreeView<SessionUserDto>;
     
     private isOnline: boolean = false;
 
 	dispose(): void {
-		this.view.dispose();
+		this.viewMain.dispose();
+		this.viewSub.dispose();
 	}
 
 	constructor(extension: SarosExtension) {
         
 		extension.client.onReady().then(() => {
-			this.provider = new SarosProvider(extension.client, extension.context);
-            this.view = vscode.window.createTreeView('saros-session', { treeDataProvider: this.provider });
+			this.provider = new SarosSessionProvider(extension.client, extension.context);
+            this.viewMain = vscode.window.createTreeView('saros-session-main', { treeDataProvider: this.provider });
+            this.viewSub = vscode.window.createTreeView('saros-session-sub', { treeDataProvider: this.provider });
             
             this.setSession(false);
 
@@ -97,8 +104,7 @@ export class SarosSessionView implements Disposable{
                 this.setSession(false);
 			});
 
-			extension.client.onSessionChanged(inSession => {
-				//this.provider.refresh();				
+			extension.client.onSessionChanged(inSession => {		
 				this.setSession(inSession);
 			});
 		});
@@ -106,12 +112,16 @@ export class SarosSessionView implements Disposable{
 
 	private setSession(inSession: boolean): void {
         if(!this.isOnline) {
-            this.view.message = messages.NOT_CONNECTED;
+            this.viewMain.message = messages.NOT_CONNECTED;
         } else if(!inSession) {
-            this.view.message = messages.NO_SESSION;
+            this.viewMain.message = messages.NO_SESSION;
         } else {
-            this.view.message = undefined;
-        }
+            this.viewMain.message = undefined;
+		}
+		
+		if(!this.isOnline || !inSession) {
+			this.provider.clear();
+		}
 
 		vscode.commands.executeCommand('setContext', 'inSession', inSession);
 	}

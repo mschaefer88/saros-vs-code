@@ -228,7 +228,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     }
 
 
-    if(this.session != null) {
+    if(this.session != null) { //TODO: do in consume in top?
       
       SPath p = this.getSPath(i.getUri());
       Editor editor = this.editorManager.getEditor(p);

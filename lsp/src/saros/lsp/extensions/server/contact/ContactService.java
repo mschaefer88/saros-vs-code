@@ -19,8 +19,6 @@ import org.eclipse.lsp4j.WorkDoneProgressParams;
 import saros.account.XMPPAccountStore;
 import saros.communication.connection.ConnectionHandler;
 import saros.lsp.extensions.client.ISarosLanguageClient;
-import saros.lsp.extensions.server.CancelManager;
-import saros.lsp.extensions.server.CancelObserver;
 import saros.lsp.extensions.server.RequireConnection;
 import saros.lsp.extensions.server.SarosResponse;
 import saros.lsp.extensions.server.SarosResultResponse;

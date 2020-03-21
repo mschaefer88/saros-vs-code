@@ -143,15 +143,15 @@
 					"name": "Contact List"
 				},
 				{
-					"id": "saros-session",
+					"id": "saros-session-main",
 					"name": "Session"
 				}
 			],
 			"explorer": [
 				{
-					"id": "saros-session",
+					"id": "saros-session-sub",
 					"name": "Saros",
-					"when": "inSession"
+					"when": "inSession"					
 				}
 			]
 		},

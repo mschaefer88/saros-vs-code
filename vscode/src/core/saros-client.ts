@@ -42,6 +42,11 @@ export interface InviteDto {
     description: string;
 }
 
+export interface SessionUserDto {
+    id: string;
+    nickname: string;
+}
+
 //TODO: use namespaces for grouping
 export namespace OpenProjectNotification {
     export const type = new NotificationType<SarosResultResponse<string>, void>('saros/editor/open'); //TODO: naming
@@ -121,6 +126,14 @@ export namespace StartSessionRequest {
 
 export namespace StopSessionRequest {
     export const type = new RequestType<void, SarosResponse, void>('saros/session/stop');
+}
+
+export namespace UserJoinedSessionNotification {
+    export const type = new NotificationType<SessionUserDto, void>('saros/session/user-joined');
+}
+
+export namespace UserLeftSessionNotification {
+    export const type = new NotificationType<SarosResultResponse<string>, void>('saros/session/user-left');
 }
 
 export interface AnnotationParams {

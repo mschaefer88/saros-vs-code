@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 import { Disposable } from 'vscode-languageclient';
 import { SarosExtension } from './saros-extension';
-import { SarosClient, ContactDto, SarosResultResponse, SessionStateNotification, ContactStateNotification, IsOnlineRequest, GetAllContactRequest, ConnectedStateNotification } from './saros-client';
+import { SarosClient, ContactDto, ContactStateNotification, IsOnlineRequest, GetAllContactRequest } from './saros-client';
 import { messages } from './messages';
 
-export class SarosProvider implements vscode.TreeDataProvider<ContactDto> {
+export class SarosContactProvider implements vscode.TreeDataProvider<ContactDto> {
 
 	private client: SarosClient;
 	private context: vscode.ExtensionContext;
@@ -75,7 +75,7 @@ export class SarosProvider implements vscode.TreeDataProvider<ContactDto> {
 
 export class SarosContactView implements Disposable{
 
-    private provider!: SarosProvider;
+    private provider!: SarosContactProvider;
     private view!: vscode.TreeView<ContactDto>;
 
 	dispose(): void {
@@ -85,7 +85,7 @@ export class SarosContactView implements Disposable{
 	constructor(extension: SarosExtension) {
 		
 		extension.client.onReady().then(() => {
-			this.provider = new SarosProvider(extension.client, extension.context);
+			this.provider = new SarosContactProvider(extension.client, extension.context);
             this.view = vscode.window.createTreeView('saros-contacts', { treeDataProvider: this.provider });
 
 			this.setOnline(false);
