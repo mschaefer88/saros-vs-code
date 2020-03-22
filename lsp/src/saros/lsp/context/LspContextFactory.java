@@ -1,6 +1,7 @@
 package saros.lsp.context;
 
 import org.eclipse.lsp4j.services.TextDocumentService;
+import org.eclipse.lsp4j.services.WorkspaceService;
 
 import saros.communication.connection.IProxyResolver;
 import saros.context.AbstractContextFactory;
@@ -20,6 +21,7 @@ import saros.lsp.extensions.server.session.SessionService;
 import saros.lsp.extensions.server.ui.UISynchronizerImpl;
 import saros.lsp.monitoring.ProgressMonitor;
 import saros.lsp.service.DocumentServiceStub;
+import saros.lsp.service.WorkspaceServiceStub;
 import saros.monitoring.IProgressMonitor;
 import saros.lsp.extensions.server.contact.ContactService;
 import saros.lsp.extensions.server.contact.IContactService;
@@ -55,6 +57,7 @@ public class LspContextFactory extends AbstractContextFactory {
     container.addComponent(IProgressMonitor.class, ProgressMonitor.class);
     
     container.addComponent(TextDocumentService.class, DocumentServiceStub.class);
+    container.addComponent(WorkspaceService.class, WorkspaceServiceStub.class);
     container.addComponent(AnnotationManager.class);
   }
 }

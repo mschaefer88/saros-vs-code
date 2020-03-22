@@ -48,12 +48,15 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
   private TextDocumentService documentService;
 
+  private WorkspaceService workspaceService;
+
   public SarosLanguageServer(IAccountService accountService, IContactService contactService,
-      ISessionService sessionService, TextDocumentService documentService) {
+      ISessionService sessionService, TextDocumentService documentService, WorkspaceService workspaceService) {
     this.accountService = accountService;
     this.contactService = contactService;
     this.sessionService = sessionService;
     this.documentService = documentService;
+    this.workspaceService = workspaceService;
   }
 
   @Override
@@ -135,7 +138,7 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
   @Override
   public WorkspaceService getWorkspaceService() {
-    return new WorkspaceServiceStub();
+    return this.workspaceService;
   }
 
   @Override
