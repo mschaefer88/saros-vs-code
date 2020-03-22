@@ -77,7 +77,7 @@ public class UserStatusHandler {
   }
 
   private SessionUserDto createParticipantDto(User user) {
-    final XMPPContact userAsContact = this.contactsService.getContact(user.getJID().getBareJID().toString()).get();
-    return new SessionUserDto(userAsContact.getBareJid().toString(), userAsContact.getDisplayableName());
+    final XMPPContact userAsContact = this.contactsService.getContact(user.getJID().toString()).get();
+    return new SessionUserDto(userAsContact.getBareJid().getRAW(), userAsContact.getDisplayableName());
   }
 }
