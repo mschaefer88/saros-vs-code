@@ -7,12 +7,15 @@ import java.util.Arrays;
 import org.apache.log4j.Logger;
 
 import saros.activities.FileActivity;
+import saros.activities.FolderCreatedActivity;
+import saros.activities.FolderDeletedActivity;
 import saros.filesystem.IFile;
 import saros.lsp.extensions.server.editor.EditorManager;
 import saros.lsp.utils.FileUtils;
 import saros.session.AbstractActivityConsumer;
 import saros.session.ISarosSession;
 
+//TODO: naming für File/Folder
 public class FileActivityHandler extends AbstractActivityConsumer {//TODO: naming Consumer?
     private static final Logger LOG = Logger.getLogger(FileActivityHandler.class);
 
@@ -42,6 +45,24 @@ public class FileActivityHandler extends AbstractActivityConsumer {//TODO: namin
         }
     }
 
+    @Override
+    public void receive(FolderCreatedActivity folderCreatedActivity) {
+        try {
+            folderCreatedActivity.getPath().getFolder().create(false, true);
+        } catch (IOException e) {
+            LOG.error(e); //TODO: warn?
+        }
+    }
+
+    @Override
+    public void receive(FolderDeletedActivity folderDeletedActivity) {
+        try {
+            folderDeletedActivity.getPath().getFolder().delete(0);
+        } catch (IOException e) {
+            LOG.error(e);
+        }
+    }
+
     private void handleDelete(FileActivity fileActivity) {
         LOG.debug("handleDelete");
         this.editorManager.closeEditor(fileActivity.getPath());
@@ -67,9 +88,9 @@ public class FileActivityHandler extends AbstractActivityConsumer {//TODO: namin
         if (file.exists()) actualContent = FileUtils.getLocalFileContent(file); //TODO: use editor manager?
 
         if (!Arrays.equals(newContent, actualContent)) {
-        FileUtils.writeFile(new ByteArrayInputStream(newContent), file);
+            FileUtils.writeFile(new ByteArrayInputStream(newContent), file);
         } else {
-        LOG.debug("FileActivity " + fileActivity + " dropped (same content)");
+            LOG.debug("FileActivity " + fileActivity + " dropped (same content)");
         }
 
         // if (encoding != null) updateFileEncoding(encoding, file); TODO
