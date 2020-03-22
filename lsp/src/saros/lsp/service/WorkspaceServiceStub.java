@@ -18,6 +18,7 @@ import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IWorkspace;
 import saros.lsp.SarosLauncher;
+import saros.lsp.extensions.server.editor.EditorManager;
 import saros.lsp.filesystem.LspPath;
 import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
@@ -34,6 +35,8 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
   private ISarosSession session;
 
   private IWorkspace workspace;
+
+  private EditorManager editorManager;
 
   private final ISessionLifecycleListener sessionLifecycleListener = new ISessionLifecycleListener() {
 
@@ -64,8 +67,10 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
     this.session.addActivityProducer(this);
   }
 
-  public WorkspaceServiceStub(ISarosSessionManager sessionManager, IWorkspace workspace) {
+  public WorkspaceServiceStub(ISarosSessionManager sessionManager, IWorkspace workspace, EditorManager editorManager) {
     this.workspace = workspace;
+    this.editorManager = editorManager;
+
     sessionManager.addSessionLifecycleListener(this.sessionLifecycleListener);
   }
 
@@ -94,7 +99,7 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
         // NOP
         break;
       case Created:
-        activityFromEvent = new FileActivity(this.session.getLocalUser(), Type.CREATED, Purpose.ACTIVITY, target, null, null, null);
+        activityFromEvent = new FileActivity(this.session.getLocalUser(), Type.CREATED, Purpose.ACTIVITY, target, null, this.editorManager.getContent(target).getBytes(), null);
         break;
       case Deleted:
         activityFromEvent = new FileActivity(this.session.getLocalUser(), Type.REMOVED, Purpose.ACTIVITY, target, null, null, null);
@@ -105,6 +110,20 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
       this.fireActivity(activityFromEvent);
     }
   }
+
+  /**
+   * switch (type) {
+      case CREATED:
+        if (content == null || oldPath != null) throw new IllegalArgumentException();
+        break;
+      case REMOVED:
+        if (content != null || oldPath != null) throw new IllegalArgumentException();
+        break;
+      case MOVED:
+        if (oldPath == null) throw new IllegalArgumentException();
+        break;
+    }  
+   */
 
   private SPath createSPath(FileEvent fileEvent) throws URISyntaxException {
     IPath path = LspPath.fromUri(new URI(fileEvent.getUri()));
