@@ -25,7 +25,7 @@ public class LspPath implements IPath {
 
     public static IPath fromUri(URI uri) {
       LOG.info(String.format("URI Scheme: %s", uri.getScheme()));
-    if (uri == null) {
+      if (uri == null || !uri.getScheme().equals("file")) {
         return EMPTY;
       }
   

@@ -131,6 +131,9 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
   }
 
   private IActivity getCreateActivity(SPath target) {
+    LOG.info(target);
+    LOG.info(target.getResource());
+    LOG.info(target.getResource().getType());
     if(target.getResource().getType() == IResource.PROJECT) {
       return new FolderCreatedActivity(this.session.getLocalUser(), target);
     } else if(target.getResource().getType() == IResource.FILE) {
