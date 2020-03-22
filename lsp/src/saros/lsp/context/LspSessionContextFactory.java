@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import saros.context.IContextFactory;
 import saros.context.AbstractContextFactory.Component;
 import saros.lsp.activity.ActivityConsumer;
+import saros.lsp.activity.FileActivityHandler;
 import saros.lsp.activity.InconsistencyHandler;
 import saros.lsp.activity.UserStatusHandler;
 import saros.lsp.session.NegotiationHook;
@@ -30,6 +31,9 @@ public class LspSessionContextFactory extends SarosCoreSessionContextFactory{//T
 
     container.addComponent(ActivityConsumer.class);
     container.addComponent(InconsistencyHandler.class);
+
+    // Handler
+    container.addComponent(FileActivityHandler.class);
 
     // UI Handler
     container.addComponent(UserStatusHandler.class);
