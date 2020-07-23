@@ -1,44 +1,43 @@
-import * as vscode from 'vscode';
-import {sarosExtensionInstance} from './core';
-import {activateAccounts} from './account';
+import { activateAccounts, activateContacts, activateSessions } from './commands';
+import { SarosContactView, SarosSessionView, SarosAccountView } from './views';
+import { sarosExtensionInstance } from './lsp';
+import { window, ExtensionContext } from 'vscode';
+import { variables } from './views/variables';
 
 /**
  * Activation function of the extension.
  *
  * @export
- * @param {vscode.ExtensionContext} context - The extension context
+ * @param {ExtensionContext} context - The extension context
  */
-export function activate(context: vscode.ExtensionContext) {
-  sarosExtensionInstance.setContext(context)
-      .init()
-      .then(() => {
-        activateAccounts(sarosExtensionInstance);
+export function activate(context: ExtensionContext) {
 
-        console.log('Extension "Saros" is now active!');
-      })
-      .catch((reason) => {
-        console.log(reason);
-        vscode.window.showErrorMessage(
-            'Saros extension did not start propertly.' +
-            'Reason: ' + reason);
-      });
+	sarosExtensionInstance.setContext(context)
+						.init()
+						.then(() => {
+							activateAccounts(sarosExtensionInstance);
+							activateContacts(sarosExtensionInstance);
+							activateSessions(sarosExtensionInstance);
+							
+							context.subscriptions.push(new SarosAccountView(sarosExtensionInstance));
+							context.subscriptions.push(new SarosContactView(sarosExtensionInstance));
+							context.subscriptions.push(new SarosSessionView(sarosExtensionInstance));
 
-  context.subscriptions.push(createStatusBar());
-}
+							variables.setInitialized(true);
+						})
+						.catch((reason?: string) => {
+							window.showErrorMessage('Saros extension did not start properly. '
+														+ 'Reason: ' + reason);
+						});
 
-/**
- * Creates the status bar.
- *
- * @return {Disposable} The status bar item as [disposable](#Disposable)
- */
-function createStatusBar(): vscode.Disposable {
-  const statusBarItem =
-    vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left,
-        Number.MAX_VALUE);
-  statusBarItem.text = 'Saros';
-  statusBarItem.show();
-
-  return statusBarItem;
+	window.onDidChangeTextEditorSelection(l => {
+		console.log("Kind: " + l.kind?.toString()); 
+		l.selections.forEach(e => {
+			console.log(`Line ${e.active.line} Char ${e.active.character}`);
+		});
+		console.log("Selections: " + l.selections.length.toString());
+		console.log("Document: " + l.textEditor.document.fileName);
+	});
 }
 
 /**
@@ -47,5 +46,6 @@ function createStatusBar(): vscode.Disposable {
  * @export
  */
 export function deactivate() {
-  console.log('deactivated');
+	sarosExtensionInstance.deactivate();
+	variables.setInitialized(false);
 }
