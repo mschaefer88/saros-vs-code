@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 export class QuickPickItem<T> implements vscode.QuickPickItem {
-    label: string;    
+    label: string;
     description?: string | undefined;
     detail?: string | undefined;
     picked?: boolean | undefined;
@@ -9,7 +9,7 @@ export class QuickPickItem<T> implements vscode.QuickPickItem {
     item: T;
 
     constructor(label: string, item: T) {
-        this.label = label;
-        this.item = item;
+      this.label = label;
+      this.item = item;
     }
 }

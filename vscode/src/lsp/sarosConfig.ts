@@ -1,4 +1,4 @@
-import { workspace, WorkspaceConfiguration } from 'vscode';
+import {workspace, WorkspaceConfiguration} from 'vscode';
 
 export namespace config {
     export enum ServerTrace {
@@ -6,7 +6,7 @@ export namespace config {
 		Messages = 'messages',
 		Verbose = 'verbose'
     }
-    
+
     export enum ServerLog {
         All ='all',
 		Debug =	'debug',
@@ -21,36 +21,36 @@ export namespace config {
     export const appName = 'saros';
 
     export function getTraceServer(): ServerTrace {
-        const trace = getConfiguration().get('trace.server') as ServerTrace;
-        
-        return trace;
+      const trace = getConfiguration().get('trace.server') as ServerTrace;
+
+      return trace;
     }
 
     export function getLogServer(): ServerLog {
-        const log = getConfiguration().get('log.server') as ServerLog;
-        
-        return log;
+      const log = getConfiguration().get('log.server') as ServerLog;
+
+      return log;
     }
 
     export function getDefaultHost(): string {
-        const host = getConfiguration().get('defaultHost.client') as string;
-        
-        return host;
+      const host = getConfiguration().get('defaultHost.client') as string;
+
+      return host;
     }
 
     export function getServerPort(): number | null {
-        const port = getConfiguration().get('port.server') as number;
-        
-        return port;
+      const port = getConfiguration().get('port.server') as number;
+
+      return port;
     }
 
     export function isServerStandalone(): boolean {
-        const standalone = getConfiguration().get('standalone.server') as boolean;
+      const standalone = getConfiguration().get('standalone.server') as boolean;
 
-        return standalone;
+      return standalone;
     }
 
     function getConfiguration(): WorkspaceConfiguration {
-        return workspace.getConfiguration(appName);
+      return workspace.getConfiguration(appName);
     }
 }

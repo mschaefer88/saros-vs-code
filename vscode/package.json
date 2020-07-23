@@ -246,7 +246,8 @@
 		"test-compile": "tsc -p ./",
 		"pretest": "npm run compile",
 		"test": "node ./out/test/runTest.js",
-		"lint": "eslint */**/*.ts --quiet"
+		"lint": "eslint */**/*.ts --quiet",
+		"lint-fix": "eslint */**/*.ts --fix --quiet"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.2",

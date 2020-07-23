@@ -1,5 +1,5 @@
-import { NotificationType, RequestType } from "vscode-languageclient";
-import { Range } from "vscode";
+import {NotificationType, RequestType} from 'vscode-languageclient';
+import {Range} from 'vscode';
 
 /**
  * Response for adding new accounts.
@@ -18,9 +18,9 @@ export interface SarosResultResponse<T> extends SarosResponse {
 
 export interface AccountDto extends AccountIdDto {
     password: string;
-    server: string; 
+    server: string;
     port: number;
-    useTLS: boolean; 
+    useTLS: boolean;
     useSASL: boolean;
     isDefault: boolean;
 }
@@ -48,21 +48,21 @@ export interface SessionUserDto {
     nickname: string;
 }
 
-//TODO: use namespaces for grouping
+// TODO: use namespaces for grouping
 export namespace OpenProjectNotification {
-    export const type = new NotificationType<SarosResultResponse<string>, void>('saros/editor/open'); //TODO: naming
+    export const type = new NotificationType<SarosResultResponse<string>, void>('saros/editor/open'); // TODO: naming
 }
 
 export namespace SessionStateNotification {
-	export const type = new NotificationType<SarosResultResponse<boolean>, void>('saros/session/state'); //TODO: naming
+	export const type = new NotificationType<SarosResultResponse<boolean>, void>('saros/session/state'); // TODO: naming
 }
 
 export namespace ConnectedStateNotification {
-	export const type = new NotificationType<SarosResultResponse<boolean>, void>('saros/session/connected'); //TODO: naming
+	export const type = new NotificationType<SarosResultResponse<boolean>, void>('saros/session/connected'); // TODO: naming
 }
 
 export namespace ContactStateNotification {
-    export const type = new NotificationType<ContactDto, void>('saros/contact/state'); //TODO: naming
+    export const type = new NotificationType<ContactDto, void>('saros/contact/state'); // TODO: naming
 }
 
 export namespace AddAccountRequest {
@@ -114,11 +114,11 @@ export namespace DisconnectRequest {
 }
 
 export namespace IsOnlineRequest {
-    export const type = new RequestType<void, SarosResultResponse<boolean>, void>('saros/session/status'); //TODO: naming
+    export const type = new RequestType<void, SarosResultResponse<boolean>, void>('saros/session/status'); // TODO: naming
 }
 
 export namespace InviteContactRequest {
-    export const type = new RequestType<ContactDto, SarosResultResponse<boolean>, void>('saros/session/invite'); //TODO: naming
+    export const type = new RequestType<ContactDto, SarosResultResponse<boolean>, void>('saros/session/invite'); // TODO: naming
 }
 
 export namespace StartSessionRequest {
