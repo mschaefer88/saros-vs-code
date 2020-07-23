@@ -121,9 +121,33 @@ Create the `launch.json` in your `.vscode` directory of the folder you opened wi
 
 #### Using gradle
 
-Using gradle tasks directly has the benefits of starting multiple instances of the `VS Code Extension Host` which is useful for testing multiple at once. Just open the available tasks (usually `CTRL+SHIFT+T`) and run `runVSCode` in order to start the extension in an `Extension Host`. When debugging is needed just hit `F5` and choose the NodeJs debugger and attach to the desired process.
+Using gradle tasks directly has the benefits of starting multiple instances of the `VS Code Extension Host` which is useful for testing with multiple instances at once. Just open the available tasks (usually `CTRL+SHIFT+T`) and run `runExtension` in order to start the extension in an `Extension Host`. When debugging is needed just hit `F5` and choose the NodeJs debugger and attach to the desired process.
 
 To make it more comfortable a keybinding can be assigned to that task (`keybindings.json`) or the launch configuration of the NodeJs debugger can be saved (`launch.json`) in order to attach via `F5`.
+
+If `runExtension` isn't detected by Visual Studio Code you have to add a `task.json` like the following to your `.vscode` folder. (seems not to work within workspaces)
+
+```json
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Extension",
+            "type": "shell",
+            "command": "gradle",
+            "args": [
+                "runExtension"
+            ],
+            "problemMatcher": [],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        }
+    ]
+}
+```
 
 ## Develop Without an IDE
 
@@ -137,12 +161,12 @@ The following tasks are used to build and test the different Saros components:
 * `sarosIntellij` - Triggers the build and test of the Saros IntelliJ Plugin
 * `sarosServer` - Triggers the build and test of the Saros Server
 * `sarosLsp` - Triggers the build and test of the Saros Language Server
-* `sarosVSCode` - Triggers the build and test of the Saros VS Code Extension
+* `sarosVSCode` - Triggers the build of the Saros VS Code Extension
 * `prepareEclipse` - Executes all tasks which are required before developing in Eclipse
 * `runIde` - Starts a IntelliJ IDE containing the Saros Plugin. The IDE version depends on the value of `INTELLIJ_HOME` or the `intellijVersion` specified in the build file of the IntelliJ package.
-* `runVSCode` - Starts an VS Code (Extension Host) with the Saros Extension. Use the node debugger to attach to the process for debugging.
+* `runExtension` - Starts an VS Code (Extension Host) with the Saros Extension. Use the node debugger to attach to the process for debugging.
 
-In order to build the whole project without using existing build artifacts simply call `./gradlew cleanAll sarosEclipse sarosIntellij sarosServer sarosVSCode`.
+In order to build the whole project without using existing build artifacts simply call `./gradlew cleanAll sarosEclipse sarosIntellij sarosServer sarosLsp sarosVSCode`.
 
 Gradle checks whether the component specific sources are changed. Therefore a task become a NOP if nothing changed and the build results still exist.
 If you want to force Gradle to re-execute the tasks, you have to call `./gradlew --rerun-tasks <task>...` or call the `cleanAll` task before other tasks.
