@@ -1,6 +1,30 @@
+/**
+ * Aggregator for events.
+ *
+ * @export
+ * @interface IEventAggregator
+ */
 export interface IEventAggregator {
-    subscribe<TArgs>(event: string, callback: (args: TArgs) => void): void;
-    publish<TArgs>(event: string, args: TArgs): void;
+  /**
+   * Registers a callback for an event.
+   *
+   * @template TArgs
+   * @param {string} event Event identifier
+   * @param {TypedEventCallback<TArgs>} callback Callback that will be called
+   *  when event is being published
+   * @memberof IEventAggregator
+   */
+  subscribe<TArgs>(event: string, callback: TypedEventCallback<TArgs>): void;
+
+  /**
+   * Publishes the event.
+   *
+   * @template TArgs
+   * @param {String} event Event identifier
+   * @param {TArgs} args Event arguments
+   * @memberof IEventAggregator
+   */
+  publish<TArgs>(event: string, args: TArgs): void;
 }
 
 type EventCallback = (args: any) => void;

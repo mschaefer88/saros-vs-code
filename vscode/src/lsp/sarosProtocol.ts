@@ -1,15 +1,37 @@
 import {NotificationType, RequestType} from 'vscode-languageclient';
 import {Range} from 'vscode';
 
+/**
+ * Generic response that indicates success or failure.
+ *
+ * @export
+ * @interface SarosResponse
+ */
 export interface SarosResponse {
   success: boolean;
   error: string;
 }
 
+/**
+ * Response that indicates success or failure and
+ * contains a payload.
+ *
+ * @export
+ * @interface SarosResultResponse
+ * @extends {SarosResponse}
+ * @template T
+ */
 export interface SarosResultResponse<T> extends SarosResponse {
   result: T;
 }
 
+/**
+ * Contains data about an account.
+ *
+ * @export
+ * @interface AccountDto
+ * @extends {AccountIdDto}
+ */
 export interface AccountDto extends AccountIdDto {
   password: string;
   server: string;
@@ -19,11 +41,23 @@ export interface AccountDto extends AccountIdDto {
   isDefault: boolean;
 }
 
+/**
+ * Identifies an account.
+ *
+ * @export
+ * @interface AccountIdDto
+ */
 export interface AccountIdDto {
   username: string;
   domain: string;
 }
 
+/**
+ * Contains data about a contact.
+ *
+ * @export
+ * @interface ContactDto
+ */
 export interface ContactDto {
   id: string;
   nickname: string;
@@ -32,16 +66,34 @@ export interface ContactDto {
   subscribed: boolean;
 }
 
+/**
+ * Contains data about the user to invite.
+ *
+ * @export
+ * @interface InviteDto
+ */
 export interface InviteDto {
   id: string;
   description: string;
 }
 
+/**
+ * Contains data about an user in the session.
+ *
+ * @export
+ * @interface SessionUserDto
+ */
 export interface SessionUserDto {
   id: string;
   nickname: string;
 }
 
+/**
+ * Contains data about annotations.
+ *
+ * @export
+ * @interface AnnotationParams
+ */
 export interface AnnotationParams {
   uri: string;
   user: string;
