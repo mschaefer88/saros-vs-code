@@ -1,28 +1,56 @@
 import {WizardStep, WizardContext} from '../../../types';
 import {ContactDto} from '../../../lsp';
+import {regex} from '../../../utils/regex';
 
-const regexJid = /^[^\u0000-\u001f\u0020\u0022\u0026\u0027\u002f\u003a\u003c\u003e\u0040\u007f\u0080-\u009f\u00a0]+@[a-z0-9.-]+\.[a-z]{2,10}$/;
-const regexJidPrefix = /^[^\u0000-\u001f\u0020\u0022\u0026\u0027\u002f\u003a\u003c\u003e\u0040\u007f\u0080-\u009f\u00a0]+$/;
-
+/**
+ * Wizard step to enter a JID.
+ *
+ * @export
+ * @class JidStep
+ * @implements {WizardStep<ContactDto>}
+ */
 export class JidStep implements WizardStep<ContactDto> {
-  canExecute(context: WizardContext<ContactDto>): boolean {
+  /**
+   * Checks if step can be executed.
+   *
+   * @param {WizardContext<AccountDto>} _context Current wizard context
+   * @return {boolean} true if step can be executed, false otherwise
+   * @memberof JidStep
+   */
+  canExecute(_context: WizardContext<ContactDto>): boolean {
     return true;
   }
 
+  /**
+   * Executes the step.
+   *
+   * @param {WizardContext<AccountDto>} context Current wizard context
+   * @return {Promise<void>} Awaitable promise with no result
+   * @memberof JidStep
+   */
   async execute(context: WizardContext<ContactDto>): Promise<void> {
     const id = await context.showInputBox({
       value: context.target.id || '',
       prompt: 'Enter name or JID',
       placeholder: undefined,
       password: false,
-      validate: this.validateJid,
+      validate: this._validateJid,
     });
 
     context.target.id = id;
   }
 
-  validateJid(input: string): Promise<string|undefined> {
-    const isValid = regexJid.test(input) || regexJidPrefix.test(input);
+  /**
+   * Validates input if it's a JID.
+   *
+   * @private
+   * @param {string} input The input to validate
+   * @return {(Promise<string|undefined>)} Awaitable result which is undefined
+   *  if valid and contains the error message if not
+   * @memberof JidStep
+   */
+  private _validateJid(input: string): Promise<string|undefined> {
+    const isValid = regex.jid.test(input) || regex.jidPrefix.test(input);
     const result = isValid ? undefined : 'Not a valid JID';
 
     return Promise.resolve(result);

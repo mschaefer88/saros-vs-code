@@ -2,12 +2,21 @@ import {QuickPickItem} from '../types';
 import {window} from 'vscode';
 import {SarosResponse} from '../lsp';
 
-export function pick<T>(items: T[], labelFunc: ((item: T) => string), detailFunc: ((item: T) => string)) {
-  const pickItems = mapToQuickPickItems(items, labelFunc, detailFunc);
-  return window.showQuickPick(pickItems);
-}
+export type TextFunc<T> = (item: T) => string;
 
-export function mapToQuickPickItems<T>(items: T[], labelFunc: ((item: T) => string), detailFunc?: ((item: T) => string)): QuickPickItem<T>[] {
+/**
+ * Creates quickpick items that wrap the pickable objects.
+ *
+ * @export
+ * @template T
+ * @param {T[]} items The pickable items
+ * @param {TextFunc<T>} labelFunc Function that extracts the label
+ * @param {TextFunc<T>} [detailFunc] Function that extracts the details
+ * @return {QuickPickItem<T>[]} Pickable quickpick items
+ */
+export function mapToQuickPickItems<T>(
+    items: T[], labelFunc: TextFunc<T>, detailFunc?: TextFunc<T>,
+): QuickPickItem<T>[] {
   return items.map((item) => {
     return {
       label: labelFunc(item),
@@ -17,7 +26,17 @@ export function mapToQuickPickItems<T>(items: T[], labelFunc: ((item: T) => stri
   });
 }
 
-export function showMessage(response: SarosResponse, successMessage: string, errorMessage?: string) {
+/**
+ * Shows a success or error message depending on the response.
+ *
+ * @export
+ * @param {SarosResponse} response The response
+ * @param {string} successMessage The message to be shown on success
+ * @param {string} [errorMessage] The message to be shown on failure
+ */
+export function showMessage(
+    response: SarosResponse, successMessage: string, errorMessage?: string,
+) {
   if (response.success) {
     window.showInformationMessage(successMessage);
   } else {

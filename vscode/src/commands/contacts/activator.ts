@@ -1,9 +1,13 @@
 import {SarosExtension} from '../../lsp';
 import {commands} from 'vscode';
-import {addContactWizard, editContactWizard, removeContactWizard} from './wizards';
+import {
+  addContactWizard,
+  editContactWizard,
+  removeContactWizard,
+} from './wizards';
 
 /**
- * Activation function of the account module.
+ * Registers all commands of the contact module.
  *
  * @export
  * @param {SarosExtension} extension - The instance of the extension

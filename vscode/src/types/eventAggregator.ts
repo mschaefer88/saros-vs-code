@@ -1,12 +1,32 @@
 export interface IEventAggregator {
     subscribe<TArgs>(event: string, callback: (args: TArgs) => void): void;
-    publish<TArgs>(event: String, args: TArgs): void;
+    publish<TArgs>(event: string, args: TArgs): void;
 }
 
-export class EventAggregator implements IEventAggregator {
-    private _subscriber = new Map<String, ((args: any) => void)[]>();
+type EventCallback = (args: any) => void;
+type TypedEventCallback<TArgs> = (args: TArgs) => void;
 
-    public subscribe<TArgs>(event: string, callback: (args: TArgs) => void): void {
+/**
+ * Aggregator for events.
+ *
+ * @export
+ * @class EventAggregator
+ * @implements {IEventAggregator}
+ */
+export class EventAggregator implements IEventAggregator {
+    private _subscriber = new Map<string, EventCallback[]>();
+
+    /**
+     * Registers a callback for an event.
+     *
+     * @template TArgs
+     * @param {string} event Event identifier
+     * @param {TypedEventCallback<TArgs>} callback Callback that will be called
+     *  when event is being published
+     * @memberof EventAggregator
+     */
+    public subscribe<TArgs>(event: string, callback: TypedEventCallback<TArgs>)
+      : void {
       if (!this._subscriber.has(event)) {
         this._subscriber.set(event, []);
       }
@@ -15,7 +35,15 @@ export class EventAggregator implements IEventAggregator {
         callbacks?.push(callback);
     }
 
-    public publish<TArgs>(event: String, args: TArgs): void {
+    /**
+     * Publishes the event.
+     *
+     * @template TArgs
+     * @param {String} event Event identifier
+     * @param {TArgs} args Event arguments
+     * @memberof EventAggregator
+     */
+    public publish<TArgs>(event: string, args: TArgs): void {
       if (!this._subscriber.has(event)) {
         return;
       }

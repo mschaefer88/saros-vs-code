@@ -1,14 +1,25 @@
-import {ExtensionContext, workspace, window, ProgressLocation, Uri, OverviewRulerLane, TextEditorDecorationType, OutputChannel} from 'vscode'; // TODO: überall so machen!
+import {
+  ExtensionContext,
+  workspace,
+  window,
+  ProgressLocation,
+  OverviewRulerLane,
+  TextEditorDecorationType,
+  OutputChannel,
+} from 'vscode';
 import {SarosServer} from './sarosServer';
-import {OpenProjectNotification, AnnotationNotification} from './sarosProtocol';
-import {LanguageClientOptions, RevealOutputChannelOn, ErrorHandler, Message, ErrorAction, CloseAction} from 'vscode-languageclient';
+import {AnnotationNotification, AnnotationParams} from './sarosProtocol';
+import {
+  LanguageClientOptions,
+  RevealOutputChannelOn,
+} from 'vscode-languageclient';
 import {config} from './sarosConfig';
 import {SarosClient} from './sarosClient';
 import * as _ from 'lodash';
-import {SarosEvent} from './sarosEvents';
 import {IEventAggregator, EventAggregator} from '../types/eventAggregator';
+import {SarosErrorHandler, ErrorCallback} from './sarosErrorHandler';
 
-type ErrorCallback = (reason?: any) => void;
+type SubscriptionCallback<TArgs> = (args: TArgs) => void;
 
 /**
  * The Saros extension.
@@ -23,10 +34,27 @@ export class SarosExtension implements IEventAggregator {
 
     private _eventAggregator = new EventAggregator();
 
-    public subscribe<TArgs>(event: string, callback: (args: TArgs) => void) {
+    /**
+     * Subscribes to an event.
+     *
+     * @template TArgs Event argument type
+     * @param {string} event Event identifier
+     * @param {SubscriptionCallback<TArgs>} callback Event callback
+     * @memberof SarosExtension
+     */
+    public subscribe<TArgs>(event: string,
+        callback: SubscriptionCallback<TArgs>) {
       this._eventAggregator.subscribe(event, callback);
     }
 
+    /**
+     * Publishes an event.
+     *
+     * @template TArgs Event argument type
+     * @param {String} event Event identifier
+     * @param {TArgs} args Event arguments
+     * @memberof SarosExtension
+     */
     public publish<TArgs>(event: String, args: TArgs) {
       this._eventAggregator.publish(event, args);
     }
@@ -63,124 +91,106 @@ export class SarosExtension implements IEventAggregator {
     /**
      * Initializes the extension.
      *
-     * @return
+     * @return {Promise<void>} Awaitable promise that
+     *  returns after initialization
      * @memberof SarosExtension
      */
-    async init() {
+    async init(): Promise<void> {
       if (!this.context) {
-        return Promise.reject('Context not set');
+        return Promise.reject(new Error('Context not set'));
       }
 
       const self = this;
 
-      return window.withProgress({location: ProgressLocation.Window, cancellable: false, title: 'Starting Saros'},
-          () => {
-            return new Promise((resolve, reject) => {
-              const server = new SarosServer(self.context);
-              self.client = new SarosClient(server.getStartFunc(), this._createClientOptions(reject));
-              self.context.subscriptions.push(self.client.start());
+      return window.withProgress({
+        location: ProgressLocation.Window,
+        cancellable: false,
+        title: 'Starting Saros',
+      },
+      () => {
+        return new Promise((resolve, reject) => {
+          const server = new SarosServer(self.context);
+          self.client = new SarosClient(server.getStartFunc(),
+              this._createClientOptions(reject));
+          self.context.subscriptions.push(self.client.start());
 
-              self.client.onReady().then(() => {
-                self.client.onNotification(OpenProjectNotification.type, async (project) => {
-                  const uri = Uri.file(project.result);
-                  const newWindow = false;
-                  // let result = await commands.executeCommand('vscode.openFolder', uri, newWindow);
-                  // console.log(`Open Project Result: ${result}`);
-                });
+          self.client.onReady().then(() => {
+            self.client.onNotification(AnnotationNotification.type,
+                (params) => {
+                  this.processAnnotations(params.result);
+                },
+            );
 
-                self.client.onNotification(AnnotationNotification.type, (params) => {
-                  const user = _.groupBy(params.result, (a) => a.user);
-
-                  _.forEach(user, (as, u) => {
-                    if (u !== 'mschaefer88_u') {
-                      const ranges = _.map(as, (a) => a.range);
-
-                                window.activeTextEditor?.setDecorations(this._annotationType, ranges);
-                    }
-                  });
-                });
-
-                resolve();
-              });
-            });
+            resolve();
           });
+        });
+      });
+    }
+
+    /**
+     * Processes incoming annotations.
+     *
+     * @private
+     * @param {AnnotationParams[]} annotations Current annotations
+     * @memberof SarosExtension
+     */
+    private processAnnotations(annotations: AnnotationParams[]) {
+      const user = _.groupBy(annotations, (a) => a.user);
+      _.forEach(user, (as, u) => {
+        if (u !== 'mschaefer88_u') {
+          const ranges = _.map(as, (a) => a.range);
+          window.activeTextEditor?.setDecorations(this._annotationType, ranges);
+        }
+      });
     }
 
     /**
      * Callback when extension is ready.
      *
-     * @return
+     * @return {Promise<void>} Awaitable promise that
+     *  returns once extension is ready
      * @memberof SarosExtension
      */
-    async onReady() {
+    async onReady(): Promise<void> {
       if (!this.client) {
-        return Promise.reject('SarosExtension is not initialized');
+        return Promise.reject(new Error('SarosExtension is not initialized'));
       }
 
       return this.client.onReady();
     }
 
     /**
-     * Creates the client options.
+     * Creates the language client options.
      *
      * @private
-     * @return {LanguageClientOptions} The client options
+     * @param {ErrorCallback} errorCallback Callback when client throws errors
+     * @return {LanguageClientOptions} Used language client options
      * @memberof SarosExtension
      */
-    private _createClientOptions(callback: ErrorCallback): LanguageClientOptions { // TODO: param in docs
+    private _createClientOptions(errorCallback: ErrorCallback)
+      : LanguageClientOptions {
       const clientOptions: LanguageClientOptions = {
-        // Register the server for plain text documents
         documentSelector: [{scheme: 'file'}],
         synchronize: {
           configurationSection: config.appName,
           fileEvents: workspace.createFileSystemWatcher('**/*'),
         },
-        revealOutputChannelOn: RevealOutputChannelOn.Error, // TODO: set with config file
-        errorHandler: new MyErrorHandler(callback),
-        progressOnInitialization: true,
+        revealOutputChannelOn: RevealOutputChannelOn.Error,
+        errorHandler: new SarosErrorHandler(errorCallback),
         outputChannel: this.channel,
       };
 
       return clientOptions;
     }
 
+    /**
+     * Deactivates the Saros extension.
+     *
+     * @memberof SarosExtension
+     */
     public deactivate(): void {
-      // this.client.stop();
+      this.client.stop();
     }
-}
-
-class MyErrorHandler implements ErrorHandler { // TODO: move to own file?! + better name
-  constructor(private _callback: ErrorCallback) {
-    console.log('ctor', _callback, this._callback);
-  }
-
-  error(error: Error, message: Message, count: number): ErrorAction {
-    console.log(`<ERROR>`);
-    console.log(`error = ${error.message}`);
-    // console.log(`message = ${message.jsonrpc}`);
-    // console.log(`count = ${count}`);
-    console.log(`</ERROR>`);
-
-    const t = typeof(error);
-
-    console.log('reject');
-    console.log(this._callback);
-    this._callback(error.message);
-    return ErrorAction.Continue;
-    // if(error.code === "ECONNREFUSED") {
-    //     return ErrorAction.Continue;
-    // }
-
-    // ECONNREFUSED
-    this._callback(error.message);
-    return ErrorAction.Shutdown;
-  }
-
-  closed(): CloseAction {
-    console.log(`CLOSED!`);
-    return CloseAction.DoNotRestart;
-    return CloseAction.Restart; // TODO: abort after count
-  }
 }
 
 export const sarosExtensionInstance = new SarosExtension();

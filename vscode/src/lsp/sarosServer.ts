@@ -6,11 +6,10 @@ import {StreamInfo} from 'vscode-languageclient';
 import getPort = require('get-port');
 import {config} from './sarosConfig';
 
-class SarosState {
-    port?: number;
-}
+export type LanguageServerOptions = (() => Promise<StreamInfo>);
 
-const Used_Port_Key = 'SAROS_PORT';
+const sarosLspJarName = 'saros.lsp.jar';
+const sarosLspJarFolder = 'out';
 
 /**
  * Encapsulation of the Saros server.
@@ -55,33 +54,54 @@ export class SarosServer {
      * Provides access to the start function.
      *
      * @remarks A free port will be determined and used.
-     * @returns {() => Thenable<StreamInfo>} Function that starts the server and retuns the io information
+     * @return {LanguageServerOptions} Function that starts
+     *  the server and retuns the io information
      * @memberof SarosServer
      */
-    public getStartFunc(): () => Promise<StreamInfo> {
+    public getStartFunc(): LanguageServerOptions {
       const self = this;
-      async function createServer(): Promise<StreamInfo> {
-        const port = config.getServerPort() || await getPort();
-        console.log(`Using port ${port} for server.`);
-
-        if (!config.isServerStandalone()) {
-          await self.start(port);
-        }
-
-        const connectionInfo: net.NetConnectOpts = {
-          port: port,
-        };
-        const socket = net.connect(connectionInfo);
-
-        const result: StreamInfo = {
-          writer: socket,
-          reader: socket,
-        };
-
-        return result;
+      /**
+       * Reference to creation function of the server
+       * for usage in the language server infrastructure.
+       *
+       * @return {Promise<StreamInfo>} Awaitable promise to the
+       *  connection informations
+       */
+      function createServerFunc(): Promise<StreamInfo> {
+        return self.createServer(self);
       }
 
-      return createServer;
+      return createServerFunc;
+    }
+
+    /**
+     * Starts the LSP server.
+     *
+     * @private
+     * @param {SarosServer} self Reference to itself
+     * @return {Promise<StreamInfo>} Awaitable promise to the
+     *  connection informations
+     * @memberof SarosServer
+     */
+    private async createServer(self: SarosServer): Promise<StreamInfo> {
+      const port = config.getServerPort() || await getPort();
+      console.log(`Using port ${port} for server.`);
+
+      if (!config.isServerStandalone()) {
+        await self.start(port);
+      }
+
+      const connectionInfo: net.NetConnectOpts = {
+        port: port,
+      };
+      const socket = net.connect(connectionInfo);
+
+      const result: StreamInfo = {
+        writer: socket,
+        reader: socket,
+      };
+
+      return result;
     }
 
     /**
@@ -93,17 +113,17 @@ export class SarosServer {
      * @memberof SarosServer
      */
     private _startProcess(...args: any[]): SarosServer {
-      const pathToJar = path.resolve(this._context.extensionPath, 'out', 'saros.lsp.jar'); // TODO: change on publish
+      const pathToJar = path.resolve(
+          this._context.extensionPath,
+          sarosLspJarFolder,
+          sarosLspJarName,
+      );
       const jre = require('node-jre');
 
       if (this._process) {
         console.log('Killing old process.');
         this._process.kill();
       }
-
-
-      // console.log('Installing jre.');
-      // jre.install((error: Error) => console.log(error));
 
       console.log('Spawning jar process.');
       this._process = jre.spawn(
@@ -113,34 +133,13 @@ export class SarosServer {
           {encoding: 'utf8'},
       ) as cp.ChildProcess;
 
-      try {
-
-        // var pathToFork = path.resolve(this.context.extensionPath, 'out', 'core', 'process-starter.js');//TODO: put aside jar
-        // console.log(pathToFork);
-        // this.process = process.fork(pathToFork, [`java -jar "${pathToJar}" ${args[0]}`], {detached: true, stdio: 'ignore'});
-        // this.process = process.fork(pathToFork, ['notepad'], {detached: true, stdio: 'ignore'});
-
-
-        // let cp = require('child_process')
-        // var child = cp.spawn('notepad', [], {
-        //             detached: true,
-        //             stdio: 'ignore'
-        //             });
-
-        //         console.log(`Server PID is ${child.pid}`);
-        //             child.unref();
-      } catch (err) {
-        console.log(err);
-      }
-
-      console.log(`Server PID is ${this._process?.pid}`);
-
       return this;
     }
 
     /**
      * Attaches listeners for debug informations and prints
-     * retrieved data to a newly created [output channel](#vscode.OutputChannel).
+     * retrieved data to a newly created
+     * [output channel](#vscode.OutputChannel).
      *
      * @private
      * @param {boolean} isEnabled - Wether debug output is redirected or not

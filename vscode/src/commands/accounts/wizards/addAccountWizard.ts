@@ -1,9 +1,26 @@
 import {Wizard} from '../../../types';
 import {SarosExtension, AddAccountRequest, AccountDto} from '../../../lsp';
 import {showMessage} from '../../../utils';
-import {UsernameStep, DomainStep, PasswordStep, ServerStep, PortStep, TlsStep, SaslStep} from '../steps';
+import {
+  UsernameStep,
+  DomainStep,
+  PasswordStep,
+  ServerStep,
+  PortStep,
+  TlsStep,
+  SaslStep,
+} from '../steps';
 
-export async function addAccountWizard(extension: SarosExtension): Promise<AccountDto|undefined> {
+/**
+ * Wizard to add an account.
+ *
+ * @export
+ * @param {SarosExtension} extension The instance of the extension
+ * @return {(Promise<AccountDto|undefined>)} An awaitable promise that
+ *  returns the result if completed and undefined otherwise
+ */
+export async function addAccountWizard(extension: SarosExtension)
+  : Promise<AccountDto|undefined> {
   const account: AccountDto = {port: 0} as any;
   const wizard = new Wizard(account, 'Add account', [
     new UsernameStep(),
@@ -17,7 +34,8 @@ export async function addAccountWizard(extension: SarosExtension): Promise<Accou
   await wizard.execute();
 
   if (!wizard.aborted) {
-    const result = await extension.client.sendRequest(AddAccountRequest.type, account);
+    const result =
+      await extension.client.sendRequest(AddAccountRequest.type, account);
     showMessage(result, 'Account created successfully!');
 
     return result.success ? account : undefined;
