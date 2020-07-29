@@ -8,14 +8,13 @@ import saros.filesystem.NullChecksumCache;
 
 public class LspOptionalContextFactory extends AbstractOptionalContextFactory {
 
-    @Override
-    protected Class<? extends IProxyResolver> getProxyResolverClass() {
-        return NullProxyResolver.class;
-    }
+  @Override
+  protected Class<? extends IProxyResolver> getProxyResolverClass() {
+    return NullProxyResolver.class;
+  }
 
-    @Override
-    protected Class<? extends IChecksumCache> getChecksumCacheClass() {
-        return NullChecksumCache.class;
-    }
-
+  @Override
+  protected Class<? extends IChecksumCache> getChecksumCacheClass() {
+    return NullChecksumCache.class;
+  }
 }

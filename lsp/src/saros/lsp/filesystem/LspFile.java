@@ -7,16 +7,14 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-
 import org.apache.log4j.Logger;
-
 import saros.filesystem.IFile;
 import saros.filesystem.IPath;
 import saros.filesystem.IWorkspace;
 
 public class LspFile extends LspResource implements IFile {
 
-    private final Logger LOG = Logger.getLogger(LspFile.class);
+  private final Logger LOG = Logger.getLogger(LspFile.class);
 
   private String charset;
 

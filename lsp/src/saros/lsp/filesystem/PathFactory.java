@@ -1,15 +1,14 @@
-package saros.lsp.filesystem; //TODO: best package location?
+package saros.lsp.filesystem; // TODO: best package location?
 
 import org.apache.log4j.Logger;
-
 import saros.filesystem.IPath;
 import saros.filesystem.IPathFactory;
 
-public class PathFactory implements IPathFactory {//TODO: use factory where static was used!
+public class PathFactory implements IPathFactory { // TODO: use factory where static was used!
 
-    private static final Logger LOG = Logger.getLogger(PathFactory.class);
+  private static final Logger LOG = Logger.getLogger(PathFactory.class);
 
-    @Override
+  @Override
   public String fromPath(IPath path) {
 
     if (path == null) throw new NullPointerException("path is null");
@@ -31,5 +30,4 @@ public class PathFactory implements IPathFactory {//TODO: use factory where stat
 
     return path;
   }
-
 }

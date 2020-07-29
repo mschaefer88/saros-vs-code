@@ -1,10 +1,10 @@
 package saros.lsp.preferences;
 
-//import saros.annotations.Component;
+// import saros.annotations.Component;
 import saros.preferences.IPreferenceStore;
 import saros.preferences.Preferences;
 
-//@Component(module = "server")
+// @Component(module = "server")
 public class LspPreferences extends Preferences {
 
   /**

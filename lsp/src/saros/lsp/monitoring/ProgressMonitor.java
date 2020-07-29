@@ -3,145 +3,142 @@ package saros.lsp.monitoring;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import org.apache.log4j.Logger;
-import org.eclipse.lsp4j.WorkDoneProgressCreateParams;
 import org.eclipse.lsp4j.ProgressParams;
 import org.eclipse.lsp4j.WorkDoneProgressBegin;
-import org.eclipse.lsp4j.WorkDoneProgressReport;
+import org.eclipse.lsp4j.WorkDoneProgressCreateParams;
 import org.eclipse.lsp4j.WorkDoneProgressEnd;
-
+import org.eclipse.lsp4j.WorkDoneProgressReport;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.monitoring.IProgressMonitor;
 
 public class ProgressMonitor implements IProgressMonitor {
 
-    private static final Logger LOG = Logger.getLogger(ProgressMonitor.class);
+  private static final Logger LOG = Logger.getLogger(ProgressMonitor.class);
 
-    private ExecutorService executor = Executors.newCachedThreadPool();
+  private ExecutorService executor = Executors.newCachedThreadPool();
 
-    private ISarosLanguageClient client;
+  private ISarosLanguageClient client;
 
-    private String token;
+  private String token;
 
-    private String taskName;
+  private String taskName;
 
-    private String subTask;
+  private String subTask;
 
-    private boolean canceled;
+  private boolean canceled;
 
-    private int size;
+  private int size;
 
-    public ProgressMonitor(ISarosLanguageClient client) {
-        this.client = client;
-        this.token = UUID.randomUUID().toString();
+  public ProgressMonitor(ISarosLanguageClient client) {
+    this.client = client;
+    this.token = UUID.randomUUID().toString();
+  }
+
+  @Override
+  public void done() {
+    LOG.debug("done");
+
+    this.endProgress("Done");
+  }
+
+  @Override
+  public void subTask(String name) {
+    LOG.debug(String.format("subTask('%s')", name));
+
+    this.subTask = name;
+  }
+
+  @Override
+  public void setTaskName(String name) {
+    LOG.debug(String.format("setTaskName('%s')", name));
+
+    this.taskName = name;
+  }
+
+  @Override
+  public void worked(int amount) {
+    LOG.debug(String.format("worked(%d)", amount));
+
+    if (this.canceled) {
+      LOG.error("cancelling not supported");
+      throw new UnsupportedOperationException();
     }
 
-    @Override
-    public void done() {
-        LOG.debug("done");
-        
-        this.endProgress("Done");
+    this.reportProgress(amount);
+  }
+
+  @Override
+  public void setCanceled(boolean canceled) {
+    LOG.debug(String.format("setCanceled(%b)", canceled));
+
+    if (this.canceled && !canceled) {
+      LOG.error("resuming not supported");
+      throw new UnsupportedOperationException();
     }
 
-    @Override
-    public void subTask(String name) {
-        LOG.debug(String.format("subTask('%s')", name));
-        
-        this.subTask = name;
+    if (canceled) {
+      this.endProgress("Cancelled");
     }
 
-    @Override
-    public void setTaskName(String name) {
-        LOG.debug(String.format("setTaskName('%s')", name));
-        
-        this.taskName = name;
+    this.canceled = canceled;
+  }
+
+  @Override
+  public boolean isCanceled() {
+    LOG.debug(String.format("isCanceled -> %b", this.canceled));
+
+    return this.canceled;
+  }
+
+  @Override
+  public void beginTask(String name, int size) {
+    LOG.debug(String.format("beginTask('%s', %d)", name, size));
+
+    if (this.canceled) {
+      LOG.error("resuming not supported");
+      throw new UnsupportedOperationException();
     }
 
-    @Override
-    public void worked(int amount) {
-        LOG.debug(String.format("worked(%d)", amount));
+    this.size = size;
 
-        if(this.canceled) {
-            LOG.error("cancelling not supported");
-            throw new UnsupportedOperationException();
-        }
-        
-        this.reportProgress(amount);
-    }
+    this.setTaskName(name);
+    this.createProgress();
+    this.beginProgress(this.taskName);
+  }
 
-    @Override
-    public void setCanceled(boolean canceled) {
-        LOG.debug(String.format("setCanceled(%b)", canceled));
-         
-        if(this.canceled && !canceled) {
-            LOG.error("resuming not supported");
-            throw new UnsupportedOperationException();
-        }
+  private void createProgress() {
 
-        if(canceled) {
-            this.endProgress("Cancelled");
-        }
+    WorkDoneProgressCreateParams c = new WorkDoneProgressCreateParams(this.token);
 
-        this.canceled = canceled;
-    }
+    this.client.createProgress(c);
+  }
 
-    @Override
-    public boolean isCanceled() {
-        LOG.debug(String.format("isCanceled -> %b", this.canceled));
-        
-        return this.canceled;
-    }
+  private void beginProgress(String title) {
 
-    @Override
-    public void beginTask(String name, int size) {
-        LOG.debug(String.format("beginTask('%s', %d)", name, size));
+    ProgressParams<WorkDoneProgressBegin> p =
+        new ProgressParams<WorkDoneProgressBegin>(
+            this.token, new WorkDoneProgressBegin(title, null, 0, false));
 
-        if(this.canceled) {
-            LOG.error("resuming not supported");
-            throw new UnsupportedOperationException();
-        }
-        
-        this.size = size;
+    this.client.progress(p);
+  }
 
-        this.setTaskName(name);                
-        this.createProgress();
-        this.beginProgress(this.taskName);
-    }
+  private void reportProgress(int amount) {
 
-    private void createProgress() {
+    ProgressParams<WorkDoneProgressReport> p =
+        new ProgressParams<WorkDoneProgressReport>(
+            this.token,
+            new WorkDoneProgressReport(
+                this.subTask, (int) Math.round(amount / (double) this.size * 100), false));
 
-            WorkDoneProgressCreateParams c = new WorkDoneProgressCreateParams(this.token);
+    this.client.progress(p);
+  }
 
-            this.client.createProgress(c);
-    }
+  private void endProgress(String message) {
 
-    private void beginProgress(String title) {
+    ProgressParams<WorkDoneProgressEnd> p =
+        new ProgressParams<WorkDoneProgressEnd>(this.token, new WorkDoneProgressEnd(message));
 
-            ProgressParams<WorkDoneProgressBegin> p 
-                = new ProgressParams<WorkDoneProgressBegin>(this.token, 
-                    new WorkDoneProgressBegin(title, null, 0, false));
-
-            this.client.progress(p);
-    }
-
-    private void reportProgress(int amount) {
-
-            ProgressParams<WorkDoneProgressReport> p 
-                = new ProgressParams<WorkDoneProgressReport>(this.token, 
-                    new WorkDoneProgressReport(this.subTask, (int)Math.round(amount/(double)this.size*100), false));
-
-            this.client.progress(p);
-    }
-
-    private void endProgress(String message) {
-
-            ProgressParams<WorkDoneProgressEnd> p 
-                = new ProgressParams<WorkDoneProgressEnd>(this.token, 
-                    new WorkDoneProgressEnd(message));
-
-            this.client.progress(p);
-       
-    }
-
+    this.client.progress(p);
+  }
 }

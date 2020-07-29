@@ -2,7 +2,6 @@ package saros.lsp.log;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
-import org.apache.log4j.Priority;
 import org.apache.log4j.spi.LoggingEvent;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;

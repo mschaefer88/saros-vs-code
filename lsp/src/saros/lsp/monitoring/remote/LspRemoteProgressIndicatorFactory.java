@@ -7,11 +7,10 @@ import saros.session.User;
 
 public class LspRemoteProgressIndicatorFactory implements IRemoteProgressIndicatorFactory {
 
-    @Override
-    public IRemoteProgressIndicator create(RemoteProgressManager remoteProgressManager, String remoteProgressID,
-            User remoteUser) {
-        
-        return new LspRemoteProgressIndicator(); //TODO: manager muss hier drauf arbeiten
-    }
+  @Override
+  public IRemoteProgressIndicator create(
+      RemoteProgressManager remoteProgressManager, String remoteProgressID, User remoteUser) {
 
+    return new LspRemoteProgressIndicator(); // TODO: manager muss hier drauf arbeiten
+  }
 }

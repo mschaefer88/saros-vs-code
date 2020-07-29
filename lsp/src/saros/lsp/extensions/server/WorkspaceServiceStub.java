@@ -1,28 +1,21 @@
 package saros.lsp.extensions.server;
 
+import com.google.gson.Gson;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonParser;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
-import org.eclipse.lsp4j.FileChangeType;
 import org.eclipse.lsp4j.FileEvent;
 import org.eclipse.lsp4j.services.WorkspaceService;
-
 import saros.activities.FileActivity;
+import saros.activities.FileActivity.Purpose;
+import saros.activities.FileActivity.Type;
 import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
 import saros.activities.IActivity;
 import saros.activities.SPath;
-import saros.activities.FileActivity.Purpose;
-import saros.activities.FileActivity.Type;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
@@ -37,7 +30,7 @@ import saros.session.ISarosSessionManager;
 import saros.session.ISessionLifecycleListener;
 import saros.session.SessionEndReason;
 
-//TODO: Deprecated since not used -> to null in server?
+// TODO: Deprecated since not used -> to null in server?
 /** Empty implementation of the workspace service. */
 public class WorkspaceServiceStub extends AbstractActivityProducer implements WorkspaceService {
 
@@ -49,22 +42,24 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
 
   private EditorManager editorManager;
 
-  private final ISessionLifecycleListener sessionLifecycleListener = new ISessionLifecycleListener() {
+  private final ISessionLifecycleListener sessionLifecycleListener =
+      new ISessionLifecycleListener() {
 
-    @Override
-    public void sessionStarted(final ISarosSession session) {
-      initialize(session);
-    }
+        @Override
+        public void sessionStarted(final ISarosSession session) {
+          initialize(session);
+        }
 
-    @Override
-    public void sessionEnded(final ISarosSession session, SessionEndReason reason) {
-      uninitialize(session);
-    }
-  };
+        @Override
+        public void sessionEnded(final ISarosSession session, SessionEndReason reason) {
+          uninitialize(session);
+        }
+      };
 
   @Override
-  public void didChangeConfiguration(DidChangeConfigurationParams params) {// TODO dat Location Änderbar? -> bessere
-                                                                           // Vorführung
+  public void didChangeConfiguration(
+      DidChangeConfigurationParams params) { // TODO dat Location Änderbar? -> bessere
+    // Vorführung
     LOG.info("didChangeConfiguration");
     String settingsJson = params.getSettings().toString();
     Configuration configuration = new Gson().fromJson(settingsJson, Configuration.class);
@@ -80,7 +75,8 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
     this.session.addActivityProducer(this);
   }
 
-  public WorkspaceServiceStub(ISarosSessionManager sessionManager, IWorkspace workspace, EditorManager editorManager) {
+  public WorkspaceServiceStub(
+      ISarosSessionManager sessionManager, IWorkspace workspace, EditorManager editorManager) {
     this.workspace = workspace;
     this.editorManager = editorManager;
 
@@ -102,10 +98,10 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
   private void handleFileEvent(FileEvent fileEvent) throws URISyntaxException {
     if (this.session == null) {
       return;
-    }    
+    }
 
     SPath target = this.tryCreateSPath(fileEvent);
-    if(target == null) {
+    if (target == null) {
       return;
     }
 
@@ -122,50 +118,58 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
         break;
     }
 
-    if(activityFromEvent != null) {
+    if (activityFromEvent != null) {
       this.fireActivity(activityFromEvent);
     }
   }
 
   private IActivity getDeleteActivity(SPath target) {
-    if(target.getResource().getType() == IResource.PROJECT) {
+    if (target.getResource().getType() == IResource.PROJECT) {
       return new FolderDeletedActivity(this.session.getLocalUser(), target);
-    } else if(target.getResource().getType() == IResource.FILE) {
-      return new FileActivity(this.session.getLocalUser(), Type.REMOVED, Purpose.ACTIVITY, target, null, null, null);
+    } else if (target.getResource().getType() == IResource.FILE) {
+      return new FileActivity(
+          this.session.getLocalUser(), Type.REMOVED, Purpose.ACTIVITY, target, null, null, null);
     }
-    
-    return null;    
+
+    return null;
   }
 
   private IActivity getCreateActivity(SPath target) {
     LOG.info(target);
     LOG.info(target.getResource());
     LOG.info(target.getResource().getType());
-    if(target.getResource().getType() == IResource.PROJECT) {
+    if (target.getResource().getType() == IResource.PROJECT) {
       return new FolderCreatedActivity(this.session.getLocalUser(), target);
-    } else if(target.getResource().getType() == IResource.FILE) {
-      return new FileActivity(this.session.getLocalUser(), Type.CREATED, Purpose.ACTIVITY, target, null, this.editorManager.getContent(target).getBytes(), null);
+    } else if (target.getResource().getType() == IResource.FILE) {
+      return new FileActivity(
+          this.session.getLocalUser(),
+          Type.CREATED,
+          Purpose.ACTIVITY,
+          target,
+          null,
+          this.editorManager.getContent(target).getBytes(),
+          null);
     }
-    
+
     return null;
   }
 
   private SPath tryCreateSPath(FileEvent fileEvent) throws URISyntaxException {
     URI uri = new URI(fileEvent.getUri());
     IPath path = LspPath.fromUri(uri);
-    IProject project = this.workspace.getProject("");    
+    IProject project = this.workspace.getProject("");
 
     File file = path.toFile();
     IResource resource = null;
-    if(file.isFile()) {
+    if (file.isFile()) {
       resource = project.getFile(path);
-    } else if(file.isDirectory()) {
+    } else if (file.isDirectory()) {
       resource = project.getFolder(path);
     } else {
       LOG.warn(String.format("'%s' doesn't seem to be a file nor a directory!", uri.getPath()));
       return null;
     }
-    
+
     return new SPath(resource);
   }
 }

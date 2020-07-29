@@ -1,12 +1,8 @@
 package saros.lsp.activity;
 
-import java.util.Optional;
-
 import org.apache.log4j.Logger;
-
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.SarosResultResponse;
-import saros.lsp.extensions.server.contact.dto.ContactDto;
 import saros.lsp.extensions.server.session.dto.SessionUserDto;
 import saros.lsp.ui.UIInteractionManager;
 import saros.net.xmpp.contact.XMPPContact;
@@ -18,7 +14,7 @@ import saros.session.ISessionListener;
 import saros.session.SessionEndReason;
 import saros.session.User;
 
-//TODO: move to session ns? or saros.ui.eventhandler
+// TODO: move to session ns? or saros.ui.eventhandler
 public class SessionStatusHandler {
 
   private static Logger LOG = Logger.getLogger(SessionStatusHandler.class);
@@ -27,17 +23,20 @@ public class SessionStatusHandler {
   private ISarosSessionManager sessionManager;
   private UIInteractionManager interactionManager;
 
-    private final ISessionLifecycleListener sessionLifecycleListener =
+  private final ISessionLifecycleListener sessionLifecycleListener =
       new ISessionLifecycleListener() {
         @Override
         public void sessionStarting(ISarosSession session) {
           LOG.info("UserStatusHandler.sessionStarting");
           session.addListener(sessionListener);
           client.sendStateSession(new SarosResultResponse<Boolean>(true));
-          
-          session.getRemoteUsers().forEach(user -> {
-            client.notifyUserJoinedSession(createParticipantDto(user));//TODO: is host
-          });
+
+          session
+              .getRemoteUsers()
+              .forEach(
+                  user -> {
+                    client.notifyUserJoinedSession(createParticipantDto(user)); // TODO: is host
+                  });
         }
 
         @Override
@@ -48,7 +47,7 @@ public class SessionStatusHandler {
         }
       };
 
-      private final ISarosLanguageClient client;
+  private final ISarosLanguageClient client;
 
   private ISessionListener sessionListener =
       new ISessionListener() {
@@ -56,26 +55,30 @@ public class SessionStatusHandler {
         @Override
         public void userJoined(User user) {
           LOG.info("UserStatusHandler.userJoined");
-            client.notifyUserJoinedSession(createParticipantDto(user));//TODO: is host
-        //   SarosView.showNotification(
-        //       Messages.UserStatusChangeHandler_user_joined,
-        //       CoreUtils.format(Messages.UserStatusChangeHandler_user_joined_text, user));
+          client.notifyUserJoinedSession(createParticipantDto(user)); // TODO: is host
+          //   SarosView.showNotification(
+          //       Messages.UserStatusChangeHandler_user_joined,
+          //       CoreUtils.format(Messages.UserStatusChangeHandler_user_joined_text, user));
         }
 
         @Override
         public void userLeft(User user) {
           LOG.info("UserStatusHandler.userLeft");
-          client.notifyUserLeftSession(createParticipantDto(user));//TODO: is host
-        
-          if(sessionManager.getSession().getRemoteUsers().size() == 0) {
-            if(interactionManager.getUserInputYesNo("Session is empty", "Close session?")) {
+          client.notifyUserLeftSession(createParticipantDto(user)); // TODO: is host
+
+          if (sessionManager.getSession().getRemoteUsers().size() == 0) {
+            if (interactionManager.getUserInputYesNo("Session is empty", "Close session?")) {
               sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
             }
           }
         }
-      };      
+      };
 
-  public SessionStatusHandler(ISarosSessionManager sessionManager, ISarosLanguageClient client, XMPPContactsService contactsService, UIInteractionManager interactionManager) {
+  public SessionStatusHandler(
+      ISarosSessionManager sessionManager,
+      ISarosLanguageClient client,
+      XMPPContactsService contactsService,
+      UIInteractionManager interactionManager) {
     LOG.info("UserStatusHandler.CTOR");
     this.client = client;
     this.contactsService = contactsService;
@@ -86,7 +89,9 @@ public class SessionStatusHandler {
   }
 
   private SessionUserDto createParticipantDto(User user) {
-    final XMPPContact userAsContact = this.contactsService.getContact(user.getJID().toString()).get();
-    return new SessionUserDto(userAsContact.getBareJid().getBase().toString(), userAsContact.getDisplayableName());
+    final XMPPContact userAsContact =
+        this.contactsService.getContact(user.getJID().toString()).get();
+    return new SessionUserDto(
+        userAsContact.getBareJid().getBase().toString(), userAsContact.getDisplayableName());
   }
 }

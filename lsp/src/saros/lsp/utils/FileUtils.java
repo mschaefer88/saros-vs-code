@@ -1,23 +1,17 @@
-package saros.lsp.utils; //TODO: is from eclipse
+package saros.lsp.utils; // TODO: is from eclipse
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-
 import saros.filesystem.IContainer;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IResource;
-import saros.monitoring.NullProgressMonitor;
 import saros.util.StackTrace;
 
 /**
@@ -41,20 +35,18 @@ public class FileUtils {
    */
   public static void writeFile(final InputStream input, final IFile file) {
     try {
-        if (file.exists()) {
-            file.setContents(input, false, true);
-          } else {
-            mkdirs(file);
-            file.create(input, false);
-          }
-    }catch(IOException e) {
-        LOG.error(e);
+      if (file.exists()) {
+        file.setContents(input, false, true);
+      } else {
+        mkdirs(file);
+        file.create(input, false);
+      }
+    } catch (IOException e) {
+      LOG.error(e);
     }
   }
 
-  /**
-   * Makes sure that the parent directories of the given {@linkplain IResource resource} exist.
-   */
+  /** Makes sure that the parent directories of the given {@linkplain IResource resource} exist. */
   public static void mkdirs(final IResource resource) {
 
     final List<IFolder> parents = new ArrayList<IFolder>();
@@ -71,11 +63,11 @@ public class FileUtils {
     Collections.reverse(parents);
 
     for (final IFolder folder : parents)
-        try {
-            folder.create(false, true);
-        } catch (IOException e) {
-            LOG.error(e);
-        }
+      try {
+        folder.create(false, true);
+      } catch (IOException e) {
+        LOG.error(e);
+      }
   }
 
   /**
@@ -91,9 +83,9 @@ public class FileUtils {
 
     mkdirs(folder);
     try {
-        folder.create(false, true);
+      folder.create(false, true);
     } catch (IOException e) {
-        LOG.error(e);
+      LOG.error(e);
     }
   }
 
@@ -110,9 +102,9 @@ public class FileUtils {
     }
 
     try {
-        resource.delete(IResource.KEEP_HISTORY);
+      resource.delete(IResource.KEEP_HISTORY);
     } catch (IOException e) {
-        LOG.error(e);
+      LOG.error(e);
     }
   }
 
@@ -126,11 +118,11 @@ public class FileUtils {
    */
   public static void move(final IPath destination, final IResource source) {
 
-      try {
-          source.move(destination.makeAbsolute(), false);
-      } catch (IOException e) {
-          LOG.error(e);
-      }
+    try {
+      source.move(destination.makeAbsolute(), false);
+    } catch (IOException e) {
+      LOG.error(e);
+    }
   }
 
   /**

@@ -1,15 +1,11 @@
 package saros.lsp.extensions.server.session;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
-
 import org.apache.log4j.Logger;
-
 import saros.account.XMPPAccount;
 import saros.account.XMPPAccountStore;
 import saros.communication.connection.ConnectionHandler;
@@ -30,148 +26,160 @@ import saros.session.ISarosSessionManager;
 import saros.session.ISessionLifecycleListener;
 import saros.session.SessionEndReason;
 
-public class SessionService implements ISessionService, IConnectionStateListener, ISessionLifecycleListener {// TODO:
-                                                                                                             // interfaces
-                                                                                                             // according
-                                                                                                             // to
-                                                                                                             // guidelines
-    private final ConnectionHandler connectionHandler;
-    private final XMPPAccountStore accountStore;
-    private final ISarosSessionManager sessionManager; // TODO: move to own service
-    private final ISarosLanguageClient client;
-    private final XMPPContactsService contactService;
-    private final IWorkspace workspace;
+public class SessionService
+    implements ISessionService, IConnectionStateListener, ISessionLifecycleListener { // TODO:
+  // interfaces
+  // according
+  // to
+  // guidelines
+  private final ConnectionHandler connectionHandler;
+  private final XMPPAccountStore accountStore;
+  private final ISarosSessionManager sessionManager; // TODO: move to own service
+  private final ISarosLanguageClient client;
+  private final XMPPContactsService contactService;
+  private final IWorkspace workspace;
 
-    private static final Logger LOG = Logger.getLogger(SessionService.class);
+  private static final Logger LOG = Logger.getLogger(SessionService.class);
 
-    public SessionService(ConnectionHandler connectionHandler, XMPPAccountStore accountStore,
-            ISarosSessionManager sessionManager, ISarosLanguageClient client, XMPPContactsService contactService,
-            IWorkspace workspace) {
-        this.connectionHandler = connectionHandler;
-        this.accountStore = accountStore;
-        this.sessionManager = sessionManager;
-        this.client = client;
-        this.contactService = contactService;
-        this.workspace = workspace;
+  public SessionService(
+      ConnectionHandler connectionHandler,
+      XMPPAccountStore accountStore,
+      ISarosSessionManager sessionManager,
+      ISarosLanguageClient client,
+      XMPPContactsService contactService,
+      IWorkspace workspace) {
+    this.connectionHandler = connectionHandler;
+    this.accountStore = accountStore;
+    this.sessionManager = sessionManager;
+    this.client = client;
+    this.contactService = contactService;
+    this.workspace = workspace;
 
-        this.connectionHandler.addConnectionStateListener(this);
-        this.sessionManager.addSessionLifecycleListener(this);
+    this.connectionHandler.addConnectionStateListener(this);
+    this.sessionManager.addSessionLifecycleListener(this);
+  }
+
+  @Override
+  public CompletableFuture<SarosResponse> connect() {
+
+    try {
+      XMPPAccount account = this.accountStore.getDefaultAccount();
+
+      LOG.debug(String.format("Connecting with %s", account.toString()));
+      this.connectionHandler.connect(account, false); // TODO: on fail currently true gets back
+
+    } catch (Exception e) {
+      return CompletableFuture.completedFuture(new SarosResponse(e));
     }
 
-    @Override
-    public CompletableFuture<SarosResponse> connect() {
+    return CompletableFuture.completedFuture(new SarosResponse());
+  }
 
-        try {
-            XMPPAccount account = this.accountStore.getDefaultAccount();
+  @Override
+  public CompletableFuture<SarosResponse> disconnect() {
 
-            LOG.debug(String.format("Connecting with %s", account.toString()));
-            this.connectionHandler.connect(account, false);// TODO: on fail currently true gets back
+    try {
+      this.connectionHandler.disconnect();
 
-        } catch (Exception e) {
-            return CompletableFuture.completedFuture(new SarosResponse(e));
-        }
-
-        return CompletableFuture.completedFuture(new SarosResponse());
+    } catch (Exception e) {
+      return CompletableFuture.completedFuture(new SarosResponse(e));
     }
 
-    @Override
-    public CompletableFuture<SarosResponse> disconnect() {
+    return CompletableFuture.completedFuture(new SarosResponse());
+  }
 
-        try {
-            this.connectionHandler.disconnect();
+  @Override
+  public CompletableFuture<SarosResponse> start() {
 
-        } catch (Exception e) {
-            return CompletableFuture.completedFuture(new SarosResponse(e));
-        }
+    try {
+      Map<IProject, List<IResource>> map =
+          Collections.singletonMap(this.workspace.getProject(""), null);
 
-        return CompletableFuture.completedFuture(new SarosResponse());
+      this.sessionManager.startSession(map);
+
+    } catch (Exception e) {
+      return CompletableFuture.completedFuture(new SarosResponse(e));
     }
 
-    @Override
-    public CompletableFuture<SarosResponse> start() {
+    return CompletableFuture.completedFuture(new SarosResponse());
+  }
 
-        try {
-            Map<IProject, List<IResource>> map = Collections.singletonMap(this.workspace.getProject(""), null);
+  @Override
+  public CompletableFuture<SarosResponse> stop() {
 
-            this.sessionManager.startSession(map);
+    try {
 
-        } catch (Exception e) {
-            return CompletableFuture.completedFuture(new SarosResponse(e));
-        }
+      this.sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
 
-        return CompletableFuture.completedFuture(new SarosResponse());
+    } catch (Exception e) {
+      return CompletableFuture.completedFuture(new SarosResponse(e));
     }
 
-    @Override
-    public CompletableFuture<SarosResponse> stop() {
+    return CompletableFuture.completedFuture(new SarosResponse());
+  }
 
-        try {
+  // TODO: join session
+  @Override
+  public CompletableFuture<SarosResponse> invite(
+      InviteDto invite) { // TODO: hier und ähnliche nichts zurückgeben und
+    // über listener Nachrichten schicken!
+    CompletableFuture<SarosResponse> c = new CompletableFuture<SarosResponse>();
 
-            this.sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
-
-        } catch (Exception e) {
-            return CompletableFuture.completedFuture(new SarosResponse(e));
-        }
-
-        return CompletableFuture.completedFuture(new SarosResponse());
-    }
-
-    //TODO: join session
-    @Override
-    public CompletableFuture<SarosResponse> invite(InviteDto invite) { // TODO: hier und ähnliche nichts zurückgeben und
-                                                                       // über listener Nachrichten schicken!
-        CompletableFuture<SarosResponse> c = new CompletableFuture<SarosResponse>();
-
-        Executors.newCachedThreadPool().submit(() -> {
-                                                               
-            try {
-                if(this.sessionManager.getSession() == null) {
-                    this.start().get(); //TODO: meh, do in client?
+    Executors.newCachedThreadPool()
+        .submit(
+            () -> {
+              try {
+                if (this.sessionManager.getSession() == null) {
+                  this.start().get(); // TODO: meh, do in client?
                 }
-    
-                XMPPContact contact = this.contactService.getContact(invite.id).get(); //TODO: check if there
+
+                XMPPContact contact =
+                    this.contactService.getContact(invite.id).get(); // TODO: check if there
                 JID jid = new JID(invite.id);
 
                 LOG.info("using JID '" + jid.toString() + "'");
                 this.sessionManager.invite(jid, "VS Code Invitation");
-                //this.sessionManager.startSharingProjects(jid);
-                                                                                       
+                // this.sessionManager.startSharingProjects(jid);
+
                 c.complete(new SarosResponse());
-            } catch (Exception e) {
-                 c.complete(new SarosResponse(e));
-            }
-                                                               
-            return null;
-        });
-                                                               
-        return c;
-    }
+              } catch (Exception e) {
+                c.complete(new SarosResponse(e));
+              }
 
-    @Override
-    public CompletableFuture<SarosResultResponse<Boolean>> status() {
-        return CompletableFuture
-                .completedFuture(new SarosResultResponse<Boolean>(this.connectionHandler.isConnected()));
-    }
+              return null;
+            });
 
-    //TODO: do along guidelines!
-    @Override
-    public void connectionStateChanged(ConnectionState state, Exception error) {
-        
-        if(error == null) {
-            this.client.sendStateConnected(new SarosResultResponse<Boolean>(state == ConnectionState.CONNECTED)); //TODO: send State?
-        }
-    }
+    return c;
+  }
 
-    @Override
-    public void sessionStarting(ISarosSession session) {
-        
-        LOG.info("sessionStarting");
-        this.client.sendStateSession(new SarosResultResponse<Boolean>(true));
-    }
+  @Override
+  public CompletableFuture<SarosResultResponse<Boolean>> status() {
+    return CompletableFuture.completedFuture(
+        new SarosResultResponse<Boolean>(this.connectionHandler.isConnected()));
+  }
 
-    @Override public void sessionEnding(ISarosSession session) {
-        
-        LOG.info("sessionEnding");
-        this.client.sendStateSession(new SarosResultResponse<Boolean>(false));
+  // TODO: do along guidelines!
+  @Override
+  public void connectionStateChanged(ConnectionState state, Exception error) {
+
+    if (error == null) {
+      this.client.sendStateConnected(
+          new SarosResultResponse<Boolean>(
+              state == ConnectionState.CONNECTED)); // TODO: send State?
     }
+  }
+
+  @Override
+  public void sessionStarting(ISarosSession session) {
+
+    LOG.info("sessionStarting");
+    this.client.sendStateSession(new SarosResultResponse<Boolean>(true));
+  }
+
+  @Override
+  public void sessionEnding(ISarosSession session) {
+
+    LOG.info("sessionEnding");
+    this.client.sendStateSession(new SarosResultResponse<Boolean>(false));
+  }
 }

@@ -1,31 +1,30 @@
 package saros.lsp.ui;
 
 import java.util.concurrent.Executors;
-
 import saros.synchronize.UISynchronizer;
 
 public class UISynchronizerImpl implements UISynchronizer {
 
-    @Override
-    public void asyncExec(Runnable runnable) {
-        
-        Executors.newCachedThreadPool().submit(() -> {
+  @Override
+  public void asyncExec(Runnable runnable) {
 
-            runnable.run();
+    Executors.newCachedThreadPool()
+        .submit(
+            () -> {
+              runnable.run();
 
-            return null;
-        });
-    }
+              return null;
+            });
+  }
 
-    @Override
-    public void syncExec(Runnable runnable) {
-        
-        runnable.run();
-    }
+  @Override
+  public void syncExec(Runnable runnable) {
 
-    @Override
-    public boolean isUIThread() {
-        return false;
-    }
+    runnable.run();
+  }
 
+  @Override
+  public boolean isUIThread() {
+    return false;
+  }
 }

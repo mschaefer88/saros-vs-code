@@ -4,37 +4,35 @@ import java.io.File;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import org.apache.log4j.Logger;
-
 import saros.filesystem.IPath;
 
 public class LspPath implements IPath {
-    private Path delegate;
-    private static final Logger LOG = Logger.getLogger(LspPath.class);
+  private Path delegate;
+  private static final Logger LOG = Logger.getLogger(LspPath.class);
 
-    public static final IPath EMPTY = new LspPath(Paths.get(""));
+  public static final IPath EMPTY = new LspPath(Paths.get(""));
 
-    public static IPath fromString(String pathString) {
-        if (pathString == null || pathString.isEmpty()) {
-            return EMPTY;
-        }
-
-        return new LspPath(Paths.get(pathString));
+  public static IPath fromString(String pathString) {
+    if (pathString == null || pathString.isEmpty()) {
+      return EMPTY;
     }
 
-    public static IPath fromUri(URI uri) {
-      LOG.info(String.format("URI Scheme: %s", uri.getScheme()));
-      if (uri == null || !uri.getScheme().equals("file")) {
-        return EMPTY;
-      }
-  
-      return new LspPath(Paths.get(uri));
+    return new LspPath(Paths.get(pathString));
+  }
+
+  public static IPath fromUri(URI uri) {
+    LOG.info(String.format("URI Scheme: %s", uri.getScheme()));
+    if (uri == null || !uri.getScheme().equals("file")) {
+      return EMPTY;
     }
+
+    return new LspPath(Paths.get(uri));
+  }
 
   private LspPath(Path delegate) {
-    //LOG.info(String.format("tostring: %s", delegate.toString()));
-    //LOG.info(String.format("absolute: %s", delegate.toAbsolutePath()));
+    // LOG.info(String.format("tostring: %s", delegate.toString()));
+    // LOG.info(String.format("absolute: %s", delegate.toAbsolutePath()));
     /*
      * OpenJDK 7 on Linux has a bug which causes normalize() to throw an
      * ArrayIndexOutOfBoundsException if called on the empty path.
@@ -170,7 +168,7 @@ public class LspPath implements IPath {
     if (this == obj) return true;
 
     if (!(obj instanceof LspPath)) return false;
-    
+
     LspPath other = (LspPath) obj;
     return delegate.equals(other.delegate);
   }

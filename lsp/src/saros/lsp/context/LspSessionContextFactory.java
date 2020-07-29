@@ -1,9 +1,6 @@
-package saros.lsp.context; //TODO: move to other package! (is no real factory like the other)
+package saros.lsp.context; // TODO: move to other package! (is no real factory like the other)
 
 import org.apache.log4j.Logger;
-
-import saros.context.IContextFactory;
-import saros.context.AbstractContextFactory.Component;
 import saros.lsp.activity.ActivityConsumer;
 import saros.lsp.activity.FileActivityHandler;
 import saros.lsp.activity.InconsistencyHandler;
@@ -17,10 +14,11 @@ import saros.session.ISarosSessionContextFactory;
 import saros.session.SarosCoreSessionContextFactory;
 
 /** LSP implementation of the {@link ISarosSessionContextFactory} interface. */
-public class LspSessionContextFactory extends SarosCoreSessionContextFactory{//TODO: interface sinnvoll?
-
+public class LspSessionContextFactory
+    extends SarosCoreSessionContextFactory { // TODO: interface sinnvoll?
 
   private static final Logger LOG = Logger.getLogger(LspSessionContextFactory.class);
+
   @Override
   public void createNonCoreComponents(ISarosSession session, MutablePicoContainer container) {
     LOG.info("createNonCoreComponents");
@@ -37,7 +35,6 @@ public class LspSessionContextFactory extends SarosCoreSessionContextFactory{//T
 
     // UI Handler
     container.addComponent(SessionStatusHandler.class);
-
 
     // // IDE context wrapper
     // container.addComponent(SharedIDEContext.class);

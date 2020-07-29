@@ -2,11 +2,9 @@ package saros.lsp.interaction.session;
 
 import java.util.Set;
 import java.util.concurrent.Executors;
-
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
-
 import saros.communication.extensions.SessionStatusRequestExtension;
 import saros.communication.extensions.SessionStatusResponseExtension;
 import saros.filesystem.IProject;
@@ -18,7 +16,7 @@ import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 
 public class SessionStatusRequestHandler {
-    private static final Logger LOG = Logger.getLogger(SessionStatusRequestHandler.class);
+  private static final Logger LOG = Logger.getLogger(SessionStatusRequestHandler.class);
 
   private final ISarosSessionManager sessionManager;
 
@@ -33,9 +31,11 @@ public class SessionStatusRequestHandler {
 
         @Override
         public void processPacket(final Packet packet) {
-          Executors.newCachedThreadPool().submit(() -> {
-            handleStatusRequest(new JID(packet.getFrom()));
-          });
+          Executors.newCachedThreadPool()
+              .submit(
+                  () -> {
+                    handleStatusRequest(new JID(packet.getFrom()));
+                  });
         }
       };
 

@@ -3,53 +3,51 @@ package saros.lsp.editor.annotation;
 import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import saros.activities.TextEditActivity;
-import saros.lsp.editor.adapter.EditorString;
 import saros.session.User;
 
 public class Annotation {
-    
-    private Range range; //TODO: own class?
 
-    private User source;
+  private Range range; // TODO: own class?
 
-    private int version;
+  private User source;
 
-    public Range getRange() {
-        return this.range;
-    }
+  private int version;
 
-    public User getSource() {
-        return this.source;
-    }
+  public Range getRange() {
+    return this.range;
+  }
 
-    public int getVersion() {
-        return this.version;
-    }
+  public User getSource() {
+    return this.source;
+  }
 
-    public Annotation(Range range, User source, int version) {
-        this.range = range;
-        this.source = source;
-        this.version = version;
-    }
+  public int getVersion() {
+    return this.version;
+  }
 
-    public boolean isAfter(Annotation other) {
-        
-        Range a = this.getRange();
-        Range b = other.getRange();
+  public Annotation(Range range, User source, int version) {
+    this.range = range;
+    this.source = source;
+    this.version = version;
+  }
 
-        return b.getStart().getLine() > a.getEnd().getLine() 
-            || (b.getStart().getLine() == a.getEnd().getLine() && b.getStart().getCharacter() < a.getEnd().getCharacter());
-    }
+  public boolean isAfter(Annotation other) {
 
-    private static final Logger LOG = Logger.getLogger(Annotation.class);
+    Range a = this.getRange();
+    Range b = other.getRange();
 
-    public void move(int offset) {
-        Position start = this.getRange().getStart();
-        Position end = this.getRange().getEnd();
-        
-        start.setCharacter(start.getCharacter()+offset);
-        end.setCharacter(end.getCharacter()+offset);
-    }
+    return b.getStart().getLine() > a.getEnd().getLine()
+        || (b.getStart().getLine() == a.getEnd().getLine()
+            && b.getStart().getCharacter() < a.getEnd().getCharacter());
+  }
+
+  private static final Logger LOG = Logger.getLogger(Annotation.class);
+
+  public void move(int offset) {
+    Position start = this.getRange().getStart();
+    Position end = this.getRange().getEnd();
+
+    start.setCharacter(start.getCharacter() + offset);
+    end.setCharacter(end.getCharacter() + offset);
+  }
 }

@@ -3,7 +3,6 @@ package saros.lsp.extensions.server.account;
 import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
-
 import saros.lsp.extensions.server.SarosResponse;
 import saros.lsp.extensions.server.SarosResultResponse;
 import saros.lsp.extensions.server.account.dto.AccountDto;
