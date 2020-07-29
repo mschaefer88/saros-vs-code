@@ -18,7 +18,7 @@ If the `INTELLIJ_HOME` variable is not set, the intellij-gradle-plugin will down
 We are using [google java format](https://github.com/google/google-java-format) to ensure that our source code adheres to unified formatting rules.
 This is checked on our build server, so please make sure to format your code with the tool before pushing.
 For ease of use, the formatter can also be integrated into the default formatting logic of Eclipse and IntelliJ through a plugin.
-Installation instructions are given in the IDE specific sections on the topic ([Eclipse](#install-and-enable-google-java-formatter), [IntelliJ](#install-and-enable-google-java-formatter-1)).
+Installation instructions are given in the IDE specific sections on the topic ([Eclipse](#install-and-enable-google-java-formatter), [IntelliJ](#install-and-enable-google-java-formatter-1)). For usage in Visual Studio Code or outside of an IDE a Gradle plugin is being used (see [Visual Studio Code](#configure-and-use-google-java-formatter)).
 
 **Important:** We still use [**google java format 1.6**](https://github.com/google/google-java-format/releases/tag/google-java-format-1.6) as the maintainers of the tool have not provided an official build of the corresponding Eclipse plugin for later versions.
 
@@ -147,6 +147,72 @@ If `runExtension` isn't detected by Visual Studio Code you have to add a `task.j
         }
     ]
 }
+```
+
+#### Configure and Use Google Java Formatter
+
+Google Java Format is currently only enabled for the `lsp` project and can be used with the following Gradle tasks:
+
+* `verGJF` - Verifies java code
+* `goJF` - Formats java code
+
+Integration into `Visual Studio Code` can be achieved through a `tasks.json` within the `.vscode` folder of the project (`lsp`). For integration add one or all of the following to the `tasks` array within the `tasks.json`.
+
+General structure:
+```json
+{
+    "version": "2.0.0",
+    "tasks": []
+}
+```
+
+Recommended tasks:
+
+* Verify java code
+```json
+{
+        "label": "Check Format",
+        "type": "process",
+        "command": "gradlew",
+        "windows": {
+          "command": "gradlew.bat"
+        },
+        "group": "none",
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "args": [
+          "verGJF"
+        ],
+        "options": {
+          "cwd": "${workspaceRoot}/.."
+        },
+        "problemMatcher": []
+      }
+```
+* Format java code
+```json
+{
+        "label": "Format Code",
+        "type": "process",
+        "command": "gradlew",
+        "windows": {
+          "command": "gradlew.bat"
+        },
+        "group": "none",
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "args": [
+          "goJF"
+        ],
+        "options": {
+          "cwd": "${workspaceRoot}/.."
+        },
+        "problemMatcher": []
+      } 
 ```
 
 ## Develop Without an IDE
