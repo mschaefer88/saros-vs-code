@@ -2,17 +2,17 @@ package saros.lsp.context;
 
 import saros.core.context.AbstractCoreContextFactory;
 import saros.lsp.monitoring.remote.LspRemoteProgressIndicatorFactory;
+import saros.lsp.preferences.LspPreferenceStore;
 import saros.lsp.preferences.LspPreferences;
 import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
 import saros.preferences.IPreferenceStore;
 import saros.preferences.Preferences;
-import saros.server.preferences.PersistencePreferenceStore;
 
 public class LspCoreContextFactory extends AbstractCoreContextFactory {
 
   @Override
   protected Class<? extends IPreferenceStore> getPreferenceStoreClass() {
-    return PersistencePreferenceStore.class;
+    return LspPreferenceStore.class;
   }
 
   @Override

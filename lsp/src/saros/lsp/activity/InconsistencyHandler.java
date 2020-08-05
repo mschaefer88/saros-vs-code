@@ -4,7 +4,7 @@ import java.text.MessageFormat;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.MessageType;
-import saros.activities.SPath;
+import saros.filesystem.IFile;
 import saros.concurrent.watchdog.ConsistencyWatchdogClient;
 import saros.concurrent.watchdog.IsInconsistentObservable;
 import saros.filesystem.IResource;
@@ -60,7 +60,7 @@ public class InconsistencyHandler extends AbstractActivityConsumer implements St
       if (!this.session.isHost()) {
         ConsistencyWatchdogClient client =
             this.session.getComponent(ConsistencyWatchdogClient.class);
-        Set<SPath> paths = client.getPathsWithWrongChecksums();
+        Set<IFile> paths = client.getFilesWithWrongChecksums();
 
         if (!paths.isEmpty()) {
           this.handleInconsistency(paths, client);
@@ -83,7 +83,7 @@ public class InconsistencyHandler extends AbstractActivityConsumer implements St
     this.isInconsistentObservable.remove(this.isConsistencyListener);
   }
 
-  private void handleInconsistency(Set<SPath> files, ConsistencyWatchdogClient watchdogClient) {
+  private void handleInconsistency(Set<IFile> files, ConsistencyWatchdogClient watchdogClient) {
 
     if (files.isEmpty()) {
       return;
@@ -109,25 +109,18 @@ public class InconsistencyHandler extends AbstractActivityConsumer implements St
             });
   }
 
-  private String createInconsistentPathsMessage(Set<SPath> paths) {
+  private String createInconsistentPathsMessage(Set<IFile> paths) {
     StringBuilder sb = new StringBuilder();
 
-    for (SPath path : paths) {
-      IResource resource = path.getResource();
-
-      if (resource == null) {
-        LOG.warn("Inconsistent resource " + path + " could not be " + "found.");
-
-        continue;
-      }
+    for (IFile path : paths) {
 
       if (sb.length() > 0) {
         sb.append(", ");
       }
 
-      sb.append(resource.getProject().getName())
+      sb.append(path.getParent().getName())
           .append(" - ")
-          .append(resource.getProjectRelativePath().lastSegment());
+          .append(path.getReferencePointRelativePath().lastSegment());
     }
 
     return sb.toString();

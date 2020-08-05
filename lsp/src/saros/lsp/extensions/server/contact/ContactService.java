@@ -14,7 +14,6 @@ import saros.lsp.extensions.server.SarosResponse;
 import saros.lsp.extensions.server.SarosResultResponse;
 import saros.lsp.extensions.server.SarosService;
 import saros.lsp.extensions.server.contact.dto.ContactDto;
-import saros.lsp.extensions.server.contact.dto.Test;
 import saros.monitoring.IProgressMonitor;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.contact.IContactsUpdate;
@@ -145,39 +144,39 @@ public class ContactService extends SarosService
     }
   }
 
-  @Override
-  public CompletableFuture<Void> test(Test t) {
+  // @Override
+  // public CompletableFuture<Void> test(Test t) {
 
-    CompletableFuture<Void> c = new CompletableFuture<Void>();
+  //   CompletableFuture<Void> c = new CompletableFuture<Void>();
 
-    Executors.newCachedThreadPool()
-        .submit(
-            () -> {
-              String token = t.workDoneToken; // UUID.randomUUID().toString();
+  //   Executors.newCachedThreadPool()
+  //       .submit(
+  //           () -> {
+  //             String token = t.workDoneToken; // UUID.randomUUID().toString();
 
-              this.progressMonitor.subTask("Sub");
-              this.progressMonitor.beginTask("Test", 10);
+  //             this.progressMonitor.subTask("Sub");
+  //             this.progressMonitor.beginTask("Test", 10);
 
-              TimeUnit.SECONDS.sleep(3);
-              this.progressMonitor.worked(2);
+  //             TimeUnit.SECONDS.sleep(3);
+  //             this.progressMonitor.worked(2);
 
-              TimeUnit.SECONDS.sleep(3);
-              this.progressMonitor.worked(4);
+  //             TimeUnit.SECONDS.sleep(3);
+  //             this.progressMonitor.worked(4);
 
-              TimeUnit.SECONDS.sleep(3);
-              this.progressMonitor.worked(6);
+  //             TimeUnit.SECONDS.sleep(3);
+  //             this.progressMonitor.worked(6);
 
-              TimeUnit.SECONDS.sleep(3);
-              this.progressMonitor.worked(8);
+  //             TimeUnit.SECONDS.sleep(3);
+  //             this.progressMonitor.worked(8);
 
-              TimeUnit.SECONDS.sleep(3);
-              this.progressMonitor.worked(10);
-              this.progressMonitor.done();
+  //             TimeUnit.SECONDS.sleep(3);
+  //             this.progressMonitor.worked(10);
+  //             this.progressMonitor.done();
 
-              c.complete(null);
-              return null;
-            });
+  //             c.complete(null);
+  //             return null;
+  //           });
 
-    return c;
-  }
+  //   return c;
+  // }
 }

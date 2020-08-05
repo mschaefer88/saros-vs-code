@@ -215,6 +215,33 @@ Recommended tasks:
       } 
 ```
 
+### Developing the Saros Language Server
+
+#### Troubleshooting
+
+If the project isn't recognized adjust the `.project` file as follows:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>saros.lsp</name>
+	<comment></comment>
+	<projects/>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments/>
+		</buildCommand>
+	</buildSpec>
+	<linkedResources/>
+	<filteredResources/>
+</projectDescription>
+
+```
+
 ## Develop Without an IDE
 
 If you prefer to develop with a text editor (like Vim or Emacs) you can build and test

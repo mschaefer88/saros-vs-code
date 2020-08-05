@@ -19,6 +19,7 @@ import org.eclipse.lsp4j.DidCloseTextDocumentParams;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.DidSaveTextDocumentParams;
 import org.eclipse.lsp4j.Hover;
+import org.eclipse.lsp4j.HoverParams;
 import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.MarkupKind;
 import org.eclipse.lsp4j.Position;
@@ -29,20 +30,22 @@ import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
 import org.eclipse.lsp4j.services.TextDocumentService;
-import saros.activities.SPath;
+import saros.filesystem.IFile;
 import saros.activities.TextEditActivity;
 import saros.filesystem.IPath;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IWorkspace;
 import saros.lsp.activity.TextEditParams;
 import saros.lsp.editor.Editor;
 import saros.lsp.editor.EditorManager;
-import saros.lsp.editor.adapter.EditorString;
 import saros.lsp.editor.annotation.Annotation;
 import saros.lsp.editor.annotation.AnnotationManager;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.client.dto.AnnotationParams;
+import saros.lsp.filesystem.IWorkspacePath;
+import saros.lsp.filesystem.LspFile;
 import saros.lsp.filesystem.LspPath;
+import saros.lsp.filesystem.LspWorkspace;
 import saros.net.xmpp.JID;
 import saros.session.AbstractActivityConsumer;
 import saros.session.AbstractActivityProducer;
@@ -61,11 +64,11 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
   private ISarosSession session;
 
   private final ISarosLanguageClient client;
-  private final IWorkspace workspace;
+  private final IWorkspacePath workspace;
 
   private static final Logger LOG = Logger.getLogger(DocumentServiceStub.class);
 
-  private final Map<SPath, TextEditActivity> ignore = new HashMap<>();
+  private final Map<IFile, TextEditActivity> ignore = new HashMap<>();
 
   private Object lock = new Object();
 
@@ -89,7 +92,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
                       String uri = e.getLeft().getTextDocument().getUri();
 
                       LOG.info(String.format("Add '%s' to ignore", uri));
-                      ignore.put(getSPath(uri), activity);
+                      ignore.put(getIFile(uri), activity);
                     });
 
             ApplyWorkspaceEditResponse r;
@@ -105,7 +108,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
                           String uri = e.getLeft().getTextDocument().getUri();
 
                           LOG.info(String.format("Remove '%s' from ignore", uri));
-                          ignore.remove(getSPath(uri));
+                          ignore.remove(getIFile(uri));
                         });
               }
             } catch (InterruptedException | ExecutionException e1) {
@@ -137,7 +140,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
       EditorManager editorManager,
       ISarosSessionManager sessionManager,
       ISarosLanguageClient client,
-      IWorkspace workspace,
+      IWorkspacePath workspace,
       AnnotationManager annotationManager) {
     this.editorManager = editorManager;
     this.client = client;
@@ -161,7 +164,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     this.session = session;
   }
 
-  private SPath getSPath(String uri) {
+  private IFile getIFile(String uri) {
     IPath path;
     try {
       path = LspPath.fromUri(new URI(uri));
@@ -169,9 +172,10 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
       LOG.error(e);
       return null;
     }
-    IProject p = this.workspace.getProject("");
+    // IReferencePoint p = this.workspace.getProject("");
 
-    return new SPath(p.getFile(path));
+    // return new IFile(p.getFile(path));
+    return new LspFile(workspace, path);
   }
 
   @Override
@@ -181,7 +185,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     System.out.println(
         String.format(
             "Opened '%s' (%s, version %d)", i.getUri(), i.getLanguageId(), i.getVersion()));
-    this.editorManager.openEditor(this.getSPath(i.getUri()), false);
+    this.editorManager.openEditor(this.getIFile(i.getUri()), false);
   }
 
   @Override
@@ -189,7 +193,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     VersionedTextDocumentIdentifier i = params.getTextDocument();
 
     TextEditActivity ig = null;
-    SPath docId = this.getSPath(i.getUri());
+    IFile docId = this.getIFile(i.getUri());
     if (ignore.containsKey(docId)) {
       ig = ignore.get(docId);
       ignore.remove(docId);
@@ -203,19 +207,13 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
       source = ig.getSource();
     }
 
-    this.editorManager.setVersion(this.getSPath(i.getUri()), i.getVersion());
+    this.editorManager.setVersion(this.getIFile(i.getUri()), i.getVersion());
     for (TextDocumentContentChangeEvent changeEvent : params.getContentChanges()) {
-      SPath path = this.getSPath(i.getUri());
-      EditorString content = new EditorString(this.editorManager.getContent(path));
-      TextEditActivity activity =
-          new TextEditActivity(
-              source,
-              content.getOffset(changeEvent.getRange().getStart()),
-              changeEvent.getText(),
-              content.substring(changeEvent.getRange().getStart(), changeEvent.getRangeLength()),
-              path);
+      IFile path = this.getIFile(i.getUri());//TODO: converter
+      Editor editor = this.editorManager.getEditor(path);
+      TextEditActivity activity = editor.convert(changeEvent, source, path);
 
-      this.editorManager.applyTextEdit(activity);
+      this.editorManager.applyTextEdit(activity); //TODO: overload for changeevent?
 
       if (this.session != null && ig == null) {
         LOG.info(String.format("Sending activity: %s", activity));
@@ -225,7 +223,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
     if (this.session != null) { // TODO: do in consume in top?
 
-      SPath p = this.getSPath(i.getUri());
+      IFile p = this.getIFile(i.getUri());
       Editor editor = this.editorManager.getEditor(p);
       Annotation[] annotations = editor.getAnnotations();
       AnnotationParams[] aps =
@@ -237,7 +235,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     }
 
     // LOG.info(String.format("Content after change: \n\n'%s'\n\n",
-    // this.editorManager.getContent(this.getSPath(i.getUri()))));
+    // this.editorManager.getContent(this.getIFile(i.getUri()))));
   }
 
   private User getAnonymousUser() {
@@ -249,7 +247,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     TextDocumentIdentifier i = params.getTextDocument();
     System.out.println(String.format("Closed '%s'", i.getUri()));
 
-    this.editorManager.closeEditor(this.getSPath(i.getUri()));
+    this.editorManager.closeEditor(this.getIFile(i.getUri()));
   }
 
   @Override
@@ -257,15 +255,15 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     TextDocumentIdentifier i = params.getTextDocument();
     System.out.println(String.format("Saved '%s'", i.getUri()));
 
-    this.editorManager.saveEditor(this.getSPath(i.getUri())); // TODO: selective saving?
+    this.editorManager.saveEditor(this.getIFile(i.getUri())); // TODO: selective saving?
   }
-
+  
   @Override
-  public CompletableFuture<Hover> hover(TextDocumentPositionParams position) { // TODO: check URI!
+  public CompletableFuture<Hover> hover(HoverParams position) { // TODO: check URI!
 
     Position r = position.getPosition();
 
-    SPath p = this.getSPath(position.getTextDocument().getUri());
+    IFile p = this.getIFile(position.getTextDocument().getUri());
     Editor editor = this.editorManager.getEditor(p);
     Annotation[] annotations = editor.getAnnotations();
 
@@ -299,7 +297,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
 
     List<CodeLens> lenses = new ArrayList<>();
 
-    SPath p = this.getSPath(params.getTextDocument().getUri());
+    IFile p = this.getIFile(params.getTextDocument().getUri());
     Editor editor = this.editorManager.getEditor(p);
     Annotation[] annotations = editor.getAnnotations();
     LOG.info(String.format("codeLens... (%d)", annotations.length));

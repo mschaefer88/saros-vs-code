@@ -1,26 +1,27 @@
 package saros.lsp.filesystem;
 
+import static saros.filesystem.IResource.Type.FOLDER;
+
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
-import saros.filesystem.IResource;
-import saros.filesystem.IWorkspace;
 
 public class LspFolder extends LspContainer implements IFolder {
-  public LspFolder(IWorkspace workspace, IPath path) {
+  public LspFolder(IWorkspacePath workspace, IPath path) {
     super(workspace, path);
   }
 
   @Override
-  public int getType() {
-    return IResource.FOLDER;
+  public Type getType() {
+    return FOLDER;
   }
 
   @Override
-  public void create(int updateFlags, boolean local) throws IOException {
+  public void create() throws IOException {
     try {
       Files.createDirectory(toNioPath());
     } catch (FileAlreadyExistsException e) {
@@ -32,10 +33,5 @@ public class LspFolder extends LspContainer implements IFolder {
         throw e;
       }
     }
-  }
-
-  @Override
-  public void create(boolean force, boolean local) throws IOException {
-    create(IResource.NONE, local);
   }
 }

@@ -46,7 +46,7 @@ public class FileActivityHandler extends AbstractActivityConsumer { // TODO: nam
   @Override
   public void receive(FolderCreatedActivity folderCreatedActivity) {
     try {
-      folderCreatedActivity.getPath().getFolder().create(false, true);
+      folderCreatedActivity.getResource().create();
     } catch (IOException e) {
       LOG.error(e); // TODO: warn?
     }
@@ -55,7 +55,7 @@ public class FileActivityHandler extends AbstractActivityConsumer { // TODO: nam
   @Override
   public void receive(FolderDeletedActivity folderDeletedActivity) {
     try {
-      folderDeletedActivity.getPath().getFolder().delete(0);
+      folderDeletedActivity.getResource().delete();
     } catch (IOException e) {
       LOG.error(e);
     }
@@ -63,12 +63,12 @@ public class FileActivityHandler extends AbstractActivityConsumer { // TODO: nam
 
   private void handleDelete(FileActivity fileActivity) {
     LOG.debug("handleDelete");
-    this.editorManager.closeEditor(fileActivity.getPath());
+    this.editorManager.closeEditor(fileActivity.getResource());
 
-    IFile file = fileActivity.getPath().getFile();
+    IFile file = fileActivity.getResource();
     if (file.exists()) {
       try {
-        file.delete(0);
+        file.delete();
       } catch (IOException e) {
         LOG.error(e);
       }
@@ -79,7 +79,7 @@ public class FileActivityHandler extends AbstractActivityConsumer { // TODO: nam
     LOG.debug("handleCreate");
     // final String encoding = fileActivity.getEncoding(); TODO
     final byte[] newContent = fileActivity.getContent();
-    IFile file = fileActivity.getPath().getFile();
+    IFile file = fileActivity.getResource();
 
     byte[] actualContent = null;
 

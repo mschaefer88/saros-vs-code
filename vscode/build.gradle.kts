@@ -38,10 +38,8 @@ node {
 }
 
 tasks.register<Copy>("copyLsp") {
-  doFirst {
-      from("$rootDir/build/distribution/lsp")
-      into("dist")
-    }
+  from("${rootDir.absolutePath}/build/distribution/lsp")
+  into("dist")
 }
 
 tasks.register("buildExtension") {
@@ -57,7 +55,7 @@ tasks.register<Exec>("runExtension") {
   group = "VS Code"
   description = "Builds and runs the extension"
 
-  var execArgs = "code --extensionDevelopmentPath=${projectDir.absolutePath}"
+  var execArgs = "code --extensionDevelopmentPath=${projectDir.absolutePath} C:/Temp/Saros-A"
 
   if (Os.isFamily(Os.FAMILY_WINDOWS)) {
     executable = "cmd"

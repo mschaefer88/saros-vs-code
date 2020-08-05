@@ -7,34 +7,24 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
 import saros.filesystem.IContainer;
+import saros.filesystem.IFile;
+import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IResource;
-import saros.filesystem.IWorkspace;
 
 public abstract class LspContainer extends LspResource implements IContainer {
 
-  public LspContainer(IWorkspace workspace, IPath path) {
+  public LspContainer(IWorkspacePath workspace, IPath path) {
     super(workspace, path);
   }
 
   @Override
-  public void delete(int updateFlags) throws IOException {
+  public void delete() throws IOException {
     FileUtils.deleteDirectory(getLocation().toFile());
   }
 
   @Override
-  public void move(IPath destination, boolean force) throws IOException {
-    IPath destinationBase =
-        destination.isAbsolute()
-            ? getWorkspace().getLocation()
-            : getLocation().removeLastSegments(1);
-
-    IPath absoluteDestination = destinationBase.append(destination);
-    FileUtils.moveDirectory(getLocation().toFile(), absoluteDestination.toFile());
-  }
-
-  @Override
-  public IResource[] members() throws IOException {
+  public List<IResource> members() throws IOException {//TODO: später hier über Editor fragen?
     List<IResource> members = new ArrayList<>();
 
     File[] memberFiles = getLocation().toFile().listFiles();
@@ -55,22 +45,36 @@ public abstract class LspContainer extends LspResource implements IContainer {
       members.add(member);
     }
 
-    return members.toArray(new IResource[members.size()]);
+    return members;
   }
 
   @Override
-  public IResource[] members(int memberFlags) throws IOException {
-    return members();
+  public IFile getFile(IPath path) {
+    return new LspFile(getWorkspace(), getFullMemberPath(path));
+  }
+
+  @Override
+  public IFile getFile(String pathString) {
+    return getFile(LspPath.fromString(pathString));
+  }
+
+  @Override
+  public IFolder getFolder(IPath path) {
+    return new LspFolder(getWorkspace(), getFullMemberPath(path));
+  }
+
+  @Override
+  public IFolder getFolder(String pathString) {
+    return getFolder(LspPath.fromString(pathString));
+  }
+
+  private IPath getFullMemberPath(IPath memberPath) {
+    return getFullPath().append(memberPath);
   }
 
   @Override
   public boolean exists(IPath path) {
     IPath childLocation = getLocation().append(path);
     return childLocation.toFile().exists();
-  }
-
-  @Override
-  public String getDefaultCharset() throws IOException {
-    return getParent().getDefaultCharset();
   }
 }

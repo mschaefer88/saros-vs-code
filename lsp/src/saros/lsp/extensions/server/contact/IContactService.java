@@ -6,7 +6,6 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 import saros.lsp.extensions.server.SarosResponse;
 import saros.lsp.extensions.server.SarosResultResponse;
 import saros.lsp.extensions.server.contact.dto.ContactDto;
-import saros.lsp.extensions.server.contact.dto.Test;
 
 /** Interface of the account service. */
 @JsonSegment("saros/contact")
@@ -24,6 +23,6 @@ public interface IContactService {
   @JsonRequest
   CompletableFuture<SarosResultResponse<ContactDto[]>> getAll(ContactDto request);
 
-  @JsonRequest
-  CompletableFuture<Void> test(Test t);
+  // @JsonRequest
+  // CompletableFuture<Void> test(Test t);
 }

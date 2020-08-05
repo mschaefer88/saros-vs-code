@@ -4,12 +4,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import saros.filesystem.IContainer;
 import saros.filesystem.IPath;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
-import saros.filesystem.IWorkspace;
 
 public abstract class LspResource implements IResource {
-  private IWorkspace workspace;
+  private IWorkspacePath workspace;
   private IPath path;
 
   /**
@@ -18,7 +17,7 @@ public abstract class LspResource implements IResource {
    * @param workspace the containing workspace
    * @param path the resource's path relative to the workspace's root
    */
-  public LspResource(IWorkspace workspace, IPath path) {
+  public LspResource(IWorkspacePath workspace, IPath path) {
     assert !path.isAbsolute();
 
     this.path = path;
@@ -30,18 +29,12 @@ public abstract class LspResource implements IResource {
    *
    * @return the containing workspace
    */
-  public IWorkspace getWorkspace() {
+  public IWorkspacePath getWorkspace() {//TODO: nötig?
     return workspace;
   }
 
-  @Override
   public IPath getFullPath() {
     return path;
-  }
-
-  @Override
-  public IPath getProjectRelativePath() {
-    return getFullPath();
   }
 
   @Override
@@ -55,21 +48,15 @@ public abstract class LspResource implements IResource {
     return lastSegment;
   }
 
-  @Override
   public IPath getLocation() {
-    return workspace.getLocation().append(path);
+    return workspace.append(path);
   }
 
   @Override
   public IContainer getParent() {
-    IPath parentPath = getProjectRelativePath().removeLastSegments(1);
-    IProject project = getProject();
+    IPath parentPath = getReferencePointRelativePath().removeLastSegments(1);
+    IReferencePoint project = getReferencePoint();
     return parentPath.segmentCount() == 0 ? project : project.getFolder(parentPath);
-  }
-
-  @Override
-  public IProject getProject() {
-    return workspace.getProject("");
   }
 
   @Override
@@ -80,11 +67,6 @@ public abstract class LspResource implements IResource {
   @Override
   public boolean isIgnored() {
     return false;
-  }
-
-  @Override
-  public <T extends IResource> T adaptTo(Class<T> clazz) {
-    return clazz.isInstance(this) ? clazz.cast(this) : null;
   }
 
   @Override
@@ -104,10 +86,21 @@ public abstract class LspResource implements IResource {
   public final int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + getType();
+    result = prime * result + getType().hashCode();
     result = prime * result + path.hashCode();
     result = prime * result + workspace.hashCode();
     return result;
+  }
+
+  @Override
+  public IReferencePoint getReferencePoint() {
+    String projectName = getFullPath().segment(0);
+    return workspace.getReferencePoint(projectName);
+  }
+
+  @Override
+  public IPath getReferencePointRelativePath() {
+    return getFullPath().removeFirstSegments(1);
   }
 
   /**

@@ -19,7 +19,7 @@ import saros.util.StackTrace;
  *
  * @author orieger/chjacob
  */
-public class FileUtils {
+public class FileUtils {//TODO: still used?
 
   private static Logger LOG = Logger.getLogger(FileUtils.class);
 
@@ -36,10 +36,10 @@ public class FileUtils {
   public static void writeFile(final InputStream input, final IFile file) {
     try {
       if (file.exists()) {
-        file.setContents(input, false, true);
+        file.setContents(input);
       } else {
         mkdirs(file);
-        file.create(input, false);
+        file.create(input);
       }
     } catch (IOException e) {
       LOG.error(e);
@@ -53,7 +53,7 @@ public class FileUtils {
 
     IContainer parent = resource.getParent();
 
-    while (parent != null && parent.getType() == IResource.FOLDER) {
+    while (parent != null && parent.getType() == IResource.Type.FOLDER) {
       if (parent.exists()) break;
 
       parents.add((IFolder) parent);
@@ -64,7 +64,7 @@ public class FileUtils {
 
     for (final IFolder folder : parents)
       try {
-        folder.create(false, true);
+        folder.create();
       } catch (IOException e) {
         LOG.error(e);
       }
@@ -83,7 +83,7 @@ public class FileUtils {
 
     mkdirs(folder);
     try {
-      folder.create(false, true);
+      folder.create();
     } catch (IOException e) {
       LOG.error(e);
     }
@@ -102,24 +102,7 @@ public class FileUtils {
     }
 
     try {
-      resource.delete(IResource.KEEP_HISTORY);
-    } catch (IOException e) {
-      LOG.error(e);
-    }
-  }
-
-  /**
-   * Moves the given {@link IResource} to the place, that is pointed by the given {@link IPath}.
-   *
-   * <p>This method excepts both variables to be relative to the workspace.
-   *
-   * @param destination Destination of moving the given resource.
-   * @param source Resource, that is going to be moved
-   */
-  public static void move(final IPath destination, final IResource source) {
-
-    try {
-      source.move(destination.makeAbsolute(), false);
+      resource.delete();
     } catch (IOException e) {
       LOG.error(e);
     }
@@ -140,7 +123,7 @@ public class FileUtils {
       content = IOUtils.toByteArray(in);
     } catch (IOException e) {
       LOG.warn(
-          "could not convert file content to byte array (file: " + localFile.getFullPath() + ")");
+          "could not convert file content to byte array (file: " + localFile.getReferencePointRelativePath() + ")");
     } finally {
       IOUtils.closeQuietly(in);
     }

@@ -24,8 +24,10 @@ import picocli.CommandLine.Option;
 import saros.filesystem.IPath;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.ISarosLanguageServer;
+import saros.lsp.filesystem.IWorkspacePath;
 import saros.lsp.filesystem.LspPath;
 import saros.lsp.filesystem.LspWorkspace;
+import saros.lsp.filesystem.WorkspacePath;
 import saros.lsp.log.LanguageClientAppender;
 import saros.lsp.log.LogOutputStream;
 
@@ -114,8 +116,8 @@ public class SarosLauncher implements Callable<Integer> {
     langSvr.onInitialize(
         params -> {
           try {
-            IPath root = LspPath.fromUri(new URI(params.getRootUri()));
-            lifecycle.registerWorkspace(new LspWorkspace(root));
+            IWorkspacePath root = new WorkspacePath(new URI(params.getRootUri()));
+            lifecycle.registerWorkspace(root);
           } catch (URISyntaxException e) {
             LOG.error(e);
           }

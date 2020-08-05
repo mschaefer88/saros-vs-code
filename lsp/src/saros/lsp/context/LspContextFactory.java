@@ -5,6 +5,7 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 import saros.context.AbstractContextFactory;
 import saros.editor.IEditorManager;
 import saros.filesystem.IPathFactory;
+import saros.filesystem.IWorkspace;
 import saros.lsp.SarosLanguageServer;
 import saros.lsp.editor.EditorManager;
 import saros.lsp.editor.annotation.AnnotationManager;
@@ -17,6 +18,7 @@ import saros.lsp.extensions.server.contact.ContactService;
 import saros.lsp.extensions.server.contact.IContactService;
 import saros.lsp.extensions.server.session.ISessionService;
 import saros.lsp.extensions.server.session.SessionService;
+import saros.lsp.filesystem.LspWorkspace;
 import saros.lsp.filesystem.PathFactory;
 import saros.lsp.interaction.SubscriptionAuthorizer;
 import saros.lsp.interaction.session.NegotiationHandler;
@@ -63,5 +65,6 @@ public class LspContextFactory extends AbstractContextFactory {
     container.addComponent(WorkspaceService.class, WorkspaceServiceStub.class);
     container.addComponent(AnnotationManager.class);
     container.addComponent(UIInteractionManager.class);
+    container.addComponent(IWorkspace.class, LspWorkspace.class);
   }
 }

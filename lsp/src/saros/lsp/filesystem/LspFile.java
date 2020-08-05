@@ -12,9 +12,13 @@ import saros.filesystem.IFile;
 import saros.filesystem.IPath;
 import saros.filesystem.IWorkspace;
 
+import static saros.filesystem.IResource.Type.FILE;
+
 public class LspFile extends LspResource implements IFile {
 
   private final Logger LOG = Logger.getLogger(LspFile.class);
+
+  private static final String DEFAULT_CHARSET = "UTF-8";
 
   private String charset;
 
@@ -24,7 +28,7 @@ public class LspFile extends LspResource implements IFile {
    * @param workspace the containing workspace
    * @param path the file's path relative to the workspace's root
    */
-  public LspFile(IWorkspace workspace, IPath path) {
+  public LspFile(IWorkspacePath workspace, IPath path) {
     super(workspace, path);
   }
 
@@ -35,22 +39,28 @@ public class LspFile extends LspResource implements IFile {
    *
    * @param charset the file's character encoding
    */
+  @Override
   public void setCharset(String charset) {
     this.charset = charset;
   }
 
   @Override
-  public int getType() {
+  public Type getType() {
     return FILE;
   }
 
   @Override
-  public String getCharset() throws IOException {
-    return charset != null ? charset : getParent().getDefaultCharset();
+  public String getCharset() {
+    // TODO remove once #912 is resolved as this will no longer be necessary
+    if (charset == null) {
+      return DEFAULT_CHARSET;
+    }
+
+    return charset;
   }
 
   @Override
-  public void delete(int updateFlags) throws IOException {
+  public void delete() throws IOException {
     try {
       Files.delete(toNioPath());
     } catch (NoSuchFileException e) {
@@ -59,25 +69,12 @@ public class LspFile extends LspResource implements IFile {
   }
 
   @Override
-  public void move(IPath destination, boolean force) throws IOException {
-    IPath destinationRoot =
-        destination.isAbsolute()
-            ? getWorkspace().getLocation()
-            : getLocation().removeLastSegments(1);
-
-    IPath absoluteDestination = destinationRoot.append(destination);
-    Path nioDestination = ((LspPath) absoluteDestination).getDelegate();
-
-    Files.move(toNioPath(), nioDestination);
-  }
-
-  @Override
-  public void create(InputStream input, boolean force) throws IOException {
+  public void create(InputStream input) throws IOException {
     Path nioPath = toNioPath();
 
     Files.createDirectories(nioPath.getParent());
     Files.createFile(nioPath);
-    setContents(input, force, false);
+    setContents(input);
   }
 
   @Override
@@ -86,8 +83,7 @@ public class LspFile extends LspResource implements IFile {
   }
 
   @Override
-  public void setContents(InputStream input, boolean force, boolean keepHistory)
-      throws IOException {
+  public void setContents(InputStream input) throws IOException {
 
     /*
      * We write the new contents to a temporary file first, then move that

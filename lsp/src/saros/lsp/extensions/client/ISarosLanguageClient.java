@@ -3,6 +3,8 @@ package saros.lsp.extensions.client;
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.services.LanguageClient;
 import saros.lsp.extensions.client.dto.AnnotationParams;
+import saros.lsp.extensions.client.dto.ProgressParams;
+import saros.lsp.extensions.client.dto.WorkDoneProgressCreateParams;
 import saros.lsp.extensions.server.SarosResultResponse;
 import saros.lsp.extensions.server.contact.dto.ContactDto;
 import saros.lsp.extensions.server.session.dto.SessionUserDto;
@@ -38,6 +40,12 @@ public interface ISarosLanguageClient
 
   @JsonNotification("saros/session/user-left")
   void notifyUserLeftSession(SessionUserDto user); // TODO: use own notification/type!
+
+  @JsonNotification("window/workDoneProgress/create")
+  void createProgress(WorkDoneProgressCreateParams params);
+
+  @JsonNotification("$/progress")
+  <T> void progress(ProgressParams<T> params);
 
   /** Do seperation like: ? @JsonDelegate IAccountService getSarosAccountService(); */
 }

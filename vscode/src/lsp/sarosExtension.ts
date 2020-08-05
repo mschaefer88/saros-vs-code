@@ -51,11 +51,11 @@ export class SarosExtension implements IEventAggregator {
      * Publishes an event.
      *
      * @template TArgs Event argument type
-     * @param {String} event Event identifier
+     * @param {string} event Event identifier
      * @param {TArgs} args Event arguments
      * @memberof SarosExtension
      */
-    public publish<TArgs>(event: String, args: TArgs) {
+    public publish<TArgs>(event: string, args: TArgs) {
       this._eventAggregator.publish(event, args);
     }
 

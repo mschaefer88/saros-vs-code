@@ -3,7 +3,7 @@
 	"displayName": "Saros",
 	"description": "Saros implementation for VS Code.",
 	"version": "0.0.1",
-	"publisher": "mschaefer",
+	"publisher": "saros-dev",
 	"repository": {
 		"url": "https://github.com/saros-project/saros"
 	},
@@ -271,7 +271,6 @@
 	"dependencies": {
 		"get-port": "^5.1.1",
 		"lodash": "^4.17.15",
-		"node-jre": "^0.2.3",
 		"vscode-languageclient": "^6.1.3"
 	}
 }

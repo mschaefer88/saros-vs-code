@@ -6,9 +6,7 @@ import saros.lsp.activity.FileActivityHandler;
 import saros.lsp.activity.InconsistencyHandler;
 import saros.lsp.activity.SessionStatusHandler;
 import saros.lsp.interaction.session.NegotiationHook;
-import saros.lsp.interaction.session.SessionStatusRequestHandler;
 import saros.repackaged.picocontainer.MutablePicoContainer;
-import saros.server.session.JoinSessionRequestHandler;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionContextFactory;
 import saros.session.SarosCoreSessionContextFactory;
@@ -22,8 +20,8 @@ public class LspSessionContextFactory
   @Override
   public void createNonCoreComponents(ISarosSession session, MutablePicoContainer container) {
     LOG.info("createNonCoreComponents");
-    container.addComponent(JoinSessionRequestHandler.class);
-    container.addComponent(SessionStatusRequestHandler.class);
+    // container.addComponent(JoinSessionRequestHandler.class); TODO: removed through MIGRATION
+    // container.addComponent(SessionStatusRequestHandler.class); TODO: removed through MIGRATION
 
     container.addComponent(NegotiationHook.class);
 

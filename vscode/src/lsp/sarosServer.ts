@@ -9,7 +9,7 @@ import {config} from './sarosConfig';
 export type LanguageServerOptions = (() => Promise<StreamInfo>);
 
 const sarosLspJarName = 'saros.lsp.jar';
-const sarosLspJarFolder = 'out';
+const sarosLspJarFolder = 'dist';
 
 /**
  * Encapsulation of the Saros server.
@@ -118,7 +118,6 @@ export class SarosServer {
           sarosLspJarFolder,
           sarosLspJarName,
       );
-      const jre = require('node-jre');
 
       if (this._process) {
         console.log('Killing old process.');
@@ -126,12 +125,7 @@ export class SarosServer {
       }
 
       console.log('Spawning jar process.');
-      this._process = jre.spawn(
-          [pathToJar],
-          'saros.lsp.SarosLauncher',
-          args,
-          {encoding: 'utf8'},
-      ) as cp.ChildProcess;
+      this._process = cp.spawn('java', ['-jar',pathToJar,...args]);
 
       return this;
     }

@@ -15,15 +15,19 @@ import saros.activities.FileActivity.Type;
 import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
 import saros.activities.IActivity;
-import saros.activities.SPath;
+import saros.filesystem.IFile;
+import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
-import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.lsp.SarosLauncher;
 import saros.lsp.configuration.Configuration;
 import saros.lsp.editor.EditorManager;
+import saros.lsp.filesystem.IWorkspacePath;
+import saros.lsp.filesystem.LspFile;
+import saros.lsp.filesystem.LspFolder;
 import saros.lsp.filesystem.LspPath;
+import saros.lsp.filesystem.LspWorkspace;
 import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -38,7 +42,7 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
 
   private ISarosSession session;
 
-  private IWorkspace workspace;
+  private IWorkspacePath workspace;
 
   private EditorManager editorManager;
 
@@ -76,7 +80,7 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
   }
 
   public WorkspaceServiceStub(
-      ISarosSessionManager sessionManager, IWorkspace workspace, EditorManager editorManager) {
+      ISarosSessionManager sessionManager, IWorkspacePath workspace, EditorManager editorManager) {
     this.workspace = workspace;
     this.editorManager = editorManager;
 
@@ -100,7 +104,7 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
       return;
     }
 
-    SPath target = this.tryCreateSPath(fileEvent);
+    IResource target = this.getFile(fileEvent);
     if (target == null) {
       return;
     }
@@ -123,53 +127,53 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
     }
   }
 
-  private IActivity getDeleteActivity(SPath target) {
-    if (target.getResource().getType() == IResource.PROJECT) {
-      return new FolderDeletedActivity(this.session.getLocalUser(), target);
-    } else if (target.getResource().getType() == IResource.FILE) {
+  private IActivity getDeleteActivity(IResource target) {
+    if (target.getType() == IResource.Type.FOLDER) {
+      return new FolderDeletedActivity(this.session.getLocalUser(), (IFolder) target);
+    } else if (target.getType() == IResource.Type.FILE) {
       return new FileActivity(
-          this.session.getLocalUser(), Type.REMOVED, Purpose.ACTIVITY, target, null, null, null);
+          this.session.getLocalUser(), Type.REMOVED, Purpose.ACTIVITY, (IFile) target, null, null, null);
     }
 
     return null;
   }
 
-  private IActivity getCreateActivity(SPath target) {
+  private IActivity getCreateActivity(IResource target) {
     LOG.info(target);
-    LOG.info(target.getResource());
-    LOG.info(target.getResource().getType());
-    if (target.getResource().getType() == IResource.PROJECT) {
-      return new FolderCreatedActivity(this.session.getLocalUser(), target);
-    } else if (target.getResource().getType() == IResource.FILE) {
+    LOG.info(target.getType());
+    if (target.getType() == IResource.Type.FOLDER) {
+      return new FolderCreatedActivity(this.session.getLocalUser(), (IFolder) target);
+    } else if (target.getType() == IResource.Type.FILE) {
       return new FileActivity(
           this.session.getLocalUser(),
           Type.CREATED,
           Purpose.ACTIVITY,
-          target,
+          (IFile) target,
           null,
-          this.editorManager.getContent(target).getBytes(),
+          this.editorManager.getContent((IFile) target).getBytes(),
           null);
     }
 
     return null;
   }
 
-  private SPath tryCreateSPath(FileEvent fileEvent) throws URISyntaxException {
+  private IResource getFile(FileEvent fileEvent) throws URISyntaxException {
     URI uri = new URI(fileEvent.getUri());
     IPath path = LspPath.fromUri(uri);
-    IProject project = this.workspace.getProject("");
+
+    // IProject project = this.workspace.getProject("");
 
     File file = path.toFile();
     IResource resource = null;
     if (file.isFile()) {
-      resource = project.getFile(path);
+      resource = new LspFile(workspace, path);
     } else if (file.isDirectory()) {
-      resource = project.getFolder(path);
+      resource = new LspFolder(workspace, path);
     } else {
       LOG.warn(String.format("'%s' doesn't seem to be a file nor a directory!", uri.getPath()));
       return null;
     }
 
-    return new SPath(resource);
+    return resource;
   }
 }

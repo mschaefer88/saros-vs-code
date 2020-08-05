@@ -4,12 +4,12 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
-import org.eclipse.lsp4j.ProgressParams;
-import org.eclipse.lsp4j.WorkDoneProgressBegin;
-import org.eclipse.lsp4j.WorkDoneProgressCreateParams;
-import org.eclipse.lsp4j.WorkDoneProgressEnd;
-import org.eclipse.lsp4j.WorkDoneProgressReport;
 import saros.lsp.extensions.client.ISarosLanguageClient;
+import saros.lsp.extensions.client.dto.ProgressParams;
+import saros.lsp.extensions.client.dto.WorkDoneProgressBegin;
+import saros.lsp.extensions.client.dto.WorkDoneProgressCreateParams;
+import saros.lsp.extensions.client.dto.WorkDoneProgressEnd;
+import saros.lsp.extensions.client.dto.WorkDoneProgressReport;
 import saros.monitoring.IProgressMonitor;
 
 public class ProgressMonitor implements IProgressMonitor {

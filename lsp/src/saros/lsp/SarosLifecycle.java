@@ -11,11 +11,12 @@ import saros.lsp.context.LspOptionalContextFactory;
 import saros.lsp.context.LspProxyContextFactory;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.ISarosLanguageServer;
+import saros.lsp.filesystem.IWorkspacePath;
 
 public class SarosLifecycle extends AbstractContextLifecycle {
 
   private ISarosLanguageClient client;
-  private IWorkspace workspace;
+  private IWorkspacePath workspace;
 
   @Override
   protected Collection<IContextFactory> additionalContextFactories() {
@@ -27,7 +28,7 @@ public class SarosLifecycle extends AbstractContextLifecycle {
     factories.add(
         new LspProxyContextFactory<ISarosLanguageClient>(
             ISarosLanguageClient.class, () -> this.client));
-    factories.add(new LspProxyContextFactory<IWorkspace>(IWorkspace.class, () -> this.workspace));
+    factories.add(new LspProxyContextFactory<IWorkspacePath>(IWorkspacePath.class, () -> this.workspace));
 
     return factories;
   }
@@ -43,7 +44,7 @@ public class SarosLifecycle extends AbstractContextLifecycle {
     return client;
   }
 
-  public IWorkspace registerWorkspace(IWorkspace workspace) {
+  public IWorkspacePath registerWorkspace(IWorkspacePath workspace) {
 
     this.workspace = workspace;
 

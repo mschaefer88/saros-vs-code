@@ -10,16 +10,16 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
-import saros.activities.SPath;
-import saros.activities.TextEditActivity;
 import saros.filesystem.IFile;
-import saros.lsp.editor.adapter.EditorString;
+import saros.activities.TextEditActivity;
+import saros.editor.text.TextPosition;
 import saros.lsp.editor.annotation.Annotation;
 import saros.session.User;
 
@@ -44,7 +44,7 @@ public class Editor extends TextDocumentItem { // TODO: base class necessary?
 
   public Editor(IFile file) throws IOException {
     super.setUri(
-        "file:///" + file.getFullPath().toString()); // TODO: might not be needed, also centralize!
+        "file:///" + file.getReferencePointRelativePath().toString()); // TODO: MIGRATION
 
     try (InputStream stream = file.getContents()) {
       super.setText(IOUtils.toString(stream));
@@ -95,34 +95,44 @@ public class Editor extends TextDocumentItem { // TODO: base class necessary?
     return offset + position.getCharacter();
   }
 
+  private int offsetAt(TextPosition textPosition) {
+    return this.offsetAt(new Position(textPosition.getLineNumber(), textPosition.getInLineOffset()));
+  }
+
   public TextEditActivity convert(
       TextDocumentContentChangeEvent changeEvent,
       User source,
-      SPath path) { // TODO: set path in ctor
+      IFile path) { // TODO: set path in ctor
+    
     Range range = changeEvent.getRange();
     int length = 0;
-
-    if (range != null) {
-      length = changeEvent.getRangeLength().intValue();
+    if(range != null){
+      length = this.getLength(range); //TODO: MIGRATION
     } else {
       length = this.getText().length();
-      range = new Range(positionAt(0), positionAt(length));
     }
-
-    int startOffset = offsetAt(range.getStart());
     String text = changeEvent.getText();
-    String replacedText = this.getAt(startOffset, length);
+    String replacedText = this.getAt(range.getStart(), length); 
 
-    return new TextEditActivity(source, startOffset, text, replacedText, path);
+     return TextEditActivity.buildTextEditActivity(source, 
+     new TextPosition(changeEvent.getRange().getStart().getLine(), changeEvent.getRange().getStart().getCharacter()), 
+     text, 
+     replacedText, 
+     path);
+  }
+
+  private int getLength(Range range) {
+    return this.offsetAt(range.getEnd()) - this.offsetAt(range.getStart());
   }
 
   public TextDocumentContentChangeEvent convert(TextEditActivity editActivity) {
-    Position start = this.positionAt(editActivity.getOffset());
-    Position end =
-        this.positionAt(editActivity.getOffset() + editActivity.getReplacedText().length());
+    TextPosition startPos = editActivity.getStartPosition();
+    TextPosition endPos = editActivity.getNewEndPosition();
+    Position start = new Position(startPos.getLineNumber(), startPos.getInLineOffset());
+    Position end = new Position(endPos.getLineNumber(), endPos.getInLineOffset());
     Range range = new Range(start, end);
     return new TextDocumentContentChangeEvent(
-        range, editActivity.getReplacedText().length(), editActivity.getText());
+        range, editActivity.getReplacedText().length(), editActivity.getNewText()); //TODO: MIGRATION
   }
 
   public void apply(List<TextDocumentContentChangeEvent> changes, int version) {
@@ -134,7 +144,7 @@ public class Editor extends TextDocumentItem { // TODO: base class necessary?
         int length = 0;
 
         if (range != null) {
-          length = changeEvent.getRangeLength().intValue();
+          length = this.getLength(range);
         } else {
           length = buffer.length();
           range = new Range(positionAt(0), positionAt(length));
@@ -155,9 +165,9 @@ public class Editor extends TextDocumentItem { // TODO: base class necessary?
   public void apply(TextEditActivity activity) {
     synchronized (lock) {
       StringBuilder buffer = new StringBuilder(this.getText());
-      int startOffset = activity.getOffset();
+      int startOffset = this.offsetAt(activity.getStartPosition());
       int length = activity.getReplacedText().length();
-      String text = activity.getText();
+      String text = activity.getNewText();
 
       buffer.replace(startOffset, startOffset + length, text);
 
@@ -169,11 +179,10 @@ public class Editor extends TextDocumentItem { // TODO: base class necessary?
 
   private void annotate(TextEditActivity activity) {
 
-    EditorString es = new EditorString(this.getText());
     Range range =
         new Range(
-            es.getPosition(activity.getOffset()),
-            es.getPosition(activity.getOffset() + activity.getText().length()));
+            new Position(activity.getStartPosition().getLineNumber(), activity.getStartPosition().getInLineOffset()), //TODO: converter
+            new Position(activity.getNewEndPosition().getLineNumber(), activity.getNewEndPosition().getInLineOffset())); //TODO: converter
     Annotation recent = new Annotation(range, activity.getSource(), this.getVersion());
     Annotation[] after =
         this.annotations

@@ -30,7 +30,7 @@ public class LspPath implements IPath {
     return new LspPath(Paths.get(uri));
   }
 
-  private LspPath(Path delegate) {
+  protected LspPath(Path delegate) {
     // LOG.info(String.format("tostring: %s", delegate.toString()));
     // LOG.info(String.format("absolute: %s", delegate.toAbsolutePath()));
     /*

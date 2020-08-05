@@ -9,27 +9,28 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;
-import saros.filesystem.IProject;
 import saros.filesystem.IWorkspace;
 import saros.lsp.extensions.client.ISarosLanguageClient;
-import saros.lsp.filesystem.LspProject;
+import saros.lsp.filesystem.IWorkspacePath;
+import saros.lsp.filesystem.LspReferencePoint;
+import saros.lsp.filesystem.LspWorkspace;
 import saros.lsp.ui.UIInteractionManager;
+import saros.filesystem.IReferencePoint;
 import saros.monitoring.IProgressMonitor;
 import saros.monitoring.NullProgressMonitor;
-import saros.negotiation.AbstractIncomingProjectNegotiation;
-import saros.negotiation.AbstractOutgoingProjectNegotiation;
+import saros.negotiation.AbstractIncomingResourceNegotiation;
+import saros.negotiation.AbstractOutgoingResourceNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.NegotiationTools.CancelOption;
 import saros.negotiation.OutgoingSessionNegotiation;
-import saros.negotiation.ProjectNegotiation;
-import saros.negotiation.ProjectNegotiationData;
+import saros.negotiation.ResourceNegotiation;
+import saros.negotiation.ResourceNegotiationData;
 import saros.negotiation.SessionNegotiation;
 import saros.net.util.XMPPUtils;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.net.xmpp.contact.XMPPContact;
 import saros.net.xmpp.contact.XMPPContactsService;
-import saros.server.filesystem.ServerProjectImpl;
 import saros.session.INegotiationHandler;
 import saros.session.ISarosSessionManager;
 
@@ -44,7 +45,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
   private final ISarosLanguageClient client;
 
-  private final IWorkspace workspace;
+  private final IWorkspacePath workspace;
 
   private final UIInteractionManager interactionManager;
 
@@ -57,7 +58,7 @@ public class NegotiationHandler implements INegotiationHandler {
       final XMPPConnectionService connectionService,
       final IProgressMonitor progressMonitor,
       ISarosLanguageClient client,
-      IWorkspace workspace,
+      IWorkspacePath workspace,
       final UIInteractionManager interactionManager,
       final XMPPContactsService contactService) {
 
@@ -90,7 +91,7 @@ public class NegotiationHandler implements INegotiationHandler {
               // TODO: LOG to client
               switch (status) {
                 case OK:
-                  sessionManager.startSharingProjects(negotiation.getPeer());
+                  sessionManager.startSharingReferencePoints(negotiation.getPeer());
                   break;
                 case ERROR:
                   LOG.error("ERROR running session negotiation: " + negotiation.getErrorMessage());
@@ -169,14 +170,14 @@ public class NegotiationHandler implements INegotiationHandler {
   }
 
   @Override
-  public void handleOutgoingProjectNegotiation(AbstractOutgoingProjectNegotiation negotiation) {
+  public void handleOutgoingResourceNegotiation(AbstractOutgoingResourceNegotiation negotiation) {
     // TODO: negotiation.addCancelListener(listener);
-    LOG.info("handleOutgoingProjectNegotiation");
+    LOG.info("handleOutgoingResourceNegotiation");
 
     Executors.newCachedThreadPool()
         .submit(
             () -> {
-              ProjectNegotiation.Status status = negotiation.run(this.progressMonitor);
+              ResourceNegotiation.Status status = negotiation.run(this.progressMonitor);
 
               String peerName = getNickname(new JID(negotiation.getPeer().getBase()));
 
@@ -203,38 +204,31 @@ public class NegotiationHandler implements INegotiationHandler {
   }
 
   @Override
-  public void handleIncomingProjectNegotiation(
-      AbstractIncomingProjectNegotiation negotiation) { // TODO: logic in own class
+  public void handleIncomingResourceNegotiation(
+    AbstractIncomingResourceNegotiation negotiation) { // TODO: logic in own class
     Executors.newCachedThreadPool()
         .submit(
             () -> {
               LOG.info("handleIncomingProjectNegotiation");
               // TODO: negotiation.addCancelListener(listener);
 
-              Map<String, IProject> projectMapping = new HashMap<>();
+              Map<String, IReferencePoint> projectMapping = new HashMap<>();
               // TODO: use abstraction?
-              for (ProjectNegotiationData data : negotiation.getProjectNegotiationData()) {
+              for (ResourceNegotiationData data : negotiation.getResourceNegotiationData()) {
 
-                LOG.debug(
-                    String.format("ID: %s, Name: %s", data.getProjectID(), data.getProjectName()));
                 for (String file : data.getFileList().getPaths()) {
                   LOG.debug(String.format("File: %s", file));
                 }
-                Map<String, String> add = data.getAdditionalProjectData();
-                add.forEach(
-                    (k, v) -> {
-                      LOG.debug(String.format("Add: %s = %s", k, v));
-                    });
 
-                String projectName = data.getProjectName();
+                String projectName = data.getReferencePointName();
                 LOG.info(String.format("Retrieved project '%s'", projectName));
-                IProject project = new LspProject(this.workspace, projectName);
+                IReferencePoint project = new LspReferencePoint(this.workspace, projectName);
 
                 // TODO: The file path is currently dictated by the name, potentially resulting in
                 // CONFLICTS
                 if (!project.exists()) {
                   try {
-                    project.adaptTo(ServerProjectImpl.class).create();
+                    ((LspReferencePoint) project).create();
                   } catch (IOException e) {
                     negotiation.localCancel(
                         "Error creating project folder", CancelOption.NOTIFY_PEER);
@@ -243,14 +237,16 @@ public class NegotiationHandler implements INegotiationHandler {
                   }
                 }
 
-                projectMapping.put(data.getProjectID(), project);
+                projectMapping.put(data.getReferencePointID(), project);
               }
 
-              ProjectNegotiation.Status status =
+              //TODO: hier war runnable MIGRATION
+              ResourceNegotiation.Status status =
                   negotiation.run(projectMapping, this.progressMonitor); // TODO: cancel
 
               // TODO: process state
-              if (status == ProjectNegotiation.Status.OK) {
+              if (status != ResourceNegotiation.Status.OK) {
+                //this.sendNotification("", status); //TODO: !!!!
                 // TODO: this.client.openProject(new
                 // SarosResultResponse<String>("C:\\Temp\\saros-workspace-test\\"));
               }

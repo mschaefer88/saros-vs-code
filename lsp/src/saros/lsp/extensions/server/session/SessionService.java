@@ -3,6 +3,7 @@ package saros.lsp.extensions.server.session;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
@@ -10,7 +11,7 @@ import saros.account.XMPPAccount;
 import saros.account.XMPPAccountStore;
 import saros.communication.connection.ConnectionHandler;
 import saros.communication.connection.IConnectionStateListener;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.lsp.extensions.client.ISarosLanguageClient;
@@ -92,8 +93,8 @@ public class SessionService
   public CompletableFuture<SarosResponse> start() {
 
     try {
-      Map<IProject, List<IResource>> map =
-          Collections.singletonMap(this.workspace.getProject(""), null);
+      Set<IReferencePoint> map =
+          Collections.singleton(null/*this.workspace.getProject("")*/); //TODO: MIGRATION - getReferencePoints - use Editor? use settings?
 
       this.sessionManager.startSession(map);
 
@@ -160,9 +161,9 @@ public class SessionService
 
   // TODO: do along guidelines!
   @Override
-  public void connectionStateChanged(ConnectionState state, Exception error) {
+  public void connectionStateChanged(ConnectionState state, ErrorType errorType) {
 
-    if (error == null) {
+    if (state == ConnectionState.CONNECTED) {
       this.client.sendStateConnected(
           new SarosResultResponse<Boolean>(
               state == ConnectionState.CONNECTED)); // TODO: send State?

@@ -8,7 +8,6 @@ import saros.activities.EditorActivity;
 import saros.activities.FileActivity;
 import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
-import saros.activities.FolderMovedActivity;
 import saros.activities.JupiterActivity;
 import saros.activities.NOPActivity;
 import saros.activities.PermissionActivity;
@@ -85,12 +84,6 @@ public class ActivityConsumer extends AbstractActivityConsumer implements Starta
   public void receive(FolderDeletedActivity folderDeletedActivity) {
     LOG.info("FolderDeletedActivity");
     super.receive(folderDeletedActivity);
-  }
-
-  @Override
-  public void receive(FolderMovedActivity folderMovedActivity) {
-    LOG.info("FolderMovedActivity");
-    super.receive(folderMovedActivity);
   }
 
   @Override
