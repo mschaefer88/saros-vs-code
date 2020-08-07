@@ -18,6 +18,7 @@ import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.SarosResponse;
 import saros.lsp.extensions.server.SarosResultResponse;
 import saros.lsp.extensions.server.session.dto.InviteDto;
+import saros.lsp.filesystem.IWorkspacePath;
 import saros.net.ConnectionState;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.contact.XMPPContact;
@@ -38,7 +39,7 @@ public class SessionService
   private final ISarosSessionManager sessionManager; // TODO: move to own service
   private final ISarosLanguageClient client;
   private final XMPPContactsService contactService;
-  private final IWorkspace workspace;
+  private final IWorkspacePath workspace;
 
   private static final Logger LOG = Logger.getLogger(SessionService.class);
 
@@ -48,7 +49,7 @@ public class SessionService
       ISarosSessionManager sessionManager,
       ISarosLanguageClient client,
       XMPPContactsService contactService,
-      IWorkspace workspace) {
+      IWorkspacePath workspace) {
     this.connectionHandler = connectionHandler;
     this.accountStore = accountStore;
     this.sessionManager = sessionManager;
@@ -94,8 +95,10 @@ public class SessionService
 
     try {
       Set<IReferencePoint> map =
-          Collections.singleton(null/*this.workspace.getProject("")*/); //TODO: MIGRATION - getReferencePoints - use Editor? use settings?
+          Collections.singleton(this.workspace.getReferencePoint(""));
 
+          LOG.info(String.format("Workspace: %s", this.workspace.toString()));
+          LOG.info(String.format("Reference: %s", this.workspace.getReferencePoint("")));
       this.sessionManager.startSession(map);
 
     } catch (Exception e) {

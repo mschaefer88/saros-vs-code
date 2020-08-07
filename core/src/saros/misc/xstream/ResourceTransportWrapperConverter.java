@@ -101,7 +101,7 @@ public class ResourceTransportWrapperConverter implements Converter, Startable {
     String i = reader.getAttribute(REFERENCE_POINT_ID);
     String p = URLCodec.decode(reader.getAttribute(PATH));
     String t = reader.getAttribute(TYPE);
-
+    log.info(String.format("i = '%s' p = '%s' t = '%s'", i, p, t));
     IReferencePoint referencePoint = session.getReferencePoint(i);
     if (referencePoint == null) {
       log.error(

@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 
@@ -166,7 +167,13 @@ public class EditorManager implements IEditorManager {
   }
 
   public void setVersion(IFile path, int version) { // TODO: experimental!
+
+    LOG.info(String.format("setVersion('%s', %d)", path, version));
+    for(IFile editor : this.openEditors.keySet()) {      
+      LOG.info(String.format("openEditors = '%s'", editor));
+    }
     Editor e = this.openEditors.get(path);
+    LOG.info(String.format("setVersion.editor opened = '%s'", e));
 
     e.setVersion(version);
   }
@@ -224,7 +231,7 @@ public class EditorManager implements IEditorManager {
       return UNIX_LINE_SEPARATOR;
     }
 
-    return "";
+    return SystemUtils.IS_OS_WINDOWS ? WINDOWS_LINE_SEPARATOR : UNIX_LINE_SEPARATOR;
   }
 
   /**
@@ -259,9 +266,13 @@ public class EditorManager implements IEditorManager {
   @Override
   public String getNormalizedContent(IFile file) {
     String content = this.getContent(file);
-    if(content != null) {
-      return normalize(content, guessLineSeparator(content));
+    String normContent = "";
+    if(content != null && !content.isEmpty()) {
+      normContent = normalize(content, guessLineSeparator(content));
     }
-    return null;
+
+    LOG.info(String.format("Normalized Content for '%s' is '%s'", file.getName(), content));
+
+    return normContent;
   }
 }

@@ -10,6 +10,7 @@ public class WorkspacePath extends LspPath implements IWorkspacePath {
         super(Paths.get(path));
     }
   
+    @Override
     public IReferencePoint getReferencePoint(String name) {
       return new LspReferencePoint(this, name);
     }

@@ -237,13 +237,16 @@ public class NegotiationHandler implements INegotiationHandler {
                   }
                 }
 
+                LOG.info(String.format("PUT '%s'", data.getReferencePointID()));
                 projectMapping.put(data.getReferencePointID(), project);
               }
 
+              LOG.info("RUN");
               //TODO: hier war runnable MIGRATION
               ResourceNegotiation.Status status =
                   negotiation.run(projectMapping, this.progressMonitor); // TODO: cancel
 
+                  LOG.info(String.format("STATUS '%s'", status));
               // TODO: process state
               if (status != ResourceNegotiation.Status.OK) {
                 //this.sendNotification("", status); //TODO: !!!!

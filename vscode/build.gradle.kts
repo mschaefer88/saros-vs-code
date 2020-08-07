@@ -55,8 +55,9 @@ tasks.register<Exec>("runExtension") {
   group = "VS Code"
   description = "Builds and runs the extension"
 
-  var execArgs = "code --extensionDevelopmentPath=${projectDir.absolutePath} C:/Temp/Saros-A"
-
+  var cwd = System.getProperty("cwd", "") // argument is -Pcwd=
+  var execArgs = "code --extensionDevelopmentPath=${projectDir.absolutePath} ${cwd}"
+  
   if (Os.isFamily(Os.FAMILY_WINDOWS)) {
     executable = "cmd"
     setArgs(listOf("/c ${execArgs}"))

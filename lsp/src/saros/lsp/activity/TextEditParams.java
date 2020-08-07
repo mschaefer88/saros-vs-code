@@ -15,6 +15,7 @@ import saros.activities.TextEditActivity;
 import saros.filesystem.IWorkspace;
 import saros.lsp.editor.EditorManager;
 import saros.lsp.filesystem.IWorkspacePath;
+import saros.lsp.filesystem.LspFile;
 
 public class TextEditParams extends ApplyWorkspaceEditParams {
 
@@ -22,7 +23,8 @@ public class TextEditParams extends ApplyWorkspaceEditParams {
       IWorkspacePath workspace, EditorManager editorManager, TextEditActivity activity) {
     // TODO: replace workspace by project get full path!
 
-    String content = editorManager.getContent(activity.getResource());
+    IFile workspaceFile = new LspFile(workspace, activity.getResource().getReferencePointRelativePath());//TODO: better Way? How to elimenate the need of a ws?)
+    String content = editorManager.getContent(workspaceFile);
     TextEdit edit = createEdit(content, activity);
 
     TextDocumentEdit documentEdit =
@@ -42,7 +44,7 @@ public class TextEditParams extends ApplyWorkspaceEditParams {
   }
 
   private static String createFileUri(IWorkspacePath workspace, IFile path) {
-    return Paths.get(path.getReferencePointRelativePath().toString()) //TODO: MIGRATION
+    return Paths.get(workspace.toString(), path.getReferencePointRelativePath().toString()) //TODO: MIGRATION
         .toUri()
         .toString(); // TODO: do better!
   }

@@ -14,7 +14,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"workspaceContains:*"
+		"*"
 	],
 	"main": "./dist/extension",
 	"contributes": {

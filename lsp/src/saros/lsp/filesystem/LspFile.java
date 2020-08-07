@@ -64,7 +64,7 @@ public class LspFile extends LspResource implements IFile {
     try {
       Files.delete(toNioPath());
     } catch (NoSuchFileException e) {
-      LOG.debug("Could not delete " + getFullPath() + " because it doesn't exist (ignoring)", e);
+      LOG.debug("Could not delete " + getLocation() + " because it doesn't exist (ignoring)", e);
     }
   }
 

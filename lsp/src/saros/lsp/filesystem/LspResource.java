@@ -2,6 +2,9 @@ package saros.lsp.filesystem;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import org.apache.log4j.Logger;
+
 import saros.filesystem.IContainer;
 import saros.filesystem.IPath;
 import saros.filesystem.IReferencePoint;
@@ -10,6 +13,7 @@ import saros.filesystem.IResource;
 public abstract class LspResource implements IResource {
   private IWorkspacePath workspace;
   private IPath path;
+  private static final Logger LOG = Logger.getLogger(LspResource.class);
 
   /**
    * Creates a ServerResourceImpl.
@@ -19,6 +23,11 @@ public abstract class LspResource implements IResource {
    */
   public LspResource(IWorkspacePath workspace, IPath path) {
     assert !path.isAbsolute();
+
+    if(workspace.isPrefixOf(path))
+    {
+      path = path.removeFirstSegments(workspace.segmentCount());
+    }
 
     this.path = path;
     this.workspace = workspace;
@@ -33,13 +42,9 @@ public abstract class LspResource implements IResource {
     return workspace;
   }
 
-  public IPath getFullPath() {
-    return path;
-  }
-
   @Override
   public String getName() {
-    String lastSegment = getFullPath().lastSegment();
+    String lastSegment = path.lastSegment();
 
     if (lastSegment == null) {
       return "";
@@ -78,8 +83,7 @@ public abstract class LspResource implements IResource {
     LspResource other = (LspResource) obj;
 
     return getType() == other.getType()
-        && getWorkspace().equals(other.getWorkspace())
-        && getFullPath().equals(other.getFullPath());
+        && path.equals(other.path);
   }
 
   @Override
@@ -88,19 +92,17 @@ public abstract class LspResource implements IResource {
     int result = 1;
     result = prime * result + getType().hashCode();
     result = prime * result + path.hashCode();
-    result = prime * result + workspace.hashCode();
     return result;
   }
 
   @Override
   public IReferencePoint getReferencePoint() {
-    String projectName = getFullPath().segment(0);
-    return workspace.getReferencePoint(projectName);
+    return workspace.getReferencePoint("");//there is only one, subject to change once system is shifted towards client! (TODO)
   }
 
   @Override
   public IPath getReferencePointRelativePath() {
-    return getFullPath().removeFirstSegments(1);
+    return path;
   }
 
   /**

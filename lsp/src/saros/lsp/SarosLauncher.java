@@ -116,7 +116,7 @@ public class SarosLauncher implements Callable<Integer> {
     langSvr.onInitialize(
         params -> {
           try {
-            IWorkspacePath root = new WorkspacePath(new URI(params.getRootUri()));
+            IWorkspacePath root = new WorkspacePath(new URI(params.getRootUri())); //TODO: handle when nothing came (no workspace)
             lifecycle.registerWorkspace(root);
           } catch (URISyntaxException e) {
             LOG.error(e);
