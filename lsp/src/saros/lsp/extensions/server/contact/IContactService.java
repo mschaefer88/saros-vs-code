@@ -1,6 +1,8 @@
 package saros.lsp.extensions.server.contact;
 
 import java.util.concurrent.CompletableFuture;
+
+import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 import saros.lsp.extensions.server.SarosResponse;
@@ -23,6 +25,6 @@ public interface IContactService {
   @JsonRequest
   CompletableFuture<SarosResultResponse<ContactDto[]>> getAll(ContactDto request);
 
-  // @JsonRequest
-  // CompletableFuture<Void> test(Test t);
+  @JsonNotification
+  CompletableFuture<Void> test();
 }

@@ -108,10 +108,11 @@ public class ProgressMonitor implements IProgressMonitor {
   }
 
   private void createProgress() {
-
+    LOG.info("createProgress()");
     WorkDoneProgressCreateParams c = new WorkDoneProgressCreateParams(this.token);
 
     this.client.createProgress(c);
+    LOG.info("createProgress() -> sent");
   }
 
   private void beginProgress(String title) {

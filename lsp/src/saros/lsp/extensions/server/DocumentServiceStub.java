@@ -166,7 +166,6 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
   }
 
   private IFile getFile(String uri) {
-    LOG.info(String.format("getFile('%s')", uri));
     IPath path;
     try {
       path = LspPath.fromUri(new URI(uri));
@@ -174,10 +173,6 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
       LOG.error(e);
       return null;
     }
-    // IReferencePoint p = this.workspace.getProject("");
-    LOG.info(String.format("getFile('%s') = '%s' ws = '%s'", uri, path, workspace));
-
-    // return new IFile(p.getFile(path));
     return new LspFile(workspace, path);
   }
 

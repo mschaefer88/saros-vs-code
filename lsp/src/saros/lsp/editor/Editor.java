@@ -179,6 +179,10 @@ public class Editor extends TextDocumentItem { // TODO: base class necessary?
 
   private void annotate(TextEditActivity activity) {
 
+    if(activity.getSource().isLocal()) {
+      return;
+    }
+    
     Range range =
         new Range(
             new Position(activity.getStartPosition().getLineNumber(), activity.getStartPosition().getInLineOffset()), //TODO: converter

@@ -1,6 +1,9 @@
 package saros.lsp.extensions.client;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
+import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.services.LanguageClient;
 import saros.lsp.extensions.client.dto.AnnotationParams;
 import saros.lsp.extensions.client.dto.ProgressParams;
@@ -41,8 +44,8 @@ public interface ISarosLanguageClient
   @JsonNotification("saros/session/user-left")
   void notifyUserLeftSession(SessionUserDto user); // TODO: use own notification/type!
 
-  @JsonNotification("window/workDoneProgress/create")
-  void createProgress(WorkDoneProgressCreateParams params);
+  @JsonRequest("window/workDoneProgress/create")
+  CompletableFuture<Void> createProgress(WorkDoneProgressCreateParams params);
 
   @JsonNotification("$/progress")
   <T> void progress(ProgressParams<T> params);

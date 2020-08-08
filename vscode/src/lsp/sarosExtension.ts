@@ -137,10 +137,8 @@ export class SarosExtension implements IEventAggregator {
     private processAnnotations(annotations: AnnotationParams[]) {
       const user = _.groupBy(annotations, (a) => a.user);
       _.forEach(user, (as, u) => {
-        if (u !== 'mschaefer88_u') {
-          const ranges = _.map(as, (a) => a.range);
+        const ranges = _.map(as, (a) => a.range);
           window.activeTextEditor?.setDecorations(this._annotationType, ranges);
-        }
       });
     }
 

@@ -1,7 +1,7 @@
 import {activateAccounts, activateContacts, activateSessions} from './commands';
 import {SarosContactView, SarosSessionView, SarosAccountView} from './views';
 import {sarosExtensionInstance} from './lsp';
-import {window, ExtensionContext} from 'vscode';
+import {window, ExtensionContext, commands} from 'vscode';
 import {variables} from './views/variables';
 
 /**
@@ -24,6 +24,10 @@ export function activate(context: ExtensionContext) {
             .push(new SarosContactView(sarosExtensionInstance));
         context.subscriptions
             .push(new SarosSessionView(sarosExtensionInstance));
+
+            commands.registerCommand("xxx.xxx", () => {
+              sarosExtensionInstance.client.sendNotification("saros/contact/test");
+            })
 
         variables.setInitialized(true);
       })
