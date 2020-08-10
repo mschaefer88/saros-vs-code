@@ -8,7 +8,7 @@ import {
   OutputChannel,
 } from 'vscode';
 import {SarosServer} from './sarosServer';
-import {AnnotationNotification, AnnotationParams} from './sarosProtocol';
+import {AnnotationNotification} from './sarosProtocol';
 import {
   LanguageClientOptions,
   RevealOutputChannelOn,
@@ -18,6 +18,7 @@ import {SarosClient} from './sarosClient';
 import * as _ from 'lodash';
 import {IEventAggregator, EventAggregator} from '../types/eventAggregator';
 import {SarosErrorHandler, ErrorCallback} from './sarosErrorHandler';
+import { SarosAnnotator } from './sarosAnnotator';
 
 type SubscriptionCallback<TArgs> = (args: TArgs) => void;
 
@@ -33,6 +34,7 @@ export class SarosExtension implements IEventAggregator {
     public channel: OutputChannel;
 
     private _eventAggregator = new EventAggregator();
+    private _annotator!: SarosAnnotator;
 
     /**
      * Subscribes to an event.
@@ -65,11 +67,6 @@ export class SarosExtension implements IEventAggregator {
      * @memberof SarosExtension
      */
     constructor() {
-      this._annotationType = window.createTextEditorDecorationType({
-        overviewRulerColor: '#00ffff',
-        overviewRulerLane: OverviewRulerLane.Left,
-        backgroundColor: '#00ffff',
-      });
       this.channel = window.createOutputChannel('Saros');
     }
 
@@ -85,8 +82,6 @@ export class SarosExtension implements IEventAggregator {
 
       return this;
     }
-
-    private _annotationType: TextEditorDecorationType;
 
     /**
      * Initializes the extension.
@@ -112,33 +107,11 @@ export class SarosExtension implements IEventAggregator {
           const server = new SarosServer(self.context);
           self.client = new SarosClient(server.getStartFunc(),
               this._createClientOptions(reject));
+          self._annotator = new SarosAnnotator(self.client);
           self.context.subscriptions.push(self.client.start());
 
-          self.client.onReady().then(() => {
-            self.client.onNotification(AnnotationNotification.type,
-                (params) => {
-                  this.processAnnotations(params.result);
-                },
-            );
-
-            resolve();
-          });
+          self.client.onReady().then(() => resolve());
         });
-      });
-    }
-
-    /**
-     * Processes incoming annotations.
-     *
-     * @private
-     * @param {AnnotationParams[]} annotations Current annotations
-     * @memberof SarosExtension
-     */
-    private processAnnotations(annotations: AnnotationParams[]) {
-      const user = _.groupBy(annotations, (a) => a.user);
-      _.forEach(user, (as, u) => {
-        const ranges = _.map(as, (a) => a.range);
-          window.activeTextEditor?.setDecorations(this._annotationType, ranges);
       });
     }
 
@@ -187,7 +160,7 @@ export class SarosExtension implements IEventAggregator {
      * @memberof SarosExtension
      */
     public deactivate(): void {
-      this.client.stop();
+      this.client?.stop();
     }
 }
 

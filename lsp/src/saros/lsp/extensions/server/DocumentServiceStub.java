@@ -29,6 +29,7 @@ import org.eclipse.lsp4j.TextDocumentIdentifier;
 import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
+import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import saros.filesystem.IFile;
 import saros.activities.TextEditActivity;
@@ -43,6 +44,7 @@ import saros.lsp.editor.annotation.Annotation;
 import saros.lsp.editor.annotation.AnnotationManager;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.client.dto.AnnotationParams;
+import saros.lsp.extensions.server.document.IDocumentService;
 import saros.lsp.filesystem.IWorkspacePath;
 import saros.lsp.filesystem.LspFile;
 import saros.lsp.filesystem.LspPath;
@@ -59,7 +61,7 @@ import saros.session.SessionEndReason;
 import saros.session.User;
 
 /** Empty implementation of the text document service. */
-public class DocumentServiceStub extends AbstractActivityProducer implements TextDocumentService {
+public class DocumentServiceStub extends AbstractActivityProducer implements IDocumentService {
 
   private EditorManager editorManager;
   private ISarosSession session;
@@ -189,7 +191,6 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
   @Override
   public void didChange(DidChangeTextDocumentParams params) {
     VersionedTextDocumentIdentifier i = params.getTextDocument();
-
     TextEditActivity ig = null;
     IFile docId = this.getFile(i.getUri());
     if (ignore.containsKey(docId)) {
@@ -222,18 +223,24 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     if (this.session != null) { // TODO: do in consume in top?
 
       IFile p = this.getFile(i.getUri());
-      Editor editor = this.editorManager.getEditor(p);
-      Annotation[] annotations = editor.getAnnotations();
-      AnnotationParams[] aps =
-          Arrays.stream(annotations)
-              .map(a -> new AnnotationParams(a, this.workspace, p))
-              .toArray(size -> new AnnotationParams[size]);
+      AnnotationParams[] aps = this.getAnnotations(p);
       client.sendAnnotation(
           new SarosResultResponse<AnnotationParams[]>(aps)); // TODO: wording apply?
     }
 
     // LOG.info(String.format("Content after change: \n\n'%s'\n\n",
     // this.editorManager.getContent(this.getIFile(i.getUri()))));
+  }
+
+  private AnnotationParams[] getAnnotations(IFile file) {
+    Editor editor = this.editorManager.getEditor(file);
+      Annotation[] annotations = editor.getAnnotations();
+      AnnotationParams[] aps =
+          Arrays.stream(annotations)
+              .map(a -> new AnnotationParams(a, this.workspace, file))
+              .toArray(size -> new AnnotationParams[size]);
+
+      return aps;
   }
 
   private User getAnonymousUser() {
@@ -327,5 +334,13 @@ public class DocumentServiceStub extends AbstractActivityProducer implements Tex
     cl.setCommand(c);
 
     return CompletableFuture.completedFuture(cl);
+  }
+
+  @Override
+  public CompletableFuture<SarosResultResponse<AnnotationParams[]>> getAnnotations(TextDocumentIdentifier identifier) {    
+    IFile p = this.getFile(identifier.getUri());
+    AnnotationParams[] aps = this.getAnnotations(p);
+
+    return CompletableFuture.completedFuture(new SarosResultResponse<AnnotationParams[]>(aps));
   }
 }

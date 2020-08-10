@@ -20,11 +20,6 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "xxx.xxx",
-				"title": "xxx.xxx",
-				"category": "Saros"
-			},
-			{
 				"command": "saros.account.add",
 				"title": "Add Account",
 				"category": "Saros",
@@ -86,7 +81,7 @@
 					"light": "media/dlcl16/xmpp_connect_tsk.png",
 					"dark": "media/dlcl16/xmpp_connect_tsk.png"
 				},
-				"when": "connectionActive"
+				"when": "!connectionActive"
 			},
 			{
 				"command": "saros.session.disconnect",
@@ -96,7 +91,7 @@
 					"light": "media/dlcl16/xmpp_disconnect_tsk.png",
 					"dark": "media/dlcl16/xmpp_disconnect_tsk.png"
 				},
-				"when": "sessionActive"
+				"when": "connectionActive"
 			},
 			{
 				"command": "saros.session.status",
@@ -177,6 +172,41 @@
 					"type": "boolean",
 					"default": false,
 					"description": "When set to true the server won't be started by this extension. This is especially useful for debugging the server when developing this extension."
+				},
+				"saros.annotationColor.user1": {
+					"scope": "window",
+					"type": "string",
+					"description": "First color that can be assigned to a user in a session.",
+					"default": "#23F0C7",
+					"pattern": "^#[0-9A-Fa-f]{6}$"
+				},
+				"saros.annotationColor.user2": {
+					"scope": "window",
+					"type": "string",
+					"description": "Second color that can be assigned to a user in a session.",
+					"default": "#EF767A",
+					"pattern": "^#[0-9A-Fa-f]{6}$"
+				},
+				"saros.annotationColor.user3": {
+					"scope": "window",
+					"type": "string",
+					"description": "Third color that can be assigned to a user in a session.",
+					"default": "#7D7ABC",
+					"pattern": "^#[0-9A-Fa-f]{6}$"
+				},
+				"saros.annotationColor.user4": {
+					"scope": "window",
+					"type": "string",
+					"description": "Fourth color that can be assigned to a user in a session.",
+					"default": "#75704E",
+					"pattern": "^#[0-9A-Fa-f]{6}$"
+				},
+				"saros.annotationColor.user5": {
+					"scope": "window",
+					"type": "string",
+					"description": "Fifth color that can be assigned to a user in a session.",
+					"default": "#FFE347",
+					"pattern": "^#[0-9A-Fa-f]{6}$"
 				}
 			}
 		},
@@ -255,11 +285,11 @@
 		"lint-fix": "eslint */**/*.ts --fix --quiet"
 	},
 	"devDependencies": {
-		"@types/glob": "^7.1.2",
-		"@types/lodash": "^4.14.155",
+		"@types/glob": "^7.1.3",
+		"@types/lodash": "^4.14.159",
 		"@types/mocha": "^5.2.6",
-		"@types/node": "^10.17.26",
-		"@types/vscode": "^1.46.0",
+		"@types/node": "^10.17.28",
+		"@types/vscode": "^1.47.0",
 		"@typescript-eslint/eslint-plugin": "^2.19.2",
 		"@typescript-eslint/parser": "^2.19.2",
 		"eslint": "^6.8.0",
@@ -267,15 +297,16 @@
 		"glob": "^7.1.6",
 		"mocha": "^6.2.3",
 		"ts-loader": "^6.2.1",
-		"typescript": "^3.9.5",
+		"typescript": "^3.9.7",
 		"vsce": "^1.71.0",
 		"vscode-test": "^1.4.0",
-		"webpack": "^4.41.6",
+		"webpack": "^4.44.1",
 		"webpack-cli": "^3.3.10"
 	},
 	"dependencies": {
 		"get-port": "^5.1.1",
-		"lodash": "^4.17.15",
+		"lodash": "^4.17.19",
+		"pureimage": "^0.2.4",
 		"vscode-languageclient": "^6.1.3"
 	}
 }

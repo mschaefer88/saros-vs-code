@@ -103,3 +103,6 @@ public
 
 # DynamoDB Local files
 .dynamodb/
+
+# Generated images
+media/colors-generated/

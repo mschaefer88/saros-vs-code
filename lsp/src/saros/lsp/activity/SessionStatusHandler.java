@@ -1,5 +1,7 @@
 package saros.lsp.activity;
 
+import java.util.Optional;
+
 import org.apache.log4j.Logger;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.SarosResultResponse;
@@ -7,6 +9,7 @@ import saros.lsp.extensions.server.session.dto.SessionUserDto;
 import saros.lsp.ui.UIInteractionManager;
 import saros.net.xmpp.contact.XMPPContact;
 import saros.net.xmpp.contact.XMPPContactsService;
+import saros.preferences.IPreferenceStore;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.session.ISessionLifecycleListener;
@@ -53,7 +56,19 @@ public class SessionStatusHandler {
       new ISessionListener() {
 
         @Override
+        public void userColorChanged(User user) {
+          if(user.isHost()) {
+            return;
+          }
+          LOG.info("UserStatusHandler.userColorChanged");
+          client.notifyUserChangedSession(createParticipantDto(user));
+        }
+
+        @Override
         public void userJoined(User user) {
+          if(user.isHost()) {
+            return;
+          }
           LOG.info("UserStatusHandler.userJoined");
           client.notifyUserJoinedSession(createParticipantDto(user)); // TODO: is host
           //   SarosView.showNotification(
@@ -63,6 +78,9 @@ public class SessionStatusHandler {
 
         @Override
         public void userLeft(User user) {
+          if(user.isHost()) {
+            return;
+          }
           LOG.info("UserStatusHandler.userLeft");
           client.notifyUserLeftSession(createParticipantDto(user)); // TODO: is host
 
@@ -78,7 +96,8 @@ public class SessionStatusHandler {
       ISarosSessionManager sessionManager,
       ISarosLanguageClient client,
       XMPPContactsService contactsService,
-      UIInteractionManager interactionManager) {
+      UIInteractionManager interactionManager,
+      IPreferenceStore preferenceStore) {
     LOG.info("UserStatusHandler.CTOR");
     this.client = client;
     this.contactsService = contactsService;
@@ -89,9 +108,14 @@ public class SessionStatusHandler {
   }
 
   private SessionUserDto createParticipantDto(User user) {
+    LOG.info(String.format("COLOR is: %d (fav: %d) - JID: %s", user.getColorID(), user.getFavoriteColorID(), user.getJID().toString()));
+
     final XMPPContact userAsContact =
-        this.contactsService.getContact(user.getJID().toString()).get();
+    this.contactsService.getContact(user.getJID().toString()).get();
+
+    int colorId = user.getColorID();
+
     return new SessionUserDto(
-        userAsContact.getBareJid().getBase().toString(), userAsContact.getDisplayableName());
+        userAsContact.getBareJid().getBase().toString(), userAsContact.getDisplayableName(), colorId);
   }
 }

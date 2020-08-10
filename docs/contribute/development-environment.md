@@ -257,7 +257,7 @@ The following tasks are used to build and test the different Saros components:
 * `sarosVSCode` - Triggers the build of the Saros VS Code Extension
 * `prepareEclipse` - Executes all tasks which are required before developing in Eclipse
 * `runIde` - Starts a IntelliJ IDE containing the Saros Plugin. The IDE version depends on the value of `INTELLIJ_HOME` or the `intellijVersion` specified in the build file of the IntelliJ package.
-* `runExtension` - Starts an VS Code (Extension Host) with the Saros Extension. Use the node debugger to attach to the process for debugging. To open a specific workspace use the parameter `-Dcwd`, eg. to open the workpsace `C:/Temp` type `-Dcwd=C:/Temp`.
+* `runExtension` - Starts an VS Code (Extension Host) with the Saros Extension. Use the node debugger to attach to the process for debugging. To open a specific workspace use the parameter `-Dcwd`, eg. to open the workpsace `C:/Temp` type `-Dcwd=C:/Temp`. Make sure to run `sarosLsp` atleast once prior to this task.
 
 In order to build the whole project without using existing build artifacts simply call `./gradlew cleanAll sarosEclipse sarosIntellij sarosServer sarosLsp sarosVSCode`.
 

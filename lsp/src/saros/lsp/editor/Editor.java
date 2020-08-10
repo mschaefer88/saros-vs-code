@@ -29,7 +29,7 @@ public class Editor extends TextDocumentItem { // TODO: base class necessary?
 
   private final Object lock = new Object();
 
-  static final int MAX_HISTORY_LENGTH = 5; // 20;
+  static final int MAX_HISTORY_LENGTH = 20; //5
 
   public Editor(TextDocumentItem documentItem) {
     this(documentItem.getText(), documentItem.getUri());

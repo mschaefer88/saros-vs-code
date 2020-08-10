@@ -5,8 +5,11 @@ public class SessionUserDto {
 
   public String nickname;
 
-  public SessionUserDto(String id, String nickname) {
+  public int annotationColorId;
+
+  public SessionUserDto(String id, String nickname, int annotationColorId) {
     this.id = id;
     this.nickname = nickname;
+    this.annotationColorId = annotationColorId;
   }
 }

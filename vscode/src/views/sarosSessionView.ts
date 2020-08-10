@@ -6,6 +6,7 @@ import {
   UserLeftSessionNotification,
   SessionUserDto,
   SarosExtension,
+  UserChangedSessionNotification,
 } from '../lsp';
 import {messages} from './labels';
 import {
@@ -16,8 +17,11 @@ import {
   Event,
   TreeItem,
   TreeView,
+  workspace,
 } from 'vscode';
 import {variables} from './variables';
+import {icons} from '../utils/icons';
+import {config} from '../lsp/sarosConfig'
 
 /**
  * Provider for users that are in the session.
@@ -39,18 +43,22 @@ export class SarosSessionProvider implements TreeDataProvider<SessionUserDto> {
   constructor(client: SarosClient, private _context: ExtensionContext) {
     this._users = [];
     this.onDidChangeTreeData = this._onDidChangeTreeData.event;
+    workspace.onDidChangeConfiguration(() => this.refresh());
 
     client.onNotification(UserJoinedSessionNotification.type,
         (user: SessionUserDto) => {
           window.showInformationMessage(
               `'${user.nickname}' joined the session.`,
           );
-          const userIndex = this._users.findIndex(
-              (user) => user.id === user.id,
-          );
-          if (userIndex < 0) {
-            this._users.push(user);
-          }
+          this.remove(user);
+          this._users.push(user);
+          this.refresh();
+        });
+
+    client.onNotification(UserChangedSessionNotification.type,
+        (user: SessionUserDto) => {
+          this.remove(user);
+          this._users.push(user);
           this.refresh();
         });
 
@@ -83,6 +91,20 @@ export class SarosSessionProvider implements TreeDataProvider<SessionUserDto> {
   }
 
   /**
+   * Removes the user from the displayed list.
+   *
+   * @private
+   * @param {SessionUserDto} user The user to remove
+   * @memberof SarosContactProvider
+   */
+  private remove(user: SessionUserDto): void {
+    const userIndex = this._users.findIndex((u) => u.id === user.id);
+    if (userIndex >= 0) {
+      this._users.splice(userIndex, 1);
+    }
+  }
+
+  /**
    * Clears the user list.
    *
    * @memberof SarosSessionProvider
@@ -92,9 +114,9 @@ export class SarosSessionProvider implements TreeDataProvider<SessionUserDto> {
     this.refresh();
   }
 
-  private _onDidChangeTreeData: EventEmitter<ContactDto | undefined> =
-    new EventEmitter<ContactDto | undefined>();
-  readonly onDidChangeTreeData: Event<ContactDto | undefined>;
+  private _onDidChangeTreeData: EventEmitter<SessionUserDto | undefined> =
+    new EventEmitter<SessionUserDto | undefined>();
+  readonly onDidChangeTreeData: Event<SessionUserDto | undefined>;
 
   /**
    * Converts the user to a tree item.
@@ -103,15 +125,16 @@ export class SarosSessionProvider implements TreeDataProvider<SessionUserDto> {
    * @return {(TreeItem | Thenable<TreeItem>)} The converted user
    * @memberof SarosSessionProvider
    */
-  getTreeItem(element: SessionUserDto): TreeItem | Thenable<TreeItem> {
+  async getTreeItem(element: SessionUserDto): Promise<TreeItem> {
     const contactItem = new TreeItem(element.nickname);
 
     contactItem.tooltip = element.id;
     contactItem.description = element.id;
     contactItem.contextValue = 'user';
     contactItem.iconPath =
-      this._context.asAbsolutePath('/media/obj16/contact_saros_obj.png');
-
+        await icons.getUserColorIcon(this._context, 
+          config.getAnnotationColor(element.annotationColorId));
+    
     return contactItem;
   }
 

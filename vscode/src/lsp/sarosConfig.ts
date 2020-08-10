@@ -1,4 +1,4 @@
-import {workspace} from 'vscode';
+import {workspace, WorkspaceConfiguration} from 'vscode';
 
 export namespace config {
     export enum ServerTrace {
@@ -81,6 +81,23 @@ export namespace config {
       return standalone;
     };
 
+    /**
+     * Gets the configuration of the annotation color from an id (zero-based).
+     *
+     * @export
+     * @return {string} Annotation color in hex format prefixed by #
+     */
+    export const getAnnotationColor = (id: number) => {
+      const color = getConfiguration().get(`annotationColor.user${id+1}`) as string;
+
+      return color;
+    };
+
+    /**
+     * Gets the configuration object.
+     *
+     * @return {WorkspaceConfiguration} The workspace configuration
+     */
     const getConfiguration = () => {
       return workspace.getConfiguration(appName);
     };

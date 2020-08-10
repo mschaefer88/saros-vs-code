@@ -41,6 +41,9 @@ public interface ISarosLanguageClient
   @JsonNotification("saros/session/user-joined")
   void notifyUserJoinedSession(SessionUserDto user);
 
+  @JsonNotification("saros/session/user-changed")
+  void notifyUserChangedSession(SessionUserDto user);
+
   @JsonNotification("saros/session/user-left")
   void notifyUserLeftSession(SessionUserDto user); // TODO: use own notification/type!
 

@@ -2,11 +2,13 @@ package saros.lsp.extensions.server;
 
 import com.google.gson.Gson;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
+import org.eclipse.lsp4j.FileChangeType;
 import org.eclipse.lsp4j.FileEvent;
 import org.eclipse.lsp4j.services.WorkspaceService;
 import saros.activities.FileActivity;
@@ -46,23 +48,21 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
 
   private EditorManager editorManager;
 
-  private final ISessionLifecycleListener sessionLifecycleListener =
-      new ISessionLifecycleListener() {
+  private final ISessionLifecycleListener sessionLifecycleListener = new ISessionLifecycleListener() {
 
-        @Override
-        public void sessionStarted(final ISarosSession session) {
-          initialize(session);
-        }
+    @Override
+    public void sessionStarted(final ISarosSession session) {
+      initialize(session);
+    }
 
-        @Override
-        public void sessionEnded(final ISarosSession session, SessionEndReason reason) {
-          uninitialize(session);
-        }
-      };
+    @Override
+    public void sessionEnded(final ISarosSession session, SessionEndReason reason) {
+      uninitialize(session);
+    }
+  };
 
   @Override
-  public void didChangeConfiguration(
-      DidChangeConfigurationParams params) { // TODO dat Location Änderbar? -> bessere
+  public void didChangeConfiguration(DidChangeConfigurationParams params) { // TODO dat Location Änderbar? -> bessere
     // Vorführung
     LOG.info("didChangeConfiguration");
     String settingsJson = params.getSettings().toString();
@@ -79,8 +79,8 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
     this.session.addActivityProducer(this);
   }
 
-  public WorkspaceServiceStub(
-      ISarosSessionManager sessionManager, IWorkspacePath workspace, EditorManager editorManager) {
+  public WorkspaceServiceStub(ISarosSessionManager sessionManager, IWorkspacePath workspace,
+      EditorManager editorManager) {
     this.workspace = workspace;
     this.editorManager = editorManager;
 
@@ -93,21 +93,18 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
       LOG.info(String.format("Changed: '%s' (%s)", fileEvent.getUri(), fileEvent.getType()));
       try {
         this.handleFileEvent(fileEvent);
-      } catch (URISyntaxException e) {
+      } catch (URISyntaxException | IOException e) {
         LOG.error(e);
       }
     }
   }
 
-  private void handleFileEvent(FileEvent fileEvent) throws URISyntaxException {
+  private void handleFileEvent(FileEvent fileEvent) throws URISyntaxException, IOException {
     if (this.session == null) {
       return;
     }
 
     IResource target = this.getFile(fileEvent);
-    if (target == null) {
-      return;
-    }
 
     IActivity activityFromEvent = null;
     switch (fileEvent.getType()) {
@@ -129,16 +126,18 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
 
   private IActivity getDeleteActivity(IResource target) {
     if (target.getType() == IResource.Type.FOLDER) {
+      LOG.info("DELETE FOLDER");
       return new FolderDeletedActivity(this.session.getLocalUser(), (IFolder) target);
     } else if (target.getType() == IResource.Type.FILE) {
-      return new FileActivity(
-          this.session.getLocalUser(), Type.REMOVED, Purpose.ACTIVITY, (IFile) target, null, null, null);
+      LOG.info("DELETE FILE");
+      return new FileActivity(this.session.getLocalUser(), Type.REMOVED, Purpose.ACTIVITY, (IFile) target, null, null,
+          null);
     }
 
     return null;
   }
 
-  private IActivity getCreateActivity(IResource target) {
+  private IActivity getCreateActivity(IResource target) throws IOException {
     LOG.info(target);
     LOG.info(target.getType());
     if (target.getType() == IResource.Type.FOLDER) {
@@ -151,7 +150,7 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
           (IFile) target,
           null,
           this.editorManager.getContent((IFile) target).getBytes(),
-          null);
+          ((IFile)target).getCharset());
     }
 
     return null;

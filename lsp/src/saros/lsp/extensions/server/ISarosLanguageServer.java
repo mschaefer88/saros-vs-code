@@ -6,6 +6,7 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonDelegate;
 import org.eclipse.lsp4j.services.LanguageServer;
 import saros.lsp.extensions.server.account.IAccountService;
 import saros.lsp.extensions.server.contact.IContactService;
+import saros.lsp.extensions.server.document.IDocumentService;
 import saros.lsp.extensions.server.session.ISessionService;
 
 /**
@@ -30,4 +31,8 @@ public interface ISarosLanguageServer extends LanguageServer {
   void onExit(Runnable runnable);
 
   void onInitialize(Consumer<InitializeParams> consumer);
+
+  @Override
+  @JsonDelegate
+  IDocumentService getTextDocumentService();
 }

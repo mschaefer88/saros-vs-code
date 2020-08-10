@@ -16,6 +16,7 @@ import saros.lsp.extensions.server.account.AccountService;
 import saros.lsp.extensions.server.account.IAccountService;
 import saros.lsp.extensions.server.contact.ContactService;
 import saros.lsp.extensions.server.contact.IContactService;
+import saros.lsp.extensions.server.document.IDocumentService;
 import saros.lsp.extensions.server.session.ISessionService;
 import saros.lsp.extensions.server.session.SessionService;
 import saros.lsp.filesystem.LspWorkspace;
@@ -61,7 +62,7 @@ public class LspContextFactory extends AbstractContextFactory {
 
     container.addComponent(IProgressMonitor.class, ProgressMonitor.class);
 
-    container.addComponent(TextDocumentService.class, DocumentServiceStub.class);
+    container.addComponent(IDocumentService.class, DocumentServiceStub.class);
     container.addComponent(WorkspaceService.class, WorkspaceServiceStub.class);
     container.addComponent(AnnotationManager.class);
     container.addComponent(UIInteractionManager.class);

@@ -19,9 +19,11 @@ public class AnnotationParams {
 
   public Range range;
 
+  public int annotationColorId;
+
   public AnnotationParams(TextEditActivity activity, IWorkspacePath workspace, IEditorManager manager) {
     this.uri =
-        Paths.get(activity.getResource().getReferencePointRelativePath().toString()) //TODO: MIGRATION
+        Paths.get(workspace.append(activity.getResource().getReferencePointRelativePath()).toString()) //TODO: get from Editor/TextDocument!
             .toUri()
             .toString(); // TODO: do bettter! (centralized + correct get fullpath)
     this.user = activity.getSource().getJID().getName();
@@ -36,10 +38,11 @@ public class AnnotationParams {
 
   public AnnotationParams(Annotation annotation, IWorkspacePath workspace, IFile path) {
     this.uri =
-    Paths.get(path.getReferencePointRelativePath().toString()) //TODO: MIGRATION
+    Paths.get(workspace.append(path.getReferencePointRelativePath()).toString()) //TODO: get from Editor/TextDocument!
             .toUri()
             .toString(); // TODO: do bettter! (centralized + correct get fullpath)
     this.user = annotation.getSource().getJID().getName();
     this.range = annotation.getRange();
+    this.annotationColorId = annotation.getSource().getColorID();
   }
 }

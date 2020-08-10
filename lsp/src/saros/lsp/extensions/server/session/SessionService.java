@@ -166,11 +166,9 @@ public class SessionService
   @Override
   public void connectionStateChanged(ConnectionState state, ErrorType errorType) {
 
-    if (state == ConnectionState.CONNECTED) {
-      this.client.sendStateConnected(
+    this.client.sendStateConnected(
           new SarosResultResponse<Boolean>(
               state == ConnectionState.CONNECTED)); // TODO: send State?
-    }
   }
 
   @Override

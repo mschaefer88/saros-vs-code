@@ -14,6 +14,7 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 import saros.lsp.extensions.server.ISarosLanguageServer;
 import saros.lsp.extensions.server.account.IAccountService;
 import saros.lsp.extensions.server.contact.IContactService;
+import saros.lsp.extensions.server.document.IDocumentService;
 import saros.lsp.extensions.server.session.ISessionService;
 
 /** Implmenentation of the Saros language server. */
@@ -27,7 +28,7 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
   private ISessionService sessionService;
 
-  private TextDocumentService documentService;
+  private IDocumentService documentService;
 
   private WorkspaceService workspaceService;
 
@@ -35,7 +36,7 @@ public class SarosLanguageServer implements ISarosLanguageServer {
       IAccountService accountService,
       IContactService contactService,
       ISessionService sessionService,
-      TextDocumentService documentService,
+      IDocumentService documentService,
       WorkspaceService workspaceService) {
     this.accountService = accountService;
     this.contactService = contactService;
@@ -116,7 +117,7 @@ public class SarosLanguageServer implements ISarosLanguageServer {
   // }
 
   @Override
-  public TextDocumentService getTextDocumentService() {
+  public IDocumentService getTextDocumentService() {
     return this.documentService;
   }
 

@@ -1,4 +1,4 @@
-import {NotificationType, RequestType} from 'vscode-languageclient';
+import {NotificationType, RequestType, TextDocumentIdentifier} from 'vscode-languageclient';
 import {Range} from 'vscode';
 
 /**
@@ -86,6 +86,7 @@ export interface InviteDto {
 export interface SessionUserDto {
   id: string;
   nickname: string;
+  annotationColorId: number;
 }
 
 /**
@@ -98,6 +99,7 @@ export interface AnnotationParams {
   uri: string;
   user: string;
   range: Range;
+  annotationColorId: number;
 }
 
 export namespace OpenProjectNotification {
@@ -245,6 +247,13 @@ export namespace UserJoinedSessionNotification {
     );
 }
 
+export namespace UserChangedSessionNotification {
+  export const type =
+    new NotificationType<SessionUserDto, void>(
+        'saros/session/user-changed',
+    );
+}
+
 export namespace UserLeftSessionNotification {
   export const type =
     new NotificationType<SessionUserDto, void>(
@@ -256,5 +265,12 @@ export namespace AnnotationNotification {
   export const type =
     new NotificationType<SarosResultResponse<AnnotationParams[]>, void>(
         'saros/editor/annotate',
+    );
+}
+
+export namespace GetAnnotationsRequest {
+  export const type =
+    new RequestType<TextDocumentIdentifier, SarosResultResponse<AnnotationParams[]>, void, unknown>(
+        'textDocument/getAnnotations',
     );
 }
