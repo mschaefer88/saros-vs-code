@@ -1,0 +1,70 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Build Jar",
+        "type": "process",
+        "command": "gradlew",
+        "windows": {
+          "command": "gradlew.bat"
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "args": [
+          "sarosLsp"
+        ],
+        "options": {
+          "cwd": "${workspaceRoot}/.."
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Check Format",
+        "type": "process",
+        "command": "gradlew",
+        "windows": {
+          "command": "gradlew.bat"
+        },
+        "group": "none",
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "args": [
+          "verGJF"
+        ],
+        "options": {
+          "cwd": "${workspaceRoot}/.."
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Format Code",
+        "type": "process",
+        "command": "gradlew",
+        "windows": {
+          "command": "gradlew.bat"
+        },
+        "group": "none",
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "args": [
+          "goJF"
+        ],
+        "options": {
+          "cwd": "${workspaceRoot}/.."
+        },
+        "problemMatcher": []
+      }
+    ]
+}

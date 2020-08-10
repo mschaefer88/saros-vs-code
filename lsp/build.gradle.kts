@@ -13,10 +13,10 @@ configurations {
 
 dependencies {
     compile(project(":saros.core"))
-    compile(project(":saros.server"))
     compile("org.apache.commons:commons-collections4:4.2")
-    compile("org.eclipse.lsp4j:org.eclipse.lsp4j:0.8.1")
-    compile("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc:0.8.1")
+    compile("org.eclipse.lsp4j:org.eclipse.lsp4j:0.9.0")
+    compile("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc:0.9.0")
+    compile("info.picocli:picocli:4.2.0")
 }
 
 sourceSets {
