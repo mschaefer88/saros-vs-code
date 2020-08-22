@@ -56,7 +56,7 @@ tasks.register<Exec>("runExtension") {
   description = "Builds and runs the extension"
 
   var cwd = System.getProperty("cwd", "") // argument is -Pcwd=
-  var execArgs = "code --extensionDevelopmentPath=${projectDir.absolutePath} ${cwd}"
+  var execArgs = "code --extensionDevelopmentPath=${projectDir.absolutePath} ${cwd} --inspect-extensions 1234"
   
   if (Os.isFamily(Os.FAMILY_WINDOWS)) {
     executable = "cmd"

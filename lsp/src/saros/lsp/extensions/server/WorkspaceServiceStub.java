@@ -160,19 +160,11 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
     URI uri = new URI(fileEvent.getUri());
     IPath path = LspPath.fromUri(uri);
 
-    // IProject project = this.workspace.getProject("");
-
     File file = path.toFile();
-    IResource resource = null;
-    if (file.isFile()) {
-      resource = new LspFile(workspace, path);
-    } else if (file.isDirectory()) {
-      resource = new LspFolder(workspace, path);
+    if (file.isDirectory()) {
+      return new LspFolder(workspace, path);
     } else {
-      LOG.warn(String.format("'%s' doesn't seem to be a file nor a directory!", uri.getPath()));
-      return null;
+      return new LspFile(workspace, path);
     }
-
-    return resource;
   }
 }
