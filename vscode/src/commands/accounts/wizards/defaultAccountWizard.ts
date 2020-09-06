@@ -1,6 +1,6 @@
 import {
   AccountDto,
-  SetDefaultAccountRequest,
+  SetActiveAccountRequest,
   SarosExtension,
   events,
 } from '../../../lsp';
@@ -27,7 +27,7 @@ export async function defaultAccountWizard(extension: SarosExtension)
 
   if (!wizard.aborted && account) {
     const result =
-      await extension.client.sendRequest(SetDefaultAccountRequest.type,
+      await extension.client.sendRequest(SetActiveAccountRequest.type,
           account);
     showMessage(result, 'Active account set successfully!');
 

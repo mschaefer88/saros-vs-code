@@ -102,13 +102,26 @@ export interface AnnotationParams {
   annotationColorId: number;
 }
 
-export namespace OpenProjectNotification {
+/**
+ * Notification that issues the client to open
+ * an editor with the file contents.
+ * 
+ * @export
+ */
+export namespace OpenEditorNotification {
   export const type =
     new NotificationType<SarosResultResponse<string>, void>(
         'saros/editor/open',
     );
 }
 
+/**
+ * Notification that informs the client about a
+ * state change of the session, ie. if it's
+ * active or not.
+ * 
+ * @export
+ */
 export namespace SessionStateNotification {
   export const type =
     new NotificationType<SarosResultResponse<boolean>, void>(
@@ -116,6 +129,13 @@ export namespace SessionStateNotification {
     );
 }
 
+/**
+ * Notification that informs the client about a
+ * state change of the XMPP connection, ie. if
+ * it's active or not.
+ * 
+ * @export
+ */
 export namespace ConnectedStateNotification {
   export const type =
     new NotificationType<SarosResultResponse<boolean>, void>(
@@ -123,11 +143,24 @@ export namespace ConnectedStateNotification {
     );
 }
 
+/**
+ * Notification that informs the client about a
+ * state change of a contact, eg. online status
+ * or saros support.
+ * 
+ * @export
+ */
 export namespace ContactStateNotification {
   export const type =
     new NotificationType<ContactDto, void>('saros/contact/state');
 }
 
+/**
+ * Request to the server to add a new account for
+ * connections to the XMPP server.
+ * 
+ * @export
+ */
 export namespace AddAccountRequest {
   export const type =
     new RequestType<AccountDto, SarosResponse, void, unknown>(
@@ -135,13 +168,11 @@ export namespace AddAccountRequest {
     );
 }
 
-export namespace CreateAccountRequest {
-  export const type =
-    new RequestType<void, SarosResultResponse<string>, void, unknown>(
-        'saros/account/create',
-    );
-}
-
+/**
+ * Request to the server to update an existing account.
+ * 
+ * @export
+ */
 export namespace UpdateAccountRequest {
   export const type =
     new RequestType<AccountDto, SarosResponse, void, unknown>(
@@ -149,6 +180,11 @@ export namespace UpdateAccountRequest {
     );
 }
 
+/**
+ * Request to the server to remove an existing account.
+ * 
+ * @export
+ */
 export namespace RemoveAccountRequest {
   export const type =
     new RequestType<AccountIdDto, SarosResponse, void, unknown>(
@@ -156,13 +192,23 @@ export namespace RemoveAccountRequest {
     );
 }
 
-export namespace SetDefaultAccountRequest {
+/**
+ * Request to the server to set the currently active account.
+ * 
+ * @export
+ */
+export namespace SetActiveAccountRequest {
   export const type =
     new RequestType<AccountIdDto, SarosResponse, void, unknown>(
-        'saros/account/setDefault',
+        'saros/account/setActive',
     );
 }
 
+/**
+ * Request to the server to get all saved accounts.
+ * 
+ * @export
+ */
 export namespace GetAllAccountRequest {
   export const type =
     new RequestType<void, SarosResultResponse<AccountDto[]>, void, unknown>(
@@ -170,6 +216,11 @@ export namespace GetAllAccountRequest {
     );
 }
 
+/**
+ * Request to the server to add a new contact.
+ * 
+ * @export
+ */
 export namespace AddContactRequest {
   export const type =
     new RequestType<ContactDto, SarosResponse, void, unknown>(
@@ -177,6 +228,11 @@ export namespace AddContactRequest {
     );
 }
 
+/**
+ * Request to the server to remove an existing contact.
+ * 
+ * @export
+ */
 export namespace RemoveContactRequest {
   export const type =
     new RequestType<ContactDto, SarosResponse, void, unknown>(
@@ -184,6 +240,12 @@ export namespace RemoveContactRequest {
     );
 }
 
+/**
+ * Request to the server to change the nickname of an
+ * existing contact.
+ * 
+ * @export
+ */
 export namespace RenameContactRequest {
   export const type =
     new RequestType<ContactDto, SarosResponse, void, unknown>(
@@ -191,6 +253,12 @@ export namespace RenameContactRequest {
     );
 }
 
+/**
+ * Request to the server to get all contacts
+ * of the contact list.
+ * 
+ * @export
+ */
 export namespace GetAllContactRequest {
   export const type =
     new RequestType<void, SarosResultResponse<ContactDto[]>, void, unknown>(
@@ -198,6 +266,12 @@ export namespace GetAllContactRequest {
     );
 }
 
+/**
+ * Request to the server to connect to the XMPP
+ * server with the currently active account.
+ * 
+ * @export
+ */
 export namespace ConnectRequest {
   export const type =
     new RequestType<void, SarosResponse, void, unknown>(
@@ -205,6 +279,12 @@ export namespace ConnectRequest {
     );
 }
 
+/**
+ * Request to the server to disconnect from the XMPP
+ * server.
+ * 
+ * @export
+ */
 export namespace DisconnectRequest {
   export const type =
     new RequestType<void, SarosResponse, void, unknown>(
@@ -212,6 +292,12 @@ export namespace DisconnectRequest {
     );
 }
 
+/**
+ * Request to the server to get the current state
+ * of the session, ie. active or not.
+ * 
+ * @export
+ */
 export namespace IsOnlineRequest {
   export const type =
     new RequestType<void, SarosResultResponse<boolean>, void, unknown>(
@@ -219,6 +305,12 @@ export namespace IsOnlineRequest {
     );
 }
 
+/**
+ * Request to the server to invite a contact from
+ * the contact list to a new or active session.
+ * 
+ * @export
+ */
 export namespace InviteContactRequest {
   export const type =
     new RequestType<ContactDto, SarosResultResponse<boolean>, void, unknown>(
@@ -226,6 +318,11 @@ export namespace InviteContactRequest {
     );
 }
 
+/**
+ * Request to the server to start a new empty session.
+ * 
+ * @export
+ */
 export namespace StartSessionRequest {
   export const type =
     new RequestType<void, SarosResponse, void, unknown>(
@@ -233,6 +330,12 @@ export namespace StartSessionRequest {
     );
 }
 
+/**
+ * Request to the server to stop the currently
+ * active session.
+ * 
+ * @export
+ */
 export namespace StopSessionRequest {
   export const type =
     new RequestType<void, SarosResponse, void, unknown>(
@@ -240,6 +343,12 @@ export namespace StopSessionRequest {
     );
 }
 
+/**
+ * Notification to the client that a user has
+ * joined the currently active session.
+ * 
+ * @export
+ */
 export namespace UserJoinedSessionNotification {
   export const type =
     new NotificationType<SessionUserDto, void>(
@@ -247,6 +356,13 @@ export namespace UserJoinedSessionNotification {
     );
 }
 
+/**
+ * Notification to the client that the state
+ * of a user that is part of the session has
+ * changed.
+ * 
+ * @export
+ */
 export namespace UserChangedSessionNotification {
   export const type =
     new NotificationType<SessionUserDto, void>(
@@ -254,6 +370,12 @@ export namespace UserChangedSessionNotification {
     );
 }
 
+/**
+ * Notification to the client that a user
+ * that is part of the session has left.
+ * 
+ * @export
+ */
 export namespace UserLeftSessionNotification {
   export const type =
     new NotificationType<SessionUserDto, void>(
@@ -261,6 +383,12 @@ export namespace UserLeftSessionNotification {
     );
 }
 
+/**
+ * Notification to the client that annotations
+ * have changed.
+ * 
+ * @export
+ */
 export namespace AnnotationNotification {
   export const type =
     new NotificationType<SarosResultResponse<AnnotationParams[]>, void>(
@@ -268,6 +396,12 @@ export namespace AnnotationNotification {
     );
 }
 
+/**
+ * Request to the server to get all annotations
+ * of an editor.
+ * 
+ * @export
+ */
 export namespace GetAnnotationsRequest {
   export const type =
     new RequestType<TextDocumentIdentifier, SarosResultResponse<AnnotationParams[]>, void, unknown>(

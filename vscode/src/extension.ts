@@ -1,7 +1,7 @@
 import {activateAccounts, activateContacts, activateSessions} from './commands';
 import {SarosContactView, SarosSessionView, SarosAccountView} from './views';
 import {sarosExtensionInstance} from './lsp';
-import {ExtensionContext, workspace, window} from 'vscode';
+import {ExtensionContext, workspace, window, commands} from 'vscode';
 import {variables} from './views/variables';
 
 /**
@@ -17,7 +17,7 @@ export function activate(context: ExtensionContext) {
     deactivate();
     return;
   }
-
+  commands.registerCommand("fff.fff", () => {console.log("HI");});
   sarosExtensionInstance.setContext(context)
       .init()
       .then(() => {

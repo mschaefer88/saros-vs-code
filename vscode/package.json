@@ -20,6 +20,10 @@
 	"contributes": {
 		"commands": [
 			{
+				"command": "fff.fff",
+				"title": "TEST"
+			},
+			{
 				"command": "saros.account.add",
 				"title": "Add Account",
 				"category": "Saros",
