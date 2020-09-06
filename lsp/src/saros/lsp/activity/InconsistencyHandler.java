@@ -2,13 +2,12 @@ package saros.lsp.activity;
 
 import java.text.MessageFormat;
 import java.util.Set;
-import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.MessageType;
 import saros.filesystem.IFile;
 import saros.concurrent.watchdog.ConsistencyWatchdogClient;
 import saros.concurrent.watchdog.IsInconsistentObservable;
-import saros.filesystem.IResource;
 import saros.lsp.extensions.client.ISarosLanguageClient;
+import saros.lsp.extensions.client.dto.ShowMessageParams;
 import saros.monitoring.IProgressMonitor;
 import saros.observables.ValueChangeListener;
 import saros.repackaged.picocontainer.Startable;
@@ -22,25 +21,7 @@ public class InconsistencyHandler extends AbstractActivityConsumer implements St
   private final IProgressMonitor progressMonitor;
   private final IsInconsistentObservable isInconsistentObservable;
 
-  private final Logger LOG = Logger.getLogger(InconsistencyHandler.class);
-
   private final ValueChangeListener<Boolean> isConsistencyListener = this::handleConsistencyChange;
-
-  // private final ISessionLifecycleListener sessionLifecycleListener = new
-  // ISessionLifecycleListener() {
-
-  //     @Override
-  //     public void sessionStarted(final ISarosSession session) {
-  //       LOG.info("Session started!");
-  //       initialize(session);
-  //     }
-
-  //     @Override
-  //     public void sessionEnded(final ISarosSession session, SessionEndReason reason) {
-  //       LOG.info("Session ended!");
-  //       uninitialize(session);
-  //     }
-  //   };
 
   public InconsistencyHandler(
       ISarosSession session,
@@ -54,8 +35,6 @@ public class InconsistencyHandler extends AbstractActivityConsumer implements St
   }
 
   private void handleConsistencyChange(Boolean isInconsistent) {
-    LOG.info(String.format("Consistency changed: isInconsistent = %b", isInconsistent));
-
     if (isInconsistent) {
       if (!this.session.isHost()) {
         ConsistencyWatchdogClient client =
@@ -70,28 +49,22 @@ public class InconsistencyHandler extends AbstractActivityConsumer implements St
   }
 
   @Override
-  public void start() { // TODO: do with session listener?
-    LOG.info("start");
-
+  public void start() {
     this.isInconsistentObservable.add(this.isConsistencyListener);
   }
 
   @Override
   public void stop() {
-    LOG.info("stop");
-
     this.isInconsistentObservable.remove(this.isConsistencyListener);
   }
 
   private void handleInconsistency(Set<IFile> files, ConsistencyWatchdogClient watchdogClient) {
-
     if (files.isEmpty()) {
       return;
     }
 
     String message =
         "These files have become unsynchronized with the host:{1} {0} {1}{1}Do you want to synchronize your project? \nYou may wish to backup those file(s) in case important changes are overwritten.";
-    String fileList = this.createInconsistentPathsMessage(files);
     this.languageClient
         .showMessageRequest(
             new ShowMessageParams(
@@ -108,38 +81,4 @@ public class InconsistencyHandler extends AbstractActivityConsumer implements St
               this.isConsistencyListener.setValue(false);
             });
   }
-
-  private String createInconsistentPathsMessage(Set<IFile> paths) {
-    StringBuilder sb = new StringBuilder();
-
-    for (IFile path : paths) {
-
-      if (sb.length() > 0) {
-        sb.append(", ");
-      }
-
-      sb.append(path.getParent().getName())
-          .append(" - ")
-          .append(path.getReferencePointRelativePath().lastSegment());
-    }
-
-    return sb.toString();
-  }
-
-  // @Override
-  // public void receive(ChecksumErrorActivity checksumErrorActivity) {
-
-  // String message = "These files have become unsynchronized with the host:\n {0} \n\nPress the
-  // inconsistency recovery button to synchronize your project. \nYou may wish to backup those
-  // file(s) in case important changes are overwritten.";
-  // String files = String.join(", ", (CharSequence[]) checksumErrorActivity.getPaths().stream()
-  //         .map(path -> path.getFile().getName()).toArray());
-  // this.languageClient.showMessageRequest(new ShowMessageParams(MessageType.Warning,
-  // "Inconsistency Detected", MessageFormat.format(message, files), "Yes", "No"))
-  // .thenAccept(action -> {
-  //     if(action.getTitle().equals("Yes")) {
-  //         this.watchdogClient.runRecovery(this.progressMonitor);
-  //     }
-  // });
-  // }
 }

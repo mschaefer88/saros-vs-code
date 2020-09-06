@@ -3,6 +3,8 @@ package saros.lsp.activity;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import saros.activities.FileActivity;
 import saros.activities.FolderCreatedActivity;
@@ -13,23 +15,18 @@ import saros.lsp.utils.FileUtils;
 import saros.session.AbstractActivityConsumer;
 import saros.session.ISarosSession;
 
-// TODO: naming für File/Folder
-public class FileActivityHandler extends AbstractActivityConsumer { // TODO: naming Consumer?
+public class FileActivityHandler extends AbstractActivityConsumer {
   private static final Logger LOG = Logger.getLogger(FileActivityHandler.class);
 
   private EditorManager editorManager;
 
   public FileActivityHandler(ISarosSession session, EditorManager editorManager) {
-    LOG.debug("CTOR");
     this.editorManager = editorManager;
-
     session.addActivityConsumer(this, Priority.ACTIVE);
   }
 
   @Override
   public void receive(FileActivity fileActivity) {
-    LOG.debug(String.format("Retrieved activity '%s'", fileActivity.getType()));
-
     switch (fileActivity.getType()) {
       case CREATED:
         this.handleCreate(fileActivity);
@@ -48,7 +45,7 @@ public class FileActivityHandler extends AbstractActivityConsumer { // TODO: nam
     try {
       folderCreatedActivity.getResource().create();
     } catch (IOException e) {
-      LOG.error(e); // TODO: warn?
+      LOG.error(e);
     }
   }
 
@@ -62,7 +59,6 @@ public class FileActivityHandler extends AbstractActivityConsumer { // TODO: nam
   }
 
   private void handleDelete(FileActivity fileActivity) {
-    LOG.debug("handleDelete");
     this.editorManager.closeEditor(fileActivity.getResource());
 
     IFile file = fileActivity.getResource();
@@ -76,22 +72,19 @@ public class FileActivityHandler extends AbstractActivityConsumer { // TODO: nam
   }
 
   private void handleCreate(FileActivity fileActivity) {
-    LOG.debug("handleCreate");
-    // final String encoding = fileActivity.getEncoding(); TODO
     final byte[] newContent = fileActivity.getContent();
     IFile file = fileActivity.getResource();
 
     byte[] actualContent = null;
 
-    if (file.exists())
-      actualContent = FileUtils.getLocalFileContent(file); // TODO: use editor manager?
+    if (file.exists()) {
+      actualContent = this.editorManager.getContent(file).getBytes();
+    }
 
     if (!Arrays.equals(newContent, actualContent)) {
       FileUtils.writeFile(new ByteArrayInputStream(newContent), file);
     } else {
       LOG.debug("FileActivity " + fileActivity + " dropped (same content)");
     }
-
-    // if (encoding != null) updateFileEncoding(encoding, file); TODO
   }
 }

@@ -1,4 +1,4 @@
-package saros.lsp.activity;
+package saros.lsp.extensions.client.dto;
 
 import java.util.ArrayList;
 import java.util.List;

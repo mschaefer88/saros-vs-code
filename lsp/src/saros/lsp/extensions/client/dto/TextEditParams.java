@@ -1,4 +1,4 @@
-package saros.lsp.activity;
+package saros.lsp.extensions.client.dto;
 
 import java.nio.file.Paths;
 import java.util.Collections;

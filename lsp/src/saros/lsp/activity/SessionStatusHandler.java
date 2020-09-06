@@ -1,7 +1,5 @@
 package saros.lsp.activity;
 
-import java.util.Optional;
-
 import org.apache.log4j.Logger;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.SarosResultResponse;
@@ -17,10 +15,7 @@ import saros.session.ISessionListener;
 import saros.session.SessionEndReason;
 import saros.session.User;
 
-// TODO: move to session ns? or saros.ui.eventhandler
 public class SessionStatusHandler {
-
-  private static Logger LOG = Logger.getLogger(SessionStatusHandler.class);
 
   private XMPPContactsService contactsService;
   private ISarosSessionManager sessionManager;
@@ -30,7 +25,6 @@ public class SessionStatusHandler {
       new ISessionLifecycleListener() {
         @Override
         public void sessionStarting(ISarosSession session) {
-          LOG.info("UserStatusHandler.sessionStarting");
           session.addListener(sessionListener);
           client.sendStateSession(new SarosResultResponse<Boolean>(true));
 
@@ -38,13 +32,12 @@ public class SessionStatusHandler {
               .getRemoteUsers()
               .forEach(
                   user -> {
-                    client.notifyUserJoinedSession(createParticipantDto(user)); // TODO: is host
+                    client.notifyUserJoinedSession(createParticipantDto(user));
                   });
         }
 
         @Override
         public void sessionEnded(ISarosSession session, SessionEndReason reason) {
-          LOG.info("UserStatusHandler.sessionEnded");
           session.removeListener(sessionListener);
           client.sendStateSession(new SarosResultResponse<Boolean>(false));
         }
@@ -60,7 +53,6 @@ public class SessionStatusHandler {
           if(user.isHost()) {
             return;
           }
-          LOG.info("UserStatusHandler.userColorChanged");
           client.notifyUserChangedSession(createParticipantDto(user));
         }
 
@@ -69,11 +61,7 @@ public class SessionStatusHandler {
           if(user.isHost()) {
             return;
           }
-          LOG.info("UserStatusHandler.userJoined");
-          client.notifyUserJoinedSession(createParticipantDto(user)); // TODO: is host
-          //   SarosView.showNotification(
-          //       Messages.UserStatusChangeHandler_user_joined,
-          //       CoreUtils.format(Messages.UserStatusChangeHandler_user_joined_text, user));
+          client.notifyUserJoinedSession(createParticipantDto(user)); 
         }
 
         @Override
@@ -81,8 +69,7 @@ public class SessionStatusHandler {
           if(user.isHost()) {
             return;
           }
-          LOG.info("UserStatusHandler.userLeft");
-          client.notifyUserLeftSession(createParticipantDto(user)); // TODO: is host
+          client.notifyUserLeftSession(createParticipantDto(user));
 
           if (sessionManager.getSession().getRemoteUsers().size() == 0) {
             if (interactionManager.getUserInputYesNo("Session is empty", "Close session?")) {
@@ -98,7 +85,6 @@ public class SessionStatusHandler {
       XMPPContactsService contactsService,
       UIInteractionManager interactionManager,
       IPreferenceStore preferenceStore) {
-    LOG.info("UserStatusHandler.CTOR");
     this.client = client;
     this.contactsService = contactsService;
     this.sessionManager = sessionManager;
@@ -108,8 +94,6 @@ public class SessionStatusHandler {
   }
 
   private SessionUserDto createParticipantDto(User user) {
-    LOG.info(String.format("COLOR is: %d (fav: %d) - JID: %s", user.getColorID(), user.getFavoriteColorID(), user.getJID().toString()));
-
     final XMPPContact userAsContact =
     this.contactsService.getContact(user.getJID().toString()).get();
 
