@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import saros.context.AbstractContextLifecycle;
 import saros.context.IContextFactory;
-import saros.filesystem.IWorkspace;
 import saros.lsp.context.LspContextFactory;
-import saros.lsp.context.LspCoreContextFactory;
-import saros.lsp.context.LspOptionalContextFactory;
-import saros.lsp.context.LspProxyContextFactory;
+import saros.lsp.context.CoreContextFactory;
+import saros.lsp.context.FileSystemContextFactory;
+import saros.lsp.context.ProxyContextFactory;
+import saros.lsp.context.UiContextFactory;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.ISarosLanguageServer;
 import saros.lsp.filesystem.IWorkspacePath;
@@ -22,13 +22,14 @@ public class SarosLifecycle extends AbstractContextLifecycle {
   protected Collection<IContextFactory> additionalContextFactories() {
     Collection<IContextFactory> factories = new ArrayList<IContextFactory>();
 
-    factories.add(new LspOptionalContextFactory());
-    factories.add(new LspCoreContextFactory());
+    factories.add(new CoreContextFactory());
     factories.add(new LspContextFactory());
+    factories.add(new UiContextFactory());
+    factories.add(new FileSystemContextFactory());
     factories.add(
-        new LspProxyContextFactory<ISarosLanguageClient>(
+        new ProxyContextFactory<ISarosLanguageClient>(
             ISarosLanguageClient.class, () -> this.client));
-    factories.add(new LspProxyContextFactory<IWorkspacePath>(IWorkspacePath.class, () -> this.workspace));
+    factories.add(new ProxyContextFactory<IWorkspacePath>(IWorkspacePath.class, () -> this.workspace));
 
     return factories;
   }

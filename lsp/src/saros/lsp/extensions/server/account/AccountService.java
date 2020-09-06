@@ -87,7 +87,7 @@ public class AccountService implements IAccountService {
   }
 
   @Override
-  public CompletableFuture<SarosResponse> setDefault(final AccountIdDto request) {
+  public CompletableFuture<SarosResponse> setActive(final AccountIdDto request) {
 
     try {
       final XMPPAccount account = this.accountStore.getAccount(request.username, request.domain);

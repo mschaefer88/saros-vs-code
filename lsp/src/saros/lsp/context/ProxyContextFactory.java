@@ -8,12 +8,12 @@ import java.util.function.Supplier;
 import saros.context.AbstractContextFactory;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 
-public class LspProxyContextFactory<T> extends AbstractContextFactory {
+public class ProxyContextFactory<T> extends AbstractContextFactory {
 
   private final Supplier<T> supplier;
   private final Class<T> clazz;
 
-  public LspProxyContextFactory(Class<T> clazz, Supplier<T> supplier) {
+  public ProxyContextFactory(Class<T> clazz, Supplier<T> supplier) {
     this.clazz = clazz;
     this.supplier = supplier;
   }

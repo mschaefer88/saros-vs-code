@@ -28,7 +28,7 @@ public interface IAccountService {
   CompletableFuture<SarosResponse> remove(AccountIdDto request);
 
   @JsonRequest
-  CompletableFuture<SarosResponse> setDefault(AccountIdDto request);
+  CompletableFuture<SarosResponse> setActive(AccountIdDto request);
 
   @JsonRequest
   CompletableFuture<SarosResultResponse<AccountDto[]>> getAll();
