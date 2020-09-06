@@ -1,16 +1,23 @@
 package saros.lsp.filesystem;
 
 import java.io.IOException;
-import org.apache.log4j.Logger;
 import saros.exceptions.OperationCanceledException;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
+import saros.lsp.extensions.client.ISarosLanguageClient;
+import saros.lsp.monitoring.ProgressMonitor;
+import saros.monitoring.IProgressMonitor;
 import saros.monitoring.NullProgressMonitor;
 
 public class LspWorkspace implements IWorkspace {
 
-  private final Logger LOG = Logger.getLogger(LspWorkspace.class);
+  private ISarosLanguageClient client;
+
+  public LspWorkspace(ISarosLanguageClient client) {
+    this.client = client;
+
+  }
 
   @Override
   public void run(IWorkspaceRunnable runnable) throws IOException, OperationCanceledException {
@@ -23,7 +30,7 @@ public class LspWorkspace implements IWorkspace {
       throws IOException, OperationCanceledException {
 
     synchronized (this) {
-      runnable.run(new NullProgressMonitor()); // TODO: use my progressmonitor
+      runnable.run(new ProgressMonitor(this.client));
     }
   }
 }

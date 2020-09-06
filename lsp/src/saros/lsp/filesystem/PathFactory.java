@@ -1,12 +1,9 @@
-package saros.lsp.filesystem; // TODO: best package location?
+package saros.lsp.filesystem;
 
-import org.apache.log4j.Logger;
 import saros.filesystem.IPath;
 import saros.filesystem.IPathFactory;
 
-public class PathFactory implements IPathFactory { // TODO: use factory where static was used!
-
-  private static final Logger LOG = Logger.getLogger(PathFactory.class);
+public class PathFactory implements IPathFactory {
 
   @Override
   public String fromPath(IPath path) {

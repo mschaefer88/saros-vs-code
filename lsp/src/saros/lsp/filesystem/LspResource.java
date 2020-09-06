@@ -13,7 +13,6 @@ import saros.filesystem.IResource;
 public abstract class LspResource implements IResource {
   private IWorkspacePath workspace;
   private IPath path;
-  private static final Logger LOG = Logger.getLogger(LspResource.class);
 
   /**
    * Creates a ServerResourceImpl.
@@ -38,7 +37,7 @@ public abstract class LspResource implements IResource {
    *
    * @return the containing workspace
    */
-  public IWorkspacePath getWorkspace() {//TODO: nötig?
+  public IWorkspacePath getWorkspace() {
     return workspace;
   }
 
@@ -97,7 +96,7 @@ public abstract class LspResource implements IResource {
 
   @Override
   public IReferencePoint getReferencePoint() {
-    return workspace.getReferencePoint("");//there is only one, subject to change once system is shifted towards client! (TODO)
+    return workspace.getReferencePoint("");
   }
 
   @Override

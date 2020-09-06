@@ -4,12 +4,10 @@ import java.io.File;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.apache.log4j.Logger;
 import saros.filesystem.IPath;
 
 public class LspPath implements IPath {
   private Path delegate;
-  private static final Logger LOG = Logger.getLogger(LspPath.class);
 
   public static final IPath EMPTY = new LspPath(Paths.get(""));
 
@@ -22,7 +20,6 @@ public class LspPath implements IPath {
   }
 
   public static IPath fromUri(URI uri) {
-    LOG.info(String.format("URI Scheme: %s", uri.getScheme()));
     if (uri == null || !uri.getScheme().equals("file")) {
       return EMPTY;
     }

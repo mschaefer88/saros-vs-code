@@ -10,7 +10,6 @@ import java.nio.file.StandardCopyOption;
 import org.apache.log4j.Logger;
 import saros.filesystem.IFile;
 import saros.filesystem.IPath;
-import saros.filesystem.IWorkspace;
 
 import static saros.filesystem.IResource.Type.FILE;
 
