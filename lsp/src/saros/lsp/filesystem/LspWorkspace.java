@@ -7,8 +7,6 @@ import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.monitoring.ProgressMonitor;
-import saros.monitoring.IProgressMonitor;
-import saros.monitoring.NullProgressMonitor;
 
 public class LspWorkspace implements IWorkspace {
 
@@ -16,7 +14,6 @@ public class LspWorkspace implements IWorkspace {
 
   public LspWorkspace(ISarosLanguageClient client) {
     this.client = client;
-
   }
 
   @Override

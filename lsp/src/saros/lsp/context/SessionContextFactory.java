@@ -9,8 +9,7 @@ import saros.session.ISarosSessionContextFactory;
 import saros.session.SarosCoreSessionContextFactory;
 
 /** LSP implementation of the {@link ISarosSessionContextFactory} interface. */
-public class SessionContextFactory
-    extends SarosCoreSessionContextFactory {
+public class SessionContextFactory extends SarosCoreSessionContextFactory {
 
   @Override
   public void createNonCoreComponents(ISarosSession session, MutablePicoContainer container) {

@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 import saros.filesystem.IContainer;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
-import saros.filesystem.IPath;
 import saros.filesystem.IResource;
 import saros.util.StackTrace;
 
@@ -19,7 +18,7 @@ import saros.util.StackTrace;
  *
  * @author orieger/chjacob
  */
-public class FileUtils {//TODO: still used?
+public class FileUtils { // TODO: still used?
 
   private static Logger LOG = Logger.getLogger(FileUtils.class);
 
@@ -123,7 +122,9 @@ public class FileUtils {//TODO: still used?
       content = IOUtils.toByteArray(in);
     } catch (IOException e) {
       LOG.warn(
-          "could not convert file content to byte array (file: " + localFile.getReferencePointRelativePath() + ")");
+          "could not convert file content to byte array (file: "
+              + localFile.getReferencePointRelativePath()
+              + ")");
     } finally {
       IOUtils.closeQuietly(in);
     }

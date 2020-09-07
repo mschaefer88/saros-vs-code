@@ -1,7 +1,6 @@
 package saros.lsp.extensions.client;
 
 import java.util.concurrent.CompletableFuture;
-
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -19,8 +18,7 @@ import saros.lsp.extensions.server.session.dto.SessionUserDto;
  *
  * <p>All client features that aren't covered by the lsp protocol have to be specified here.
  */
-public interface ISarosLanguageClient
-    extends LanguageClient {
+public interface ISarosLanguageClient extends LanguageClient {
 
   @JsonNotification("saros/session/state")
   void sendStateSession(SarosResultResponse<Boolean> isActive);
@@ -34,7 +32,7 @@ public interface ISarosLanguageClient
   @JsonNotification("saros/editor/open")
   void openEditor(SarosResultResponse<String> path);
 
-  @JsonNotification("saros/editor/annotate") 
+  @JsonNotification("saros/editor/annotate")
   void sendAnnotation(SarosResultResponse<AnnotationParams[]> annotations);
 
   @JsonNotification("saros/session/user-joined")

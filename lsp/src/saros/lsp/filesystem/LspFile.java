@@ -1,5 +1,7 @@
 package saros.lsp.filesystem;
 
+import static saros.filesystem.IResource.Type.FILE;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.AtomicMoveNotSupportedException;
@@ -10,8 +12,6 @@ import java.nio.file.StandardCopyOption;
 import org.apache.log4j.Logger;
 import saros.filesystem.IFile;
 import saros.filesystem.IPath;
-
-import static saros.filesystem.IResource.Type.FILE;
 
 public class LspFile extends LspResource implements IFile {
 

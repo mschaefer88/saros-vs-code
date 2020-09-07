@@ -1,7 +1,6 @@
 package saros.lsp.interaction;
 
 import java.util.Optional;
-import org.apache.log4j.Logger;
 import saros.lsp.ui.UIInteractionManager;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.contact.XMPPContact;

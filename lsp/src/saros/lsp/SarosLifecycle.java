@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import saros.context.AbstractContextLifecycle;
 import saros.context.IContextFactory;
-import saros.lsp.context.LspContextFactory;
 import saros.lsp.context.CoreContextFactory;
 import saros.lsp.context.FileSystemContextFactory;
+import saros.lsp.context.LspContextFactory;
 import saros.lsp.context.ProxyContextFactory;
 import saros.lsp.context.UIContextFactory;
 import saros.lsp.extensions.client.ISarosLanguageClient;
@@ -29,7 +29,8 @@ public class SarosLifecycle extends AbstractContextLifecycle {
     factories.add(
         new ProxyContextFactory<ISarosLanguageClient>(
             ISarosLanguageClient.class, () -> this.client));
-    factories.add(new ProxyContextFactory<IWorkspacePath>(IWorkspacePath.class, () -> this.workspace));
+    factories.add(
+        new ProxyContextFactory<IWorkspacePath>(IWorkspacePath.class, () -> this.workspace));
 
     return factories;
   }

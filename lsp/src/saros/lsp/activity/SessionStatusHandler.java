@@ -1,6 +1,5 @@
 package saros.lsp.activity;
 
-import org.apache.log4j.Logger;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.SarosResultResponse;
 import saros.lsp.extensions.server.session.dto.SessionUserDto;
@@ -50,7 +49,7 @@ public class SessionStatusHandler {
 
         @Override
         public void userColorChanged(User user) {
-          if(user.isHost()) {
+          if (user.isHost()) {
             return;
           }
           client.notifyUserChangedSession(createParticipantDto(user));
@@ -58,15 +57,15 @@ public class SessionStatusHandler {
 
         @Override
         public void userJoined(User user) {
-          if(user.isHost()) {
+          if (user.isHost()) {
             return;
           }
-          client.notifyUserJoinedSession(createParticipantDto(user)); 
+          client.notifyUserJoinedSession(createParticipantDto(user));
         }
 
         @Override
         public void userLeft(User user) {
-          if(user.isHost()) {
+          if (user.isHost()) {
             return;
           }
           client.notifyUserLeftSession(createParticipantDto(user));
@@ -95,11 +94,13 @@ public class SessionStatusHandler {
 
   private SessionUserDto createParticipantDto(User user) {
     final XMPPContact userAsContact =
-    this.contactsService.getContact(user.getJID().toString()).get();
+        this.contactsService.getContact(user.getJID().toString()).get();
 
     int colorId = user.getColorID();
 
     return new SessionUserDto(
-        userAsContact.getBareJid().getBase().toString(), userAsContact.getDisplayableName(), colorId);
+        userAsContact.getBareJid().getBase().toString(),
+        userAsContact.getDisplayableName(),
+        colorId);
   }
 }

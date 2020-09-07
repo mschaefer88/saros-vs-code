@@ -4,5 +4,5 @@ import saros.filesystem.IPath;
 import saros.filesystem.IReferencePoint;
 
 public interface IWorkspacePath extends IPath {
-    IReferencePoint getReferencePoint(String name);
+  IReferencePoint getReferencePoint(String name);
 }

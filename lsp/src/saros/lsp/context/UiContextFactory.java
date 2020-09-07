@@ -13,12 +13,12 @@ import saros.synchronize.UISynchronizer;
 
 public class UIContextFactory extends AbstractContextFactory {
 
-    @Override
-    public void createComponents(MutablePicoContainer container) {
-        container.addComponent(UISynchronizer.class, UISynchronizerImpl.class);
-        container.addComponent(IEditorManager.class, EditorManager.class);
-        container.addComponent(IProgressMonitor.class, ProgressMonitor.class);
-        container.addComponent(AnnotationManager.class);
-        container.addComponent(UIInteractionManager.class);
-    }
+  @Override
+  public void createComponents(MutablePicoContainer container) {
+    container.addComponent(UISynchronizer.class, UISynchronizerImpl.class);
+    container.addComponent(IEditorManager.class, EditorManager.class);
+    container.addComponent(IProgressMonitor.class, ProgressMonitor.class);
+    container.addComponent(AnnotationManager.class);
+    container.addComponent(UIInteractionManager.class);
+  }
 }

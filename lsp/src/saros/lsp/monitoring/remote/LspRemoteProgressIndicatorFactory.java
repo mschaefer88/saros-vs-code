@@ -12,7 +12,6 @@ public class LspRemoteProgressIndicatorFactory implements IRemoteProgressIndicat
 
   public LspRemoteProgressIndicatorFactory(ISarosLanguageClient client) {
     this.client = client;
-
   }
 
   @Override

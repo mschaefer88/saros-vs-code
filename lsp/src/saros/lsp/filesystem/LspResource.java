@@ -2,9 +2,6 @@ package saros.lsp.filesystem;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import org.apache.log4j.Logger;
-
 import saros.filesystem.IContainer;
 import saros.filesystem.IPath;
 import saros.filesystem.IReferencePoint;
@@ -23,8 +20,7 @@ public abstract class LspResource implements IResource {
   public LspResource(IWorkspacePath workspace, IPath path) {
     assert !path.isAbsolute();
 
-    if(workspace.isPrefixOf(path))
-    {
+    if (workspace.isPrefixOf(path)) {
       path = path.removeFirstSegments(workspace.segmentCount());
     }
 
@@ -81,8 +77,7 @@ public abstract class LspResource implements IResource {
 
     LspResource other = (LspResource) obj;
 
-    return getType() == other.getType()
-        && path.equals(other.path);
+    return getType() == other.getType() && path.equals(other.path);
   }
 
   @Override

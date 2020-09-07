@@ -1,10 +1,10 @@
 package saros.lsp.filesystem;
 
+import static saros.filesystem.IResource.Type.REFERENCE_POINT;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import saros.filesystem.IReferencePoint;
-
-import static saros.filesystem.IResource.Type.REFERENCE_POINT;
 
 public class LspReferencePoint extends LspContainer implements IReferencePoint {
 

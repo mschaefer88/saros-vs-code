@@ -1,13 +1,12 @@
 package saros.lsp.extensions.client.dto;
 
 import java.nio.file.Paths;
-
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-import saros.filesystem.IFile;
 import saros.activities.TextEditActivity;
 import saros.editor.IEditorManager;
 import saros.editor.text.TextPosition;
+import saros.filesystem.IFile;
 import saros.lsp.editor.annotation.Annotation;
 import saros.lsp.filesystem.IWorkspacePath;
 
@@ -20,9 +19,13 @@ public class AnnotationParams {
 
   public int annotationColorId;
 
-  public AnnotationParams(TextEditActivity activity, IWorkspacePath workspace, IEditorManager manager) {
+  public AnnotationParams(
+      TextEditActivity activity, IWorkspacePath workspace, IEditorManager manager) {
     this.uri =
-        Paths.get(workspace.append(activity.getResource().getReferencePointRelativePath()).toString()) //TODO: get from Editor/TextDocument!
+        Paths.get(
+                workspace
+                    .append(activity.getResource().getReferencePointRelativePath())
+                    .toString()) // TODO: get from Editor/TextDocument!
             .toUri()
             .toString();
     this.user = activity.getSource().getJID().getName();
@@ -37,7 +40,10 @@ public class AnnotationParams {
 
   public AnnotationParams(Annotation annotation, IWorkspacePath workspace, IFile path) {
     this.uri =
-    Paths.get(workspace.append(path.getReferencePointRelativePath()).toString()) //TODO: get from Editor/TextDocument!
+        Paths.get(
+                workspace
+                    .append(path.getReferencePointRelativePath())
+                    .toString()) // TODO: get from Editor/TextDocument!
             .toUri()
             .toString();
     this.user = annotation.getSource().getJID().getName();

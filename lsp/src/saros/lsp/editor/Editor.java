@@ -10,16 +10,15 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
-import saros.filesystem.IFile;
 import saros.activities.TextEditActivity;
 import saros.editor.text.TextPosition;
+import saros.filesystem.IFile;
 import saros.lsp.editor.annotation.Annotation;
 import saros.session.User;
 
@@ -29,7 +28,7 @@ public class Editor extends TextDocumentItem { // TODO: base class necessary?
 
   private final Object lock = new Object();
 
-  static final int MAX_HISTORY_LENGTH = 20; //5
+  static final int MAX_HISTORY_LENGTH = 20; // 5
 
   public Editor(TextDocumentItem documentItem) {
     this(documentItem.getText(), documentItem.getUri());
@@ -43,8 +42,7 @@ public class Editor extends TextDocumentItem { // TODO: base class necessary?
   }
 
   public Editor(IFile file) throws IOException {
-    super.setUri(
-        "file:///" + file.getReferencePointRelativePath().toString()); // TODO: MIGRATION
+    super.setUri("file:///" + file.getReferencePointRelativePath().toString()); // TODO: MIGRATION
 
     try (InputStream stream = file.getContents()) {
       super.setText(IOUtils.toString(stream));
@@ -96,29 +94,33 @@ public class Editor extends TextDocumentItem { // TODO: base class necessary?
   }
 
   private int offsetAt(TextPosition textPosition) {
-    return this.offsetAt(new Position(textPosition.getLineNumber(), textPosition.getInLineOffset()));
+    return this.offsetAt(
+        new Position(textPosition.getLineNumber(), textPosition.getInLineOffset()));
   }
 
   public TextEditActivity convert(
       TextDocumentContentChangeEvent changeEvent,
       User source,
       IFile path) { // TODO: set path in ctor
-    
+
     Range range = changeEvent.getRange();
     int length = 0;
-    if(range != null){
-      length = this.getLength(range); //TODO: MIGRATION
+    if (range != null) {
+      length = this.getLength(range); // TODO: MIGRATION
     } else {
       length = this.getText().length();
     }
     String text = changeEvent.getText();
-    String replacedText = this.getAt(range.getStart(), length); 
+    String replacedText = this.getAt(range.getStart(), length);
 
-     return TextEditActivity.buildTextEditActivity(source, 
-     new TextPosition(changeEvent.getRange().getStart().getLine(), changeEvent.getRange().getStart().getCharacter()), 
-     text, 
-     replacedText, 
-     path);
+    return TextEditActivity.buildTextEditActivity(
+        source,
+        new TextPosition(
+            changeEvent.getRange().getStart().getLine(),
+            changeEvent.getRange().getStart().getCharacter()),
+        text,
+        replacedText,
+        path);
   }
 
   private int getLength(Range range) {
@@ -132,7 +134,9 @@ public class Editor extends TextDocumentItem { // TODO: base class necessary?
     Position end = new Position(endPos.getLineNumber(), endPos.getInLineOffset());
     Range range = new Range(start, end);
     return new TextDocumentContentChangeEvent(
-        range, editActivity.getReplacedText().length(), editActivity.getNewText()); //TODO: MIGRATION
+        range,
+        editActivity.getReplacedText().length(),
+        editActivity.getNewText()); // TODO: MIGRATION
   }
 
   public void apply(List<TextDocumentContentChangeEvent> changes, int version) {
@@ -179,14 +183,18 @@ public class Editor extends TextDocumentItem { // TODO: base class necessary?
 
   private void annotate(TextEditActivity activity) {
 
-    if(activity.getSource().isLocal()) {
+    if (activity.getSource().isLocal()) {
       return;
     }
-    
+
     Range range =
         new Range(
-            new Position(activity.getStartPosition().getLineNumber(), activity.getStartPosition().getInLineOffset()), //TODO: converter
-            new Position(activity.getNewEndPosition().getLineNumber(), activity.getNewEndPosition().getInLineOffset())); //TODO: converter
+            new Position(
+                activity.getStartPosition().getLineNumber(),
+                activity.getStartPosition().getInLineOffset()), // TODO: converter
+            new Position(
+                activity.getNewEndPosition().getLineNumber(),
+                activity.getNewEndPosition().getInLineOffset())); // TODO: converter
     Annotation recent = new Annotation(range, activity.getSource(), this.getVersion());
     Annotation[] after =
         this.annotations

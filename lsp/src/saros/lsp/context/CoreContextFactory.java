@@ -27,15 +27,17 @@ public class CoreContextFactory extends AbstractContextFactory {
   public void createComponents(MutablePicoContainer container) {
     container.addComponent(IPreferenceStore.class, LspPreferenceStore.class);
     container.addComponent(Preferences.class, LspPreferences.class);
-    container.addComponent(IRemoteProgressIndicatorFactory.class, LspRemoteProgressIndicatorFactory.class);
+    container.addComponent(
+        IRemoteProgressIndicatorFactory.class, LspRemoteProgressIndicatorFactory.class);
     container.addComponent(IChecksumCache.class, NullChecksumCache.class);
     container.addComponent(ISarosSessionContextFactory.class, SessionContextFactory.class);
-    container.addComponent(SubscriptionAuthorizer.class);    
+    container.addComponent(SubscriptionAuthorizer.class);
     container.addComponent(INegotiationHandler.class, NegotiationHandler.class);
     container.addComponent(IncomingResourceNegotiationHandler.class);
     container.addComponent(OutgoingResourceNegotiationHandler.class);
     container.addComponent(IncomingSessionNegotiationHandler.class);
     container.addComponent(OutgoingSessionNegotiationHandler.class);
-    container.addComponent(BindKey.bindKey(String.class, IContextKeyBindings.SarosVersion.class), "0.0.1");
+    container.addComponent(
+        BindKey.bindKey(String.class, IContextKeyBindings.SarosVersion.class), "0.0.1");
   }
 }

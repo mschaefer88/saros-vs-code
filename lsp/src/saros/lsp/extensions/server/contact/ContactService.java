@@ -5,11 +5,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.function.BiPredicate;
-
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.SarosResponse;
 import saros.lsp.extensions.server.SarosResultResponse;
-import saros.lsp.extensions.server.SarosService;
 import saros.lsp.extensions.server.contact.dto.ContactDto;
 import saros.lsp.ui.UIInteractionManager;
 import saros.net.xmpp.JID;
@@ -23,7 +21,9 @@ public class ContactService implements IContactService, IContactsUpdate {
   private ISarosLanguageClient client;
   private UIInteractionManager interactionManager;
 
-  public ContactService(XMPPContactsService contactsService, ISarosLanguageClient client,
+  public ContactService(
+      XMPPContactsService contactsService,
+      ISarosLanguageClient client,
       UIInteractionManager interactionManager) {
     this.contactsService = contactsService;
     this.client = client;
@@ -37,17 +37,20 @@ public class ContactService implements IContactService, IContactsUpdate {
 
     CompletableFuture<SarosResponse> c = new CompletableFuture<SarosResponse>();
 
-    Executors.newCachedThreadPool().submit(() -> {
-      try {
-        this.contactsService.addContact(new JID(request.id), request.nickname, this.fromUserInput());
+    Executors.newCachedThreadPool()
+        .submit(
+            () -> {
+              try {
+                this.contactsService.addContact(
+                    new JID(request.id), request.nickname, this.fromUserInput());
 
-        c.complete(new SarosResponse());
-      } catch (Exception e) {
-        c.complete(new SarosResponse(e));
-      }
+                c.complete(new SarosResponse());
+              } catch (Exception e) {
+                c.complete(new SarosResponse(e));
+              }
 
-      return null;
-    });
+              return null;
+            });
 
     return c;
   }
@@ -93,15 +96,20 @@ public class ContactService implements IContactService, IContactsUpdate {
 
     final List<XMPPContact> contacts = this.contactsService.getAllContacts();
 
-    final ContactDto[] dtos = contacts.stream().map(contact -> {
-      ContactDto dto = new ContactDto();
-      dto.id = contact.getBareJid().toString();
-      dto.nickname = contact.getDisplayableName();
-      dto.isOnline = contact.getStatus().isOnline();
-      dto.hasSarosSupport = contact.hasSarosSupport();
+    final ContactDto[] dtos =
+        contacts
+            .stream()
+            .map(
+                contact -> {
+                  ContactDto dto = new ContactDto();
+                  dto.id = contact.getBareJid().toString();
+                  dto.nickname = contact.getDisplayableName();
+                  dto.isOnline = contact.getStatus().isOnline();
+                  dto.hasSarosSupport = contact.hasSarosSupport();
 
-      return dto;
-    }).toArray(size -> new ContactDto[size]);
+                  return dto;
+                })
+            .toArray(size -> new ContactDto[size]);
 
     return CompletableFuture.completedFuture(new SarosResultResponse<ContactDto[]>(dtos));
   }

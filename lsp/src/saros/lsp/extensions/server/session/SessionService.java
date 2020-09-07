@@ -16,7 +16,6 @@ import saros.lsp.extensions.server.session.dto.InviteDto;
 import saros.lsp.filesystem.IWorkspacePath;
 import saros.net.ConnectionState;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.contact.XMPPContact;
 import saros.net.xmpp.contact.XMPPContactsService;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -83,8 +82,7 @@ public class SessionService
   public CompletableFuture<SarosResponse> start() {
 
     try {
-      Set<IReferencePoint> map =
-          Collections.singleton(this.workspace.getReferencePoint(""));
+      Set<IReferencePoint> map = Collections.singleton(this.workspace.getReferencePoint(""));
       this.sessionManager.startSession(map);
 
     } catch (Exception e) {
@@ -109,8 +107,7 @@ public class SessionService
   }
 
   @Override
-  public CompletableFuture<SarosResponse> invite(
-      InviteDto invite) {
+  public CompletableFuture<SarosResponse> invite(InviteDto invite) {
     CompletableFuture<SarosResponse> c = new CompletableFuture<SarosResponse>();
 
     Executors.newCachedThreadPool()
@@ -146,8 +143,7 @@ public class SessionService
   public void connectionStateChanged(ConnectionState state, ErrorType errorType) {
 
     this.client.sendStateConnected(
-          new SarosResultResponse<Boolean>(
-              state == ConnectionState.CONNECTED));
+        new SarosResultResponse<Boolean>(state == ConnectionState.CONNECTED));
   }
 
   @Override

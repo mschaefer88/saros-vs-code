@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
-import org.eclipse.lsp4j.FileChangeType;
 import org.eclipse.lsp4j.FileEvent;
 import org.eclipse.lsp4j.services.WorkspaceService;
 import saros.activities.FileActivity;
@@ -21,7 +20,6 @@ import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IResource;
-import saros.filesystem.IWorkspace;
 import saros.lsp.SarosLauncher;
 import saros.lsp.configuration.Configuration;
 import saros.lsp.editor.EditorManager;
@@ -29,7 +27,6 @@ import saros.lsp.filesystem.IWorkspacePath;
 import saros.lsp.filesystem.LspFile;
 import saros.lsp.filesystem.LspFolder;
 import saros.lsp.filesystem.LspPath;
-import saros.lsp.filesystem.LspWorkspace;
 import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -48,21 +45,23 @@ public class WorkspaceServiceImpl extends AbstractActivityProducer implements Wo
 
   private EditorManager editorManager;
 
-  private final ISessionLifecycleListener sessionLifecycleListener = new ISessionLifecycleListener() {
+  private final ISessionLifecycleListener sessionLifecycleListener =
+      new ISessionLifecycleListener() {
 
-    @Override
-    public void sessionStarted(final ISarosSession session) {
-      initialize(session);
-    }
+        @Override
+        public void sessionStarted(final ISarosSession session) {
+          initialize(session);
+        }
 
-    @Override
-    public void sessionEnded(final ISarosSession session, SessionEndReason reason) {
-      uninitialize(session);
-    }
-  };
+        @Override
+        public void sessionEnded(final ISarosSession session, SessionEndReason reason) {
+          uninitialize(session);
+        }
+      };
 
   @Override
-  public void didChangeConfiguration(DidChangeConfigurationParams params) { // TODO dat Location Änderbar? -> bessere
+  public void didChangeConfiguration(
+      DidChangeConfigurationParams params) { // TODO dat Location Änderbar? -> bessere
     // Vorführung
     LOG.info("didChangeConfiguration");
     String settingsJson = params.getSettings().toString();
@@ -79,8 +78,8 @@ public class WorkspaceServiceImpl extends AbstractActivityProducer implements Wo
     this.session.addActivityProducer(this);
   }
 
-  public WorkspaceServiceImpl(ISarosSessionManager sessionManager, IWorkspacePath workspace,
-      EditorManager editorManager) {
+  public WorkspaceServiceImpl(
+      ISarosSessionManager sessionManager, IWorkspacePath workspace, EditorManager editorManager) {
     this.workspace = workspace;
     this.editorManager = editorManager;
 
@@ -130,7 +129,13 @@ public class WorkspaceServiceImpl extends AbstractActivityProducer implements Wo
       return new FolderDeletedActivity(this.session.getLocalUser(), (IFolder) target);
     } else if (target.getType() == IResource.Type.FILE) {
       LOG.info("DELETE FILE");
-      return new FileActivity(this.session.getLocalUser(), Type.REMOVED, Purpose.ACTIVITY, (IFile) target, null, null,
+      return new FileActivity(
+          this.session.getLocalUser(),
+          Type.REMOVED,
+          Purpose.ACTIVITY,
+          (IFile) target,
+          null,
+          null,
           null);
     }
 
@@ -150,7 +155,7 @@ public class WorkspaceServiceImpl extends AbstractActivityProducer implements Wo
           (IFile) target,
           null,
           this.editorManager.getContent((IFile) target).getBytes(),
-          ((IFile)target).getCharset());
+          ((IFile) target).getCharset());
     }
 
     return null;

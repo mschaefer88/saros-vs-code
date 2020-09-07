@@ -22,7 +22,8 @@ public class NegotiationHandler implements INegotiationHandler {
 
   private IncomingResourceNegotiationHandler incomingResourceNegotiationHandler;
 
-  public NegotiationHandler(final ISarosSessionManager sessionManager,
+  public NegotiationHandler(
+      final ISarosSessionManager sessionManager,
       final OutgoingSessionNegotiationHandler outgoingSessionNegotiationHandler,
       final IncomingSessionNegotiationHandler incomingSessionNegotiationHandler,
       final OutgoingResourceNegotiationHandler outgoingResourceNegotiationHandler,
@@ -38,29 +39,37 @@ public class NegotiationHandler implements INegotiationHandler {
 
   @Override
   public void handleOutgoingSessionNegotiation(OutgoingSessionNegotiation negotiation) {
-    Executors.newCachedThreadPool().submit(() -> {
-      this.outgoingSessionNegotiationHandler.handle(negotiation);
-    });
+    Executors.newCachedThreadPool()
+        .submit(
+            () -> {
+              this.outgoingSessionNegotiationHandler.handle(negotiation);
+            });
   }
 
   @Override
   public void handleIncomingSessionNegotiation(IncomingSessionNegotiation negotiation) {
-    Executors.newCachedThreadPool().submit(() -> {
-      this.incomingSessionNegotiationHandler.handle(negotiation);
-    });
+    Executors.newCachedThreadPool()
+        .submit(
+            () -> {
+              this.incomingSessionNegotiationHandler.handle(negotiation);
+            });
   }
 
   @Override
   public void handleOutgoingResourceNegotiation(AbstractOutgoingResourceNegotiation negotiation) {
-    Executors.newCachedThreadPool().submit(() -> {
-      this.outgoingResourceNegotiationHandler.handle(negotiation);
-    });
+    Executors.newCachedThreadPool()
+        .submit(
+            () -> {
+              this.outgoingResourceNegotiationHandler.handle(negotiation);
+            });
   }
 
   @Override
   public void handleIncomingResourceNegotiation(AbstractIncomingResourceNegotiation negotiation) {
-    Executors.newCachedThreadPool().submit(() -> {
-      this.incomingResourceNegotiationHandler.handle(negotiation);
-    });
+    Executors.newCachedThreadPool()
+        .submit(
+            () -> {
+              this.incomingResourceNegotiationHandler.handle(negotiation);
+            });
   }
 }

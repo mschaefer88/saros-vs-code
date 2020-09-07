@@ -28,8 +28,8 @@ import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 import org.eclipse.lsp4j.TextDocumentIdentifier;
 import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
-import saros.filesystem.IFile;
 import saros.activities.TextEditActivity;
+import saros.filesystem.IFile;
 import saros.filesystem.IPath;
 import saros.lsp.editor.Editor;
 import saros.lsp.editor.EditorManager;
@@ -201,11 +201,11 @@ public class DocumentServiceImpl extends AbstractActivityProducer implements IDo
 
     this.editorManager.setVersion(this.getFile(i.getUri()), i.getVersion());
     for (TextDocumentContentChangeEvent changeEvent : params.getContentChanges()) {
-      IFile path = this.getFile(i.getUri());//TODO: converter
+      IFile path = this.getFile(i.getUri()); // TODO: converter
       Editor editor = this.editorManager.getEditor(path);
       TextEditActivity activity = editor.convert(changeEvent, source, path);
 
-      this.editorManager.applyTextEdit(activity); //TODO: overload for changeevent?
+      this.editorManager.applyTextEdit(activity); // TODO: overload for changeevent?
 
       if (this.session != null && ig == null) {
         LOG.info(String.format("Sending activity: %s", activity));
@@ -227,13 +227,13 @@ public class DocumentServiceImpl extends AbstractActivityProducer implements IDo
 
   private AnnotationParams[] getAnnotations(IFile file) {
     Editor editor = this.editorManager.getEditor(file);
-      Annotation[] annotations = editor.getAnnotations();
-      AnnotationParams[] aps =
-          Arrays.stream(annotations)
-              .map(a -> new AnnotationParams(a, this.workspace, file))
-              .toArray(size -> new AnnotationParams[size]);
+    Annotation[] annotations = editor.getAnnotations();
+    AnnotationParams[] aps =
+        Arrays.stream(annotations)
+            .map(a -> new AnnotationParams(a, this.workspace, file))
+            .toArray(size -> new AnnotationParams[size]);
 
-      return aps;
+    return aps;
   }
 
   private User getAnonymousUser() {
@@ -255,7 +255,7 @@ public class DocumentServiceImpl extends AbstractActivityProducer implements IDo
 
     this.editorManager.saveEditor(this.getFile(i.getUri())); // TODO: selective saving?
   }
-  
+
   @Override
   public CompletableFuture<Hover> hover(HoverParams position) { // TODO: check URI!
 
@@ -330,7 +330,8 @@ public class DocumentServiceImpl extends AbstractActivityProducer implements IDo
   }
 
   @Override
-  public CompletableFuture<SarosResultResponse<AnnotationParams[]>> getAnnotations(TextDocumentIdentifier identifier) {    
+  public CompletableFuture<SarosResultResponse<AnnotationParams[]>> getAnnotations(
+      TextDocumentIdentifier identifier) {
     IFile p = this.getFile(identifier.getUri());
     AnnotationParams[] aps = this.getAnnotations(p);
 

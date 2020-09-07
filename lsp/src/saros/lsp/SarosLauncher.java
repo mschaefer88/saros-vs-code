@@ -1,7 +1,6 @@
 package saros.lsp;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,12 +20,9 @@ import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.jsonrpc.MessageConsumer;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
-import saros.filesystem.IPath;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.ISarosLanguageServer;
 import saros.lsp.filesystem.IWorkspacePath;
-import saros.lsp.filesystem.LspPath;
-import saros.lsp.filesystem.LspWorkspace;
 import saros.lsp.filesystem.WorkspacePath;
 import saros.lsp.log.LanguageClientAppender;
 

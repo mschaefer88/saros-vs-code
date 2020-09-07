@@ -9,9 +9,9 @@ import saros.repackaged.picocontainer.MutablePicoContainer;
 
 public class FileSystemContextFactory extends AbstractContextFactory {
 
-    @Override
-    public void createComponents(MutablePicoContainer container) {
-        container.addComponent(IPathFactory.class, PathFactory.class);
-        container.addComponent(IWorkspace.class, LspWorkspace.class);
-    }
+  @Override
+  public void createComponents(MutablePicoContainer container) {
+    container.addComponent(IPathFactory.class, PathFactory.class);
+    container.addComponent(IWorkspace.class, LspWorkspace.class);
+  }
 }

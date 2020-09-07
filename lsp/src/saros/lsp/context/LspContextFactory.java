@@ -17,13 +17,13 @@ import saros.repackaged.picocontainer.MutablePicoContainer;
 
 public class LspContextFactory extends AbstractContextFactory {
 
-    @Override
-    public void createComponents(MutablePicoContainer container) {
-        container.addComponent(ISarosLanguageServer.class, SarosLanguageServer.class);
-        container.addComponent(IAccountService.class, AccountService.class);
-        container.addComponent(IContactService.class, ContactService.class);
-        container.addComponent(ISessionService.class, SessionService.class);
-        container.addComponent(IDocumentService.class, DocumentServiceImpl.class);
-        container.addComponent(WorkspaceService.class, WorkspaceServiceImpl.class);
-    }
+  @Override
+  public void createComponents(MutablePicoContainer container) {
+    container.addComponent(ISarosLanguageServer.class, SarosLanguageServer.class);
+    container.addComponent(IAccountService.class, AccountService.class);
+    container.addComponent(IContactService.class, ContactService.class);
+    container.addComponent(ISessionService.class, SessionService.class);
+    container.addComponent(IDocumentService.class, DocumentServiceImpl.class);
+    container.addComponent(WorkspaceService.class, WorkspaceServiceImpl.class);
+  }
 }

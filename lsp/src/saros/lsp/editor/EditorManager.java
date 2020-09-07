@@ -11,8 +11,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
-
 import saros.activities.TextEditActivity;
 import saros.editor.IEditorManager;
 import saros.editor.ISharedEditorListener;
@@ -98,7 +96,7 @@ public class EditorManager implements IEditorManager {
     LOG.debug(String.format("getContent(%s)", path.toString()));
 
     if (this.openEditors.containsKey(path)) {
-      return this.openEditors.get(path).getText();//TODO: ask editor?!
+      return this.openEditors.get(path).getText(); // TODO: ask editor?!
     } else {
       try {
         return IOUtils.toString(path.getContents());
@@ -169,7 +167,7 @@ public class EditorManager implements IEditorManager {
   public void setVersion(IFile path, int version) { // TODO: experimental!
 
     LOG.info(String.format("setVersion('%s', %d)", path, version));
-    for(IFile editor : this.openEditors.keySet()) {      
+    for (IFile editor : this.openEditors.keySet()) {
       LOG.info(String.format("openEditors = '%s'", editor));
     }
     Editor e = this.openEditors.get(path);
@@ -192,14 +190,12 @@ public class EditorManager implements IEditorManager {
 
   public void saveEditor(IFile path) {
     try {
-      path
-          .setContents(IOUtils.toInputStream(this.openEditors.get(path).getText()));
+      path.setContents(IOUtils.toInputStream(this.openEditors.get(path).getText()));
     } catch (IOException e) {
       LOG.error(e);
     }
   }
 
-  
   /** The default Windows line separator. */
   public static final String WINDOWS_LINE_SEPARATOR = "\r\n";
   /** The default Unix line separator. */
@@ -267,7 +263,7 @@ public class EditorManager implements IEditorManager {
   public String getNormalizedContent(IFile file) {
     String content = this.getContent(file);
     String normContent = "";
-    if(content != null && !content.isEmpty()) {
+    if (content != null && !content.isEmpty()) {
       normContent = normalize(content, guessLineSeparator(content));
     }
 

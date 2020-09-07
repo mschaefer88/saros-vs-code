@@ -3,8 +3,6 @@ package saros.lsp.activity;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
-
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import saros.activities.FileActivity;
 import saros.activities.FolderCreatedActivity;
