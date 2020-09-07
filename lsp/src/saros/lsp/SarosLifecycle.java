@@ -8,7 +8,7 @@ import saros.lsp.context.LspContextFactory;
 import saros.lsp.context.CoreContextFactory;
 import saros.lsp.context.FileSystemContextFactory;
 import saros.lsp.context.ProxyContextFactory;
-import saros.lsp.context.UiContextFactory;
+import saros.lsp.context.UIContextFactory;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.ISarosLanguageServer;
 import saros.lsp.filesystem.IWorkspacePath;
@@ -24,7 +24,7 @@ public class SarosLifecycle extends AbstractContextLifecycle {
 
     factories.add(new CoreContextFactory());
     factories.add(new LspContextFactory());
-    factories.add(new UiContextFactory());
+    factories.add(new UIContextFactory());
     factories.add(new FileSystemContextFactory());
     factories.add(
         new ProxyContextFactory<ISarosLanguageClient>(

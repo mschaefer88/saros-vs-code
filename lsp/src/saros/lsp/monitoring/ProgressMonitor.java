@@ -1,9 +1,6 @@
 package saros.lsp.monitoring;
 
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import org.apache.log4j.Logger;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.client.dto.ProgressParams;
 import saros.lsp.extensions.client.dto.WorkDoneProgressBegin;
@@ -13,10 +10,6 @@ import saros.lsp.extensions.client.dto.WorkDoneProgressReport;
 import saros.monitoring.IProgressMonitor;
 
 public class ProgressMonitor implements IProgressMonitor {
-
-  private static final Logger LOG = Logger.getLogger(ProgressMonitor.class);
-
-  private ExecutorService executor = Executors.newCachedThreadPool();
 
   private ISarosLanguageClient client;
 
@@ -37,31 +30,25 @@ public class ProgressMonitor implements IProgressMonitor {
 
   @Override
   public void done() {
-    LOG.debug("done");
-
     this.endProgress("Done");
   }
 
   @Override
   public void subTask(String name) {
-    LOG.debug(String.format("subTask('%s')", name));
 
     this.subTask = name;
   }
 
   @Override
   public void setTaskName(String name) {
-    LOG.debug(String.format("setTaskName('%s')", name));
 
     this.taskName = name;
   }
 
   @Override
   public void worked(int amount) {
-    LOG.debug(String.format("worked(%d)", amount));
 
     if (this.canceled) {
-      LOG.error("cancelling not supported");
       throw new UnsupportedOperationException();
     }
 
@@ -70,10 +57,8 @@ public class ProgressMonitor implements IProgressMonitor {
 
   @Override
   public void setCanceled(boolean canceled) {
-    LOG.debug(String.format("setCanceled(%b)", canceled));
 
     if (this.canceled && !canceled) {
-      LOG.error("resuming not supported");
       throw new UnsupportedOperationException();
     }
 
@@ -86,33 +71,31 @@ public class ProgressMonitor implements IProgressMonitor {
 
   @Override
   public boolean isCanceled() {
-    LOG.debug(String.format("isCanceled -> %b", this.canceled));
-
     return this.canceled;
   }
 
   @Override
   public void beginTask(String name, int size) {
-    LOG.debug(String.format("beginTask('%s', %d)", name, size));
 
     if (this.canceled) {
-      LOG.error("resuming not supported");
       throw new UnsupportedOperationException();
     }
 
-    this.size = size;
+    this.setSize(size);
 
     this.setTaskName(name);
     this.createProgress();
     this.beginProgress(this.taskName);
   }
 
+  public void setSize(int size) {
+    this.size = size;
+  }
+
   private void createProgress() {
-    LOG.info("createProgress()");
     WorkDoneProgressCreateParams c = new WorkDoneProgressCreateParams(this.token);
 
     this.client.createProgress(c);
-    LOG.info("createProgress() -> sent");
   }
 
   private void beginProgress(String title) {

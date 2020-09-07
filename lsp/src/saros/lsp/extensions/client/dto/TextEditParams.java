@@ -12,7 +12,6 @@ import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import saros.filesystem.IFile;
 import saros.activities.TextEditActivity;
-import saros.filesystem.IWorkspace;
 import saros.lsp.editor.EditorManager;
 import saros.lsp.filesystem.IWorkspacePath;
 import saros.lsp.filesystem.LspFile;
@@ -21,9 +20,8 @@ public class TextEditParams extends ApplyWorkspaceEditParams {
 
   public TextEditParams(
       IWorkspacePath workspace, EditorManager editorManager, TextEditActivity activity) {
-    // TODO: replace workspace by project get full path!
 
-    IFile workspaceFile = new LspFile(workspace, activity.getResource().getReferencePointRelativePath());//TODO: better Way? How to elimenate the need of a ws?)
+    IFile workspaceFile = new LspFile(workspace, activity.getResource().getReferencePointRelativePath());
     String content = editorManager.getContent(workspaceFile);
     TextEdit edit = createEdit(content, activity);
 
@@ -46,7 +44,7 @@ public class TextEditParams extends ApplyWorkspaceEditParams {
   private static String createFileUri(IWorkspacePath workspace, IFile path) {
     return Paths.get(workspace.toString(), path.getReferencePointRelativePath().toString()) //TODO: MIGRATION
         .toUri()
-        .toString(); // TODO: do better!
+        .toString();
   }
 
   private static TextEdit createEdit(String content, TextEditActivity activity) {
@@ -54,8 +52,8 @@ public class TextEditParams extends ApplyWorkspaceEditParams {
     edit.setNewText(activity.getNewText());
     edit.setRange(
         new Range(
-            new Position(activity.getStartPosition().getLineNumber(), activity.getStartPosition().getInLineOffset()), //TODO: use conversion
-            new Position(activity.getNewEndPosition().getLineNumber(), activity.getNewEndPosition().getInLineOffset()))); //TODO: use conversion
+            new Position(activity.getStartPosition().getLineNumber(), activity.getStartPosition().getInLineOffset()),
+            new Position(activity.getNewEndPosition().getLineNumber(), activity.getNewEndPosition().getInLineOffset())));
 
     return edit;
   }

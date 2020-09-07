@@ -2,7 +2,6 @@ package saros.lsp.extensions.server.account;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import org.apache.log4j.Logger;
 import saros.account.XMPPAccount;
 import saros.account.XMPPAccountStore;
 import saros.lsp.extensions.server.SarosResponse;
@@ -16,12 +15,11 @@ public class AccountService implements IAccountService {
 
   private final XMPPAccountStore accountStore;
 
-  private static final Logger LOG = Logger.getLogger(AccountService.class);
-
   public AccountService(final XMPPAccountStore accountStore) {
     this.accountStore = accountStore;
   }
 
+  @Override()
   public CompletableFuture<SarosResultResponse<AccountDto[]>> getAll() {
 
     final List<XMPPAccount> accounts = this.accountStore.getAllAccounts();
@@ -53,15 +51,13 @@ public class AccountService implements IAccountService {
   public CompletableFuture<SarosResponse> update(final AccountDto request) {
 
     try {
-      // TODO: do better
       JID jid = new JID(request.username);
-      // TODO: allow complete change? check Eclipse
       final XMPPAccount account = this.accountStore.getAccount(jid.getName(), jid.getDomain());
       this.accountStore.changeAccountData(
           account,
           request.username,
           request.password,
-          request.domain, // TODO: enable override with domain from request
+          request.domain,
           request.server,
           request.port,
           request.useTLS,

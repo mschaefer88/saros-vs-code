@@ -15,8 +15,6 @@ import saros.net.xmpp.subscription.SubscriptionListener;
  */
 public class SubscriptionAuthorizer implements SubscriptionListener {
 
-  private static final Logger LOG = Logger.getLogger(SubscriptionAuthorizer.class);
-
   private SubscriptionHandler subscriptionHandler;
   private XMPPContactsService contactsService;
   private UIInteractionManager interactionManager;
@@ -38,11 +36,8 @@ public class SubscriptionAuthorizer implements SubscriptionListener {
 
   @Override
   public void subscriptionRequestReceived(JID jid) {
-    LOG.info(String.format("JID: %s", jid));
     String title = String.format("User '%s' requested subscription", jid.getName());
     String message = String.format("Allow subscription from '%s'?", jid.getBase());
-    LOG.info(String.format("title: %s", title));
-    LOG.info(String.format("message: %s", message));
 
     if (this.interactionManager.getUserInputYesNo(title, message)) {
       subscriptionHandler.addSubscription(jid, true);

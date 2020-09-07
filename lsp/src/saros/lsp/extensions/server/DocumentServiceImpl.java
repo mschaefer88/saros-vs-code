@@ -27,16 +27,10 @@ import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 import org.eclipse.lsp4j.TextDocumentIdentifier;
 import org.eclipse.lsp4j.TextDocumentItem;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
-import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
-import org.eclipse.lsp4j.services.TextDocumentService;
 import saros.filesystem.IFile;
 import saros.activities.TextEditActivity;
 import saros.filesystem.IPath;
-import saros.filesystem.IReferencePoint;
-import saros.filesystem.IResource;
-import saros.filesystem.IWorkspace;
 import saros.lsp.editor.Editor;
 import saros.lsp.editor.EditorManager;
 import saros.lsp.editor.annotation.Annotation;
@@ -48,7 +42,6 @@ import saros.lsp.extensions.server.document.IDocumentService;
 import saros.lsp.filesystem.IWorkspacePath;
 import saros.lsp.filesystem.LspFile;
 import saros.lsp.filesystem.LspPath;
-import saros.lsp.filesystem.LspWorkspace;
 import saros.net.xmpp.JID;
 import saros.session.AbstractActivityConsumer;
 import saros.session.AbstractActivityProducer;
@@ -61,7 +54,7 @@ import saros.session.SessionEndReason;
 import saros.session.User;
 
 /** Empty implementation of the text document service. */
-public class DocumentServiceStub extends AbstractActivityProducer implements IDocumentService {
+public class DocumentServiceImpl extends AbstractActivityProducer implements IDocumentService {
 
   private EditorManager editorManager;
   private ISarosSession session;
@@ -69,7 +62,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements IDo
   private final ISarosLanguageClient client;
   private final IWorkspacePath workspace;
 
-  private static final Logger LOG = Logger.getLogger(DocumentServiceStub.class);
+  private static final Logger LOG = Logger.getLogger(DocumentServiceImpl.class);
 
   private final Map<IFile, TextEditActivity> ignore = new HashMap<>();
 
@@ -139,7 +132,7 @@ public class DocumentServiceStub extends AbstractActivityProducer implements IDo
 
   private final AnnotationManager annotationManager;
 
-  public DocumentServiceStub(
+  public DocumentServiceImpl(
       EditorManager editorManager,
       ISarosSessionManager sessionManager,
       ISarosLanguageClient client,

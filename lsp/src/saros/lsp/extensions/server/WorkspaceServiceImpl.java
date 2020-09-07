@@ -38,7 +38,7 @@ import saros.session.SessionEndReason;
 
 // TODO: Deprecated since not used -> to null in server?
 /** Empty implementation of the workspace service. */
-public class WorkspaceServiceStub extends AbstractActivityProducer implements WorkspaceService {
+public class WorkspaceServiceImpl extends AbstractActivityProducer implements WorkspaceService {
 
   private static final Logger LOG = Logger.getLogger(SarosLauncher.class);
 
@@ -79,7 +79,7 @@ public class WorkspaceServiceStub extends AbstractActivityProducer implements Wo
     this.session.addActivityProducer(this);
   }
 
-  public WorkspaceServiceStub(ISarosSessionManager sessionManager, IWorkspacePath workspace,
+  public WorkspaceServiceImpl(ISarosSessionManager sessionManager, IWorkspacePath workspace,
       EditorManager editorManager) {
     this.workspace = workspace;
     this.editorManager = editorManager;

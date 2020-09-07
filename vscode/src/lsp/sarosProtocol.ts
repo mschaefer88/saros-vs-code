@@ -139,7 +139,7 @@ export namespace SessionStateNotification {
 export namespace ConnectedStateNotification {
   export const type =
     new NotificationType<SarosResultResponse<boolean>, void>(
-        'saros/session/connected',
+        'saros/connected',
     );
 }
 

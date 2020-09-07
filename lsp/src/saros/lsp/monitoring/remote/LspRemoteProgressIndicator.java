@@ -2,38 +2,51 @@ package saros.lsp.monitoring.remote;
 
 import org.apache.log4j.Logger;
 import saros.activities.ProgressActivity;
+import saros.lsp.extensions.client.ISarosLanguageClient;
+import saros.lsp.monitoring.ProgressMonitor;
+import saros.monitoring.IProgressMonitor;
 import saros.monitoring.remote.IRemoteProgressIndicator;
+import saros.net.util.XMPPUtils;
 import saros.session.User;
 
-// TODO: correct location?!
 public class LspRemoteProgressIndicator implements IRemoteProgressIndicator {
 
-  private static final Logger LOG = Logger.getLogger(LspRemoteProgressIndicator.class);
+  private final ProgressMonitor progressMonitor;
+  private String remoteProgressID;
+  private User remoteUser;
+
+  public LspRemoteProgressIndicator(final ISarosLanguageClient client, String remoteProgressID, User remoteUser) {
+    this.remoteProgressID = remoteProgressID;
+    this.remoteUser = remoteUser;
+    this.progressMonitor = new ProgressMonitor(client);
+
+  }
 
   @Override
   public String getRemoteProgressID() {
-    LOG.debug("getRemoteProgressID");
-    return null;
+    return this.remoteProgressID;
   }
 
   @Override
   public User getRemoteUser() {
-    LOG.debug("getRemoteUser");
-    return null;
+    return this.remoteUser;
   }
 
   @Override
   public void start() {
-    LOG.debug("start");
+    final String nickname = XMPPUtils.getNickname(null, this.remoteUser.getJID(), this.remoteUser.getJID().toString());
+    this.progressMonitor.beginTask(nickname, IProgressMonitor.UNKNOWN);
   }
 
   @Override
   public void stop() {
-    LOG.debug("stop");
+    this.progressMonitor.done();
   }
 
   @Override
-  public void handleProgress(ProgressActivity activity) {
-    LOG.debug(String.format("handleProgress([%s])", activity.getTaskName()));
+  public void handleProgress(final ProgressActivity activity) {
+    this.progressMonitor.setSize(activity.getWorkTotal());
+    this.progressMonitor.subTask(activity.getTaskName());
+    this.progressMonitor.worked(activity.getWorkCurrent());
   }
 }

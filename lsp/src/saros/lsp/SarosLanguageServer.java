@@ -9,7 +9,6 @@ import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentSyncKind;
-import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 import saros.lsp.extensions.server.ISarosLanguageServer;
 import saros.lsp.extensions.server.account.IAccountService;
@@ -72,29 +71,18 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
     capabilities.setExperimental(true);
     capabilities.setTextDocumentSync(TextDocumentSyncKind.Incremental);
-    // CodeLensOptions clo = new CodeLensOptions();
-    // clo.setResolveProvider(true);
-    // capabilities.setCodeLensProvider(clo);
-    // capabilities.setHoverProvider(true);
-
-    // StaticProgressOptions opts = new StaticProgressOptions();
-    // opts.setWorkDoneProgress(true);
-    // capabilities.setWindow(opts);
 
     return capabilities;
   }
 
   @Override
   public CompletableFuture<Object> shutdown() {
-    LOG.info("shutdown");
     return CompletableFuture.completedFuture(null);
   }
 
   @Override
   public void exit() {
     this.exitListeners.forEach(listener -> listener.run());
-
-    LOG.info("exit");
   }
 
   private List<Runnable> exitListeners = new ArrayList<>();
@@ -109,12 +97,6 @@ public class SarosLanguageServer implements ISarosLanguageServer {
   public void onExit(Runnable runnable) {
     this.exitListeners.add(runnable);
   }
-
-  // @JsonNotification("window/workDoneProgress/cancel")
-  // public void progressCancel(WorkDoneProgressCreateParams p) {
-
-  //   this.cancelManager.cancel(p.token);
-  // }
 
   @Override
   public IDocumentService getTextDocumentService() {

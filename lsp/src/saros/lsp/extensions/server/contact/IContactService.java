@@ -24,7 +24,4 @@ public interface IContactService {
 
   @JsonRequest
   CompletableFuture<SarosResultResponse<ContactDto[]>> getAll(ContactDto request);
-
-  @JsonNotification
-  CompletableFuture<Void> test();
 }

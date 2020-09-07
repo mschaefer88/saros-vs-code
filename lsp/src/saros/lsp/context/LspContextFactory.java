@@ -3,9 +3,9 @@ package saros.lsp.context;
 import org.eclipse.lsp4j.services.WorkspaceService;
 import saros.context.AbstractContextFactory;
 import saros.lsp.SarosLanguageServer;
-import saros.lsp.extensions.server.DocumentServiceStub;
+import saros.lsp.extensions.server.DocumentServiceImpl;
 import saros.lsp.extensions.server.ISarosLanguageServer;
-import saros.lsp.extensions.server.WorkspaceServiceStub;
+import saros.lsp.extensions.server.WorkspaceServiceImpl;
 import saros.lsp.extensions.server.account.AccountService;
 import saros.lsp.extensions.server.account.IAccountService;
 import saros.lsp.extensions.server.contact.ContactService;
@@ -23,7 +23,7 @@ public class LspContextFactory extends AbstractContextFactory {
         container.addComponent(IAccountService.class, AccountService.class);
         container.addComponent(IContactService.class, ContactService.class);
         container.addComponent(ISessionService.class, SessionService.class);
-        container.addComponent(IDocumentService.class, DocumentServiceStub.class);
-        container.addComponent(WorkspaceService.class, WorkspaceServiceStub.class);
+        container.addComponent(IDocumentService.class, DocumentServiceImpl.class);
+        container.addComponent(WorkspaceService.class, WorkspaceServiceImpl.class);
     }
 }

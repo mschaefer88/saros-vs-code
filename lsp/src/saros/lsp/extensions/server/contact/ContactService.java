@@ -4,66 +4,56 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import org.apache.log4j.Logger;
-import saros.account.XMPPAccountStore;
-import saros.communication.connection.ConnectionHandler;
+import java.util.function.BiPredicate;
+
 import saros.lsp.extensions.client.ISarosLanguageClient;
-import saros.lsp.extensions.server.RequireConnection;
 import saros.lsp.extensions.server.SarosResponse;
 import saros.lsp.extensions.server.SarosResultResponse;
 import saros.lsp.extensions.server.SarosService;
 import saros.lsp.extensions.server.contact.dto.ContactDto;
-import saros.monitoring.IProgressMonitor;
+import saros.lsp.ui.UIInteractionManager;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.contact.IContactsUpdate;
 import saros.net.xmpp.contact.XMPPContact;
 import saros.net.xmpp.contact.XMPPContactsService;
 
-public class ContactService extends SarosService
-    implements IContactService, IContactsUpdate { // TODO: get added etc.
+public class ContactService implements IContactService, IContactsUpdate {
 
   private XMPPContactsService contactsService;
+  private ISarosLanguageClient client;
+  private UIInteractionManager interactionManager;
 
-  private IProgressMonitor progressMonitor;
-
-  private static final Logger LOG = Logger.getLogger(ContactService.class);
-
-  public ContactService(
-      XMPPContactsService contactsService,
-      ConnectionHandler connectionHandler,
-      XMPPAccountStore accountStore,
-      ISarosLanguageClient client,
-      IProgressMonitor progressMonitor) {
-    super(connectionHandler, accountStore, client);
+  public ContactService(XMPPContactsService contactsService, ISarosLanguageClient client,
+      UIInteractionManager interactionManager) {
     this.contactsService = contactsService;
-    this.progressMonitor = progressMonitor;
+    this.client = client;
+    this.interactionManager = interactionManager;
 
-    this.contactsService.addListener(this); // TODO: do different!
+    this.contactsService.addListener(this);
   }
 
-  @RequireConnection
   @Override
   public CompletableFuture<SarosResponse> add(ContactDto request) {
 
     CompletableFuture<SarosResponse> c = new CompletableFuture<SarosResponse>();
 
-    Executors.newCachedThreadPool()
-        .submit(
-            () -> {
-              try {
-                this.contactsService.addContact(
-                    new JID(request.id), request.nickname, this.fromUserInput());
+    Executors.newCachedThreadPool().submit(() -> {
+      try {
+        this.contactsService.addContact(new JID(request.id), request.nickname, this.fromUserInput());
 
-                c.complete(new SarosResponse());
-              } catch (Exception e) {
-                c.complete(new SarosResponse(e));
-              }
+        c.complete(new SarosResponse());
+      } catch (Exception e) {
+        c.complete(new SarosResponse(e));
+      }
 
-              return null;
-            });
+      return null;
+    });
 
     return c;
+  }
+
+  private BiPredicate<String, String> fromUserInput() {
+    return (title, message) -> this.interactionManager.getUserInputYesNo(title, message);
   }
 
   @Override
@@ -86,16 +76,10 @@ public class ContactService extends SarosService
   public CompletableFuture<SarosResponse> rename(ContactDto request) {
 
     try {
-      LOG.info("1/7");
       final Optional<XMPPContact> contact = this.contactsService.getContact(request.id);
-
-      LOG.info("2/7");
       if (contact.isPresent()) {
-        LOG.info("3/7");
         this.contactsService.renameContact(contact.get(), request.nickname);
-        LOG.info("4/7");
         this.client.sendStateContact(request);
-        LOG.info("5/7");
       }
     } catch (Exception e) {
       return CompletableFuture.completedFuture(new SarosResponse(e));
@@ -109,22 +93,15 @@ public class ContactService extends SarosService
 
     final List<XMPPContact> contacts = this.contactsService.getAllContacts();
 
-    LOG.info(String.format("Retrieved %d contacts", contacts.size()));
+    final ContactDto[] dtos = contacts.stream().map(contact -> {
+      ContactDto dto = new ContactDto();
+      dto.id = contact.getBareJid().toString();
+      dto.nickname = contact.getDisplayableName();
+      dto.isOnline = contact.getStatus().isOnline();
+      dto.hasSarosSupport = contact.hasSarosSupport();
 
-    final ContactDto[] dtos =
-        contacts
-            .stream()
-            .map(
-                contact -> {
-                  ContactDto dto = new ContactDto();
-                  dto.id = contact.getBareJid().toString(); // TODO: deprecated
-                  dto.nickname = contact.getDisplayableName();
-                  dto.isOnline = contact.getStatus().isOnline();
-                  dto.hasSarosSupport = contact.hasSarosSupport();
-
-                  return dto;
-                })
-            .toArray(size -> new ContactDto[size]);
+      return dto;
+    }).toArray(size -> new ContactDto[size]);
 
     return CompletableFuture.completedFuture(new SarosResultResponse<ContactDto[]>(dtos));
   }
@@ -142,39 +119,5 @@ public class ContactService extends SarosService
 
       this.client.sendStateContact(dto);
     }
-  }
-
-  @Override
-  public CompletableFuture<Void> test() {
-
-    CompletableFuture<Void> c = new CompletableFuture<Void>();
-
-    Executors.newCachedThreadPool()
-        .submit(
-            () -> {
-              this.progressMonitor.subTask("Sub");
-              this.progressMonitor.beginTask("Test", 10);
-
-              TimeUnit.SECONDS.sleep(3);
-              this.progressMonitor.worked(2);
-
-              TimeUnit.SECONDS.sleep(3);
-              this.progressMonitor.worked(4);
-
-              TimeUnit.SECONDS.sleep(3);
-              this.progressMonitor.worked(6);
-
-              TimeUnit.SECONDS.sleep(3);
-              this.progressMonitor.worked(8);
-
-              TimeUnit.SECONDS.sleep(3);
-              this.progressMonitor.worked(10);
-              this.progressMonitor.done();
-
-              c.complete(null);
-              return null;
-            });
-
-    return c;
   }
 }

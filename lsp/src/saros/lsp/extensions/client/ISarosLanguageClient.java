@@ -20,22 +20,21 @@ import saros.lsp.extensions.server.session.dto.SessionUserDto;
  * <p>All client features that aren't covered by the lsp protocol have to be specified here.
  */
 public interface ISarosLanguageClient
-    extends LanguageClient { // TODO: adapter/bridge for better function access aka
-                             // openProject(string) etc.
+    extends LanguageClient {
 
-  @JsonNotification("saros/session/state") // TODO: naming!
-  void sendStateSession(SarosResultResponse<Boolean> r); // TODO: use own notification/type!
+  @JsonNotification("saros/session/state")
+  void sendStateSession(SarosResultResponse<Boolean> isActive);
 
-  @JsonNotification("saros/session/connected") // TODO: naming!
-  void sendStateConnected(SarosResultResponse<Boolean> r); // TODO: use own notification/type!
+  @JsonNotification("saros/connected")
+  void sendStateConnected(SarosResultResponse<Boolean> isConnected);
 
-  @JsonNotification("saros/contact/state") // TODO: naming!
-  void sendStateContact(ContactDto r); // TODO: is Contact here really necessary? Void?
+  @JsonNotification("saros/contact/state")
+  void sendStateContact(ContactDto r);
 
-  @JsonNotification("saros/editor/open") // TODO: request? what if couldn't open?
-  void openEditor(SarosResultResponse<String> path); // TODO: own dto
+  @JsonNotification("saros/editor/open")
+  void openEditor(SarosResultResponse<String> path);
 
-  @JsonNotification("saros/editor/annotate") // TODO: or request?
+  @JsonNotification("saros/editor/annotate") 
   void sendAnnotation(SarosResultResponse<AnnotationParams[]> annotations);
 
   @JsonNotification("saros/session/user-joined")
@@ -45,13 +44,11 @@ public interface ISarosLanguageClient
   void notifyUserChangedSession(SessionUserDto user);
 
   @JsonNotification("saros/session/user-left")
-  void notifyUserLeftSession(SessionUserDto user); // TODO: use own notification/type!
+  void notifyUserLeftSession(SessionUserDto user);
 
   @JsonRequest("window/workDoneProgress/create")
   CompletableFuture<Void> createProgress(WorkDoneProgressCreateParams params);
 
   @JsonNotification("$/progress")
   <T> void progress(ProgressParams<T> params);
-
-  /** Do seperation like: ? @JsonDelegate IAccountService getSarosAccountService(); */
 }

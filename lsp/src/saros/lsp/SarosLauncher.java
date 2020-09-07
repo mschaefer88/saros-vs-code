@@ -29,7 +29,6 @@ import saros.lsp.filesystem.LspPath;
 import saros.lsp.filesystem.LspWorkspace;
 import saros.lsp.filesystem.WorkspacePath;
 import saros.lsp.log.LanguageClientAppender;
-import saros.lsp.log.LogOutputStream;
 
 /** Entry point for the Saros LSP server. */
 public class SarosLauncher implements Callable<Integer> {
@@ -52,10 +51,6 @@ public class SarosLauncher implements Callable<Integer> {
     URL log4jProperties = SarosLauncher.class.getResource(LOGGING_CONFIG_FILE);
     PropertyConfigurator.configure(log4jProperties);
     LogManager.getRootLogger().setLevel(Level.toLevel(logLevel));
-
-    LogOutputStream los = new LogOutputStream(LOG, Level.toLevel(this.logLevel));
-    PrintStream ps = new PrintStream(los);
-    System.setOut(ps);
 
     LOG.info("listening on port " + port);
 
@@ -103,7 +98,7 @@ public class SarosLauncher implements Callable<Integer> {
     ISarosLanguageServer langSvr = lifecycle.createLanguageServer();
     AsynchronousSocketChannel socket = createSocket(serverSocket);
 
-    LOG.info("starting...");
+    LOG.info("starting saros language server...");
 
     Launcher<ISarosLanguageClient> l =
         createSocketLauncher(langSvr, ISarosLanguageClient.class, socket);
@@ -116,39 +111,14 @@ public class SarosLauncher implements Callable<Integer> {
     langSvr.onInitialize(
         params -> {
           try {
-            IWorkspacePath root = new WorkspacePath(new URI(params.getRootUri())); //TODO: handle when nothing came (no workspace)
+            IWorkspacePath root = new WorkspacePath(new URI(params.getRootUri()));
             lifecycle.registerWorkspace(root);
           } catch (URISyntaxException e) {
             LOG.error(e);
           }
         });
 
-    langSvr.onExit(
-        () -> {
-          try {
-
-            LOG.info("removing appender");
-            LOG.removeAppender(a);
-            LOG.info("done");
-            LOG.info("closing old socket");
-            socket.close();
-            LOG.info("closed");
-
-            startLanguageServer(lifecycle, serverSocket);
-          } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-          } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-          } catch (ExecutionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-          }
-        });
-
     l.startListening();
-    LOG.info("CONNECTED");
   }
 
   static AsynchronousSocketChannel createSocket(AsynchronousServerSocketChannel serverSocket)
