@@ -15,7 +15,7 @@ import saros.filesystem.IResource;
 /**
  * Saros language server implementation of {@link IContainer}.
  *
- * @implNote Based on the server implementation.
+ * @implNote Based on the server implementation
  */
 public abstract class LspContainer extends LspResource implements IContainer {
 

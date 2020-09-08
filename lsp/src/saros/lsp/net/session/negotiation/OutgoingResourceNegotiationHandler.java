@@ -9,6 +9,7 @@ import saros.negotiation.ResourceNegotiation;
 import saros.net.util.XMPPUtils;
 import saros.net.xmpp.JID;
 
+/** Handler for outgoing resource negotiations. */
 public class OutgoingResourceNegotiationHandler {
 
   private ISarosLanguageClient client;
@@ -21,6 +22,11 @@ public class OutgoingResourceNegotiationHandler {
     return XMPPUtils.getNickname(null, jid, jid.getBase());
   }
 
+  /**
+   * Handles the outgoing negotiation.
+   * 
+   * @param negotiation The outgoing resource negotiation
+   */
   public void handle(AbstractOutgoingResourceNegotiation negotiation) {
     ResourceNegotiation.Status status = negotiation.run(new ProgressMonitor(this.client));
 
@@ -28,25 +34,32 @@ public class OutgoingResourceNegotiationHandler {
 
     switch (status) {
       case CANCEL:
-        this.sendNotification("Cancelled", MessageType.Warning);
+        this.showMessage("Cancelled", MessageType.Warning);
         break;
       case ERROR:
-        this.sendNotification(negotiation.getErrorMessage(), MessageType.Error);
+        this.showMessage(negotiation.getErrorMessage(), MessageType.Error);
         break;
       case OK:
         break;
       case REMOTE_CANCEL:
-        this.sendNotification(String.format("%s declined", peerName), MessageType.Warning);
+        this.showMessage(String.format("%s declined", peerName), MessageType.Warning);
         break;
       case REMOTE_ERROR:
-        this.sendNotification(
+        this.showMessage(
             String.format("%s had error '$s'", peerName, negotiation.getErrorMessage()),
             MessageType.Error);
         break;
     }
   }
 
-  private void sendNotification(String message, MessageType type) {
+  /**
+   * Sends a message to the client to show it
+   * to the user.
+   * 
+   * @param message The message to show
+   * @param type The type of message
+   */
+  private void showMessage(String message, MessageType type) {
 
     MessageParams messageParams = new MessageParams();
     messageParams.setType(type);

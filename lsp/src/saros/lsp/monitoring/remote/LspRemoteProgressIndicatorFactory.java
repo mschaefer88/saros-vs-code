@@ -6,6 +6,7 @@ import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
 import saros.monitoring.remote.RemoteProgressManager;
 import saros.session.User;
 
+/** Implementation of {@link IRemoteProgressIndicatorFactory}. */
 public class LspRemoteProgressIndicatorFactory implements IRemoteProgressIndicatorFactory {
 
   private ISarosLanguageClient client;

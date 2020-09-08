@@ -1,4 +1,4 @@
-package saros.lsp.interaction;
+package saros.lsp.net;
 
 import java.util.Optional;
 import saros.lsp.ui.UIInteractionManager;
@@ -9,8 +9,8 @@ import saros.net.xmpp.subscription.SubscriptionHandler;
 import saros.net.xmpp.subscription.SubscriptionListener;
 
 /**
- * A component which automatically authorizes all incoming presence subscription requests from
- * contacts.
+ * Authorizer for incoming subscription requests which
+ * will ask the user for consent in that case.
  */
 public class SubscriptionAuthorizer implements SubscriptionListener {
 
@@ -18,11 +18,6 @@ public class SubscriptionAuthorizer implements SubscriptionListener {
   private XMPPContactsService contactsService;
   private UIInteractionManager interactionManager;
 
-  /**
-   * Initializes the SubscriptionAuthorizer.
-   *
-   * @param subscriptionHandler the subscription handler to use
-   */
   public SubscriptionAuthorizer(
       SubscriptionHandler subscriptionHandler,
       XMPPContactsService contactsService,

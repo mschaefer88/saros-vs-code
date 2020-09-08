@@ -1,10 +1,10 @@
-package saros.lsp.interaction.session;
+package saros.lsp.net.session;
 
 import java.util.concurrent.Executors;
-import saros.lsp.interaction.session.negotiation.IncomingResourceNegotiationHandler;
-import saros.lsp.interaction.session.negotiation.IncomingSessionNegotiationHandler;
-import saros.lsp.interaction.session.negotiation.OutgoingResourceNegotiationHandler;
-import saros.lsp.interaction.session.negotiation.OutgoingSessionNegotiationHandler;
+import saros.lsp.net.session.negotiation.IncomingResourceNegotiationHandler;
+import saros.lsp.net.session.negotiation.IncomingSessionNegotiationHandler;
+import saros.lsp.net.session.negotiation.OutgoingResourceNegotiationHandler;
+import saros.lsp.net.session.negotiation.OutgoingSessionNegotiationHandler;
 import saros.negotiation.AbstractIncomingResourceNegotiation;
 import saros.negotiation.AbstractOutgoingResourceNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
@@ -12,6 +12,7 @@ import saros.negotiation.OutgoingSessionNegotiation;
 import saros.session.INegotiationHandler;
 import saros.session.ISarosSessionManager;
 
+/** Implementation of {@link INegotiationHandler}. */
 public class NegotiationHandler implements INegotiationHandler {
 
   private final OutgoingSessionNegotiationHandler outgoingSessionNegotiationHandler;

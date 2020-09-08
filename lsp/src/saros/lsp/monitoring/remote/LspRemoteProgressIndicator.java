@@ -8,6 +8,7 @@ import saros.monitoring.remote.IRemoteProgressIndicator;
 import saros.net.util.XMPPUtils;
 import saros.session.User;
 
+/** Implementation of {@link IRemoteProgressIndicator}. */
 public class LspRemoteProgressIndicator implements IRemoteProgressIndicator {
 
   private final ProgressMonitor progressMonitor;

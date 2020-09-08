@@ -8,6 +8,7 @@ import saros.negotiation.OutgoingSessionNegotiation;
 import saros.negotiation.SessionNegotiation;
 import saros.session.ISarosSessionManager;
 
+/** Handler for outgoing session negotiations. */
 public class OutgoingSessionNegotiationHandler {
   private ISarosLanguageClient client;
   private ISarosSessionManager sessionManager;
@@ -18,6 +19,11 @@ public class OutgoingSessionNegotiationHandler {
     this.sessionManager = sessionManager;
   }
 
+  /**
+   * Handles the outgoing negotiation.
+   * 
+   * @param negotiation The outgoing session negotiation
+   */
   public void handle(OutgoingSessionNegotiation negotiation) {
     SessionNegotiation.Status status = negotiation.start(new ProgressMonitor(this.client));
     switch (status) {
@@ -25,25 +31,32 @@ public class OutgoingSessionNegotiationHandler {
         sessionManager.startSharingReferencePoints(negotiation.getPeer());
         break;
       case ERROR:
-        this.sendNotification(negotiation.getErrorMessage(), MessageType.Error);
+        this.showMessage(negotiation.getErrorMessage(), MessageType.Error);
         break;
       case REMOTE_ERROR:
-        this.sendNotification(
+        this.showMessage(
             negotiation.getErrorMessage() + " at remote: " + negotiation.getPeer(),
             MessageType.Error);
         break;
       case CANCEL:
-        this.sendNotification("Session negotiation was cancelled locally", MessageType.Info);
+        this.showMessage("Session negotiation was cancelled locally", MessageType.Info);
         break;
       case REMOTE_CANCEL:
-        this.sendNotification(
+        this.showMessage(
             "Session negotiation was cancelled by remote: " + negotiation.getPeer(),
             MessageType.Warning);
         break;
     }
   }
 
-  private void sendNotification(String message, MessageType type) {
+  /**
+   * Sends a message to the client to show it
+   * to the user.
+   * 
+   * @param message The message to show
+   * @param type The type of message
+   */
+  private void showMessage(String message, MessageType type) {
 
     MessageParams messageParams = new MessageParams();
     messageParams.setType(type);

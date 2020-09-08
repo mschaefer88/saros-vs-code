@@ -3,6 +3,7 @@ package saros.lsp.ui;
 import java.util.concurrent.Executors;
 import saros.synchronize.UISynchronizer;
 
+/** Implementation of {@link UISynchronizer}. */
 public class UISynchronizerImpl implements UISynchronizer {
 
   @Override

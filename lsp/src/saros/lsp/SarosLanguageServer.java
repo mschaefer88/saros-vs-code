@@ -12,14 +12,13 @@ import org.eclipse.lsp4j.TextDocumentSyncKind;
 import org.eclipse.lsp4j.services.WorkspaceService;
 import saros.lsp.extensions.server.ISarosLanguageServer;
 import saros.lsp.extensions.server.account.IAccountService;
+import saros.lsp.extensions.server.connection.IConnectionService;
 import saros.lsp.extensions.server.contact.IContactService;
 import saros.lsp.extensions.server.document.IDocumentService;
 import saros.lsp.extensions.server.session.ISessionService;
 
-/** Implmenentation of the Saros language server. */
+/** Implmenentation of {@link ISarosLanguageServer}. */
 public class SarosLanguageServer implements ISarosLanguageServer {
-
-  private static final Logger LOG = Logger.getLogger(SarosLanguageServer.class);
 
   private IAccountService accountService;
 
@@ -31,16 +30,16 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
   private WorkspaceService workspaceService;
 
-  public SarosLanguageServer(
-      IAccountService accountService,
-      IContactService contactService,
-      ISessionService sessionService,
-      IDocumentService documentService,
+  private IConnectionService connectionService;
+
+  public SarosLanguageServer(IAccountService accountService, IContactService contactService,
+      ISessionService sessionService, IDocumentService documentService, IConnectionService connectionService,
       WorkspaceService workspaceService) {
     this.accountService = accountService;
     this.contactService = contactService;
     this.sessionService = sessionService;
     this.documentService = documentService;
+    this.connectionService = connectionService;
     this.workspaceService = workspaceService;
   }
 
@@ -121,5 +120,10 @@ public class SarosLanguageServer implements ISarosLanguageServer {
   @Override
   public ISessionService getSarosSessionService() {
     return this.sessionService;
+  }
+
+  @Override
+  public IConnectionService getSarosConnectionService() {
+    return this.connectionService;
   }
 }

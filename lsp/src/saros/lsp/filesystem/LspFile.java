@@ -16,7 +16,7 @@ import saros.filesystem.IPath;
 /**
  * Saros language server implementation of {@link IFile}.
  *
- * @implNote Based on the server implementation.
+ * @implNote Based on the server implementation
  */
 public class LspFile extends LspResource implements IFile {
 

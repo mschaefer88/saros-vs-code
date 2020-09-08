@@ -26,7 +26,7 @@ import saros.lsp.filesystem.IWorkspacePath;
 import saros.lsp.filesystem.WorkspacePath;
 import saros.lsp.log.LanguageClientAppender;
 
-/** Entry point for the Saros LSP server. */
+/** Entry point for the Saros language server. */
 public class SarosLauncher implements Callable<Integer> {
 
   private static final Logger LOG = Logger.getLogger(SarosLauncher.class);
@@ -44,29 +44,23 @@ public class SarosLauncher implements Callable<Integer> {
 
   @Override
   public Integer call() throws Exception {
-    URL log4jProperties = SarosLauncher.class.getResource(LOGGING_CONFIG_FILE);
+    final URL log4jProperties = SarosLauncher.class.getResource(LOGGING_CONFIG_FILE);
     PropertyConfigurator.configure(log4jProperties);
     LogManager.getRootLogger().setLevel(Level.toLevel(logLevel));
 
     LOG.info("listening on port " + port);
 
-    AsynchronousServerSocketChannel serverSocket =
+    final AsynchronousServerSocketChannel serverSocket =
         AsynchronousServerSocketChannel.open().bind(new InetSocketAddress("localhost", port));
 
-    SarosLifecycle lifecycle = new SarosLifecycle();
+    final SarosLifecycle lifecycle = new SarosLifecycle();
 
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread() {
+              @Override()
               public void run() {
-                // try {
-                // socket.close();
-
-                LOG.info("shutdown from runtime detected");
                 lifecycle.stop();
-                // } catch (IOException e) {
-                // // NOP
-                // }
               }
             });
 
@@ -78,31 +72,38 @@ public class SarosLauncher implements Callable<Integer> {
   }
 
   /**
-   * Starts the server.
+   * Starts the Saros language server.
    *
    * @param args command-line arguments
    * @throws Exception on critical failures
    */
-  public static void main(String... args) {
+  public static void main(final String... args) {
     new CommandLine(new SarosLauncher()).execute(args);
   }
 
+  /**
+   * Starts the Saros language server.
+   * 
+   * @param lifecycle The lifecycle of Saros
+   * @param serverSocket The used socket for a client connection
+   * @throws IOException
+   * @throws InterruptedException
+   * @throws ExecutionException
+   */
   private void startLanguageServer(
-      SarosLifecycle lifecycle, AsynchronousServerSocketChannel serverSocket)
+      final SarosLifecycle lifecycle, final AsynchronousServerSocketChannel serverSocket)
       throws IOException, InterruptedException, ExecutionException {
 
-    ISarosLanguageServer langSvr = lifecycle.createLanguageServer();
-    AsynchronousSocketChannel socket = createSocket(serverSocket);
+    final ISarosLanguageServer langSvr = lifecycle.getLanguageServer();
+    final AsynchronousSocketChannel socket = createSocket(serverSocket);
 
     LOG.info("starting saros language server...");
 
-    Launcher<ISarosLanguageClient> l =
-        createSocketLauncher(langSvr, ISarosLanguageClient.class, socket);
-    ISarosLanguageClient langClt = lifecycle.registerLanguageClient(l.getRemoteProxy());
+    final Launcher<ISarosLanguageClient> l =
+        createClientLauncher(langSvr, ISarosLanguageClient.class, socket);
+    final ISarosLanguageClient langClt = lifecycle.registerLanguageClient(l.getRemoteProxy());
 
-    LanguageClientAppender a = new LanguageClientAppender(langClt);
-    a.setThreshold(Level.toLevel(this.logLevel));
-    LOG.addAppender(a);
+    registerClientLogger(langClt);
 
     langSvr.onInitialize(
         params -> {
@@ -117,21 +118,44 @@ public class SarosLauncher implements Callable<Integer> {
     l.startListening();
   }
 
-  static AsynchronousSocketChannel createSocket(AsynchronousServerSocketChannel serverSocket)
+  /**
+   * Registers a log appender that logs to the
+   * Saros language client.
+   * 
+   * @param client The Saros language client
+   */
+  private void registerClientLogger(final ISarosLanguageClient client) {
+    final LanguageClientAppender a = new LanguageClientAppender(client);
+    a.setThreshold(Level.toLevel(this.logLevel));
+    LOG.addAppender(a);
+  }
+
+  /**
+   * Creates a server socket for receiving Saros language client
+   * connections and waits for the client to connect.
+   * 
+   * @param socketChannel The used socket channel
+   * @return  The socket channel with a client connection
+   * @throws IOException
+   * @throws InterruptedException
+   * @throws ExecutionException
+   */
+  static AsynchronousSocketChannel createSocket(final AsynchronousServerSocketChannel socketChannel)
       throws IOException, InterruptedException, ExecutionException {
 
     AsynchronousSocketChannel socketChannel;
 
-    socketChannel = serverSocket.accept().get();
+    socketChannel = socketChannel.accept().get();
 
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread() {
+              @Override()
               public void run() {
                 try {
                   LOG.info("shutdown from runtime detected");
                   socketChannel.close();
-                } catch (IOException e) {
+                } catch (final IOException e) {
                   // NOP
                 }
               }
@@ -140,17 +164,28 @@ public class SarosLauncher implements Callable<Integer> {
     return socketChannel;
   }
 
-  static <T> Launcher<T> createSocketLauncher(
-      Object localService, Class<T> remoteInterface, AsynchronousSocketChannel socketChannel)
+  /**
+   * Creates the launcher of the language client that
+   * will allow communications to the client.
+   * 
+   * @param <T> Type of the client
+   * @param languageServer The local service endpoint
+   * @param remoteInterface The class of the client
+   * @param socketChannel The used socket channel for communication
+   * @return The launcher for the specified language client
+   * @throws IOException
+   */
+  static <T> Launcher<T> createClientLauncher(
+      final Object languageServer, final Class<T> remoteInterface, final AsynchronousSocketChannel socketChannel)
       throws IOException {
-    Function<MessageConsumer, MessageConsumer> wrapper =
+    final Function<MessageConsumer, MessageConsumer> wrapper =
         consumer -> {
-          MessageConsumer result = consumer;
+          final MessageConsumer result = consumer;
           return result;
         };
 
     return Launcher.createIoLauncher(
-        localService,
+        languageServer,
         remoteInterface,
         Channels.newInputStream(socketChannel),
         Channels.newOutputStream(socketChannel),

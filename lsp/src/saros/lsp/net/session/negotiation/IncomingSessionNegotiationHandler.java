@@ -13,6 +13,7 @@ import saros.net.xmpp.JID;
 import saros.net.xmpp.contact.XMPPContact;
 import saros.net.xmpp.contact.XMPPContactsService;
 
+/** Handler for incoming session negotiations. */
 public class IncomingSessionNegotiationHandler {
   private XMPPContactsService contactService;
   private ISarosLanguageClient client;
@@ -27,6 +28,11 @@ public class IncomingSessionNegotiationHandler {
     this.interactionManager = interactionManager;
   }
 
+  /**
+   * Handles the incoming negotiation.
+   * 
+   * @param negotiation The incoming session negotiation
+   */
   public void handle(IncomingSessionNegotiation negotiation) {
     if (!this.AskAcceptInvite(negotiation)) {
       negotiation.localCancel("Declined", CancelOption.NOTIFY_PEER);
@@ -37,13 +43,13 @@ public class IncomingSessionNegotiationHandler {
           break;
         case CANCEL:
         case ERROR:
-          this.sendNotification(
+          this.showMessage(
               negotiation.getErrorMessage() + " at remote: " + negotiation.getPeer(),
               MessageType.Error);
           break;
         case REMOTE_CANCEL:
         case REMOTE_ERROR:
-          this.sendNotification(
+          this.showMessage(
               "Session negotiation was cancelled by remote: " + negotiation.getPeer().toString(),
               MessageType.Warning);
           break;
@@ -51,7 +57,14 @@ public class IncomingSessionNegotiationHandler {
     }
   }
 
-  private void sendNotification(String message, MessageType type) {
+  /**
+   * Sends a message to the client to show it
+   * to the user.
+   * 
+   * @param message The message to show
+   * @param type The type of message
+   */
+  private void showMessage(String message, MessageType type) {
 
     MessageParams messageParams = new MessageParams();
     messageParams.setType(type);
@@ -60,6 +73,14 @@ public class IncomingSessionNegotiationHandler {
     this.client.showMessage(messageParams);
   }
 
+  /**
+   * Asks the user wether the invite should be
+   * accepted or not.
+   * 
+   * @param negotiation The incoming negotiation
+   * @return <i>true</i> if the invite is accepted,
+   * <i>false</i> otherwise.
+   */
   private boolean AskAcceptInvite(IncomingSessionNegotiation negotiation) {
     JID peer = negotiation.getPeer();
     Optional<XMPPContact> invitingContact = this.contactService.getContact(peer.getBase());

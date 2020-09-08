@@ -9,7 +9,7 @@ import saros.filesystem.IReferencePoint;
 /**
  * Saros language server implementation of {@link IReferencePoint}.
  *
- * @implNote Based on the server implementation.
+ * @implNote Based on the server implementation
  */
 public class LspReferencePoint extends LspContainer implements IReferencePoint {
 

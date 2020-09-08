@@ -16,6 +16,7 @@ import saros.negotiation.NegotiationTools.CancelOption;
 import saros.negotiation.ResourceNegotiation;
 import saros.negotiation.ResourceNegotiationData;
 
+/** Handler for incoming resource negotiations. */
 public class IncomingResourceNegotiationHandler {
 
   private static final Logger LOG = Logger.getLogger(IncomingResourceNegotiationHandler.class);
@@ -29,6 +30,11 @@ public class IncomingResourceNegotiationHandler {
     this.client = client;
   }
 
+  /**
+   * Handles the incoming negotiation.
+   * 
+   * @param negotiation The incoming resource negotiation
+   */
   public void handle(final AbstractIncomingResourceNegotiation negotiation) {
 
     final Map<String, IReferencePoint> projectMapping = new HashMap<>();
@@ -53,11 +59,18 @@ public class IncomingResourceNegotiationHandler {
     final ResourceNegotiation.Status status =
         negotiation.run(projectMapping, new ProgressMonitor(this.client));
     if (status != ResourceNegotiation.Status.OK) {
-      this.sendNotification(negotiation.getErrorMessage(), MessageType.Error);
+      this.showMessage(negotiation.getErrorMessage(), MessageType.Error);
     }
   }
 
-  private void sendNotification(String message, MessageType type) {
+  /**
+   * Sends a message to the client to show it
+   * to the user.
+   * 
+   * @param message The message to show
+   * @param type The type of message
+   */
+  private void showMessage(String message, MessageType type) {
 
     MessageParams messageParams = new MessageParams();
     messageParams.setType(type);

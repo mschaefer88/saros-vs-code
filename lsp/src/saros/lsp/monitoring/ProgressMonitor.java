@@ -9,6 +9,7 @@ import saros.lsp.extensions.client.dto.WorkDoneProgressEnd;
 import saros.lsp.extensions.client.dto.WorkDoneProgressReport;
 import saros.monitoring.IProgressMonitor;
 
+/** Implementation of {@link IProgressMonitor}. */
 public class ProgressMonitor implements IProgressMonitor {
 
   private ISarosLanguageClient client;

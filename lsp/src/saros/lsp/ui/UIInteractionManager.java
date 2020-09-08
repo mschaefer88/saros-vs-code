@@ -8,6 +8,7 @@ import org.eclipse.lsp4j.MessageType;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 
+/** A manager that provides methods to request user input. */
 public class UIInteractionManager {
 
   private ISarosLanguageClient client;
@@ -16,6 +17,15 @@ public class UIInteractionManager {
     this.client = client;
   }
 
+  /**
+   * Shows the user a message with a choice between
+   * yes and no to answer.
+   * 
+   * @param title The title of the message to show
+   * @param message The actual message
+   * @return <i>true</i> if the user responds with <b>yes</b>
+   * and <i>false</i> otherwise
+   */
   public boolean getUserInputYesNo(final String title, final String message) {
 
     final MessageActionItem yes = new MessageActionItem("yes");

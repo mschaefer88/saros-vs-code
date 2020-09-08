@@ -12,7 +12,7 @@ import saros.filesystem.IPath;
 /**
  * Saros language server implementation of {@link IFolder}.
  *
- * @implNote Based on the server implementation.
+ * @implNote Based on the server implementation
  */
 public class LspFolder extends LspContainer implements IFolder {
   public LspFolder(IWorkspacePath workspace, IPath path) {

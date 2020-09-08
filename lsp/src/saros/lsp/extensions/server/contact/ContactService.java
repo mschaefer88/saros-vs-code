@@ -92,7 +92,7 @@ public class ContactService implements IContactService, IContactsUpdate {
   }
 
   @Override
-  public CompletableFuture<SarosResultResponse<ContactDto[]>> getAll(ContactDto request) {
+  public CompletableFuture<SarosResultResponse<ContactDto[]>> getAll() {
 
     final List<XMPPContact> contacts = this.contactsService.getAllContacts();
 

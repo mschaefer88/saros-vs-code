@@ -17,6 +17,7 @@ import saros.util.StackTrace;
  * This class contains static utility methods for file handling.
  *
  * @author orieger/chjacob
+ * @implNote Taken from the server implementation
  */
 public class FileUtils { // TODO: still used?
 
