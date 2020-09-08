@@ -21,9 +21,8 @@ public class ShowMessageParams extends ShowMessageRequestParams {
   }
 
   /**
-   * Creates the action items the user can choose from on client side
-   * based on their labels.
-   * 
+   * Creates the action items the user can choose from on client side based on their labels.
+   *
    * @param actions The labels of the action items
    * @return ActionItems as specified by the language server protocol
    */

@@ -8,10 +8,7 @@ import saros.lsp.extensions.server.SarosResultResponse;
 import saros.lsp.extensions.server.account.dto.AccountDto;
 import saros.lsp.extensions.server.account.dto.AccountIdDto;
 
-/** 
- * Interface of the account service that is responsible for 
- * everything account related.
- */
+/** Interface of the account service that is responsible for everything account related. */
 @JsonSegment("saros/account")
 public interface IAccountService {
 
@@ -19,48 +16,42 @@ public interface IAccountService {
    * Adds an existing account to the account store.
    *
    * @param input The account to add
-   * @return A future with a result indicating if the request
-   * has been succesfull or not
+   * @return A future with a result indicating if the request has been succesfull or not
    */
   @JsonRequest
   CompletableFuture<SarosResponse> add(AccountDto input);
 
   /**
    * Updates an existing account in the account store.
-   * 
+   *
    * @param input The account to update
-   * @return A future with a result indicating if the request
-   * has been succesfull or not
+   * @return A future with a result indicating if the request has been succesfull or not
    */
   @JsonRequest
   CompletableFuture<SarosResponse> update(AccountDto input);
 
   /**
    * Removes an existing account from the account store.
-   * 
+   *
    * @param input The account to remove
-   * @return A future with a result indicating if the request
-   * has been succesfull or not
+   * @return A future with a result indicating if the request has been succesfull or not
    */
   @JsonRequest
   CompletableFuture<SarosResponse> remove(AccountIdDto input);
 
   /**
-   * Sets an account as active, ie. it's used when
-   * connecting to the XMPP server.
-   * 
+   * Sets an account as active, ie. it's used when connecting to the XMPP server.
+   *
    * @param input The account to set active
-   * @return A future with a result indicating if the request
-   * has been succesfull or not
+   * @return A future with a result indicating if the request has been succesfull or not
    */
   @JsonRequest
   CompletableFuture<SarosResponse> setActive(AccountIdDto input);
 
   /**
    * Gets all accounts from the account store.
-   * 
-   * @return A future with a result containing all accounts
-   * from the account store
+   *
+   * @return A future with a result containing all accounts from the account store
    */
   @JsonRequest
   CompletableFuture<SarosResultResponse<AccountDto[]>> getAll();

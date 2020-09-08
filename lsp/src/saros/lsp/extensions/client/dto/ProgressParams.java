@@ -2,9 +2,9 @@ package saros.lsp.extensions.client.dto;
 
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
-/** 
+/**
  * ProgressParams implementation of the language server protocol.
- * 
+ *
  * @see https://microsoft.github.io/language-server-protocol/specification#progress
  * @param <T> Progress payload
  */

@@ -1,8 +1,8 @@
 package saros.lsp.extensions.client.dto;
 
-/** 
+/**
  * WorkDoneProgressEnd implementation of the language server protocol.
- * 
+ *
  * @see https://microsoft.github.io/language-server-protocol/specification#workDoneProgressEnd
  */
 public class WorkDoneProgressEnd {

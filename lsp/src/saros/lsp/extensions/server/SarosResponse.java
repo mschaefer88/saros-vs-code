@@ -2,10 +2,9 @@ package saros.lsp.extensions.server;
 
 import org.apache.log4j.Logger;
 
-/** 
- * A generic response for requests that indicate
- * either success or failure and have no return
- * value itself.
+/**
+ * A generic response for requests that indicate either success or failure and have no return value
+ * itself.
  */
 public class SarosResponse {
   public boolean success;

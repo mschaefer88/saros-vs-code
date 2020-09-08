@@ -36,20 +36,17 @@ public interface ISarosLanguageServer extends LanguageServer {
   IConnectionService getSarosConnectionService();
 
   /**
-   * Registers a {@link Runnable} that will be executed
-   * when the server exits.
-   * 
+   * Registers a {@link Runnable} that will be executed when the server exits.
+   *
    * @param runnable {@link Runnable} to execute upon exit
    */
   void onExit(Runnable runnable);
 
   /**
-   * Registers a {@link Consumer} that will
-   * be executed when the server initializes.
-   * 
-   * @param consumer {@link Consumer} that takes the
-   * {@link InitializeParams} and will be executed
-   * upon initialization.
+   * Registers a {@link Consumer} that will be executed when the server initializes.
+   *
+   * @param consumer {@link Consumer} that takes the {@link InitializeParams} and will be executed
+   *     upon initialization.
    */
   void onInitialize(Consumer<InitializeParams> consumer);
 

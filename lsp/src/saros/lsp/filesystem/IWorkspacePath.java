@@ -7,9 +7,8 @@ import saros.filesystem.IReferencePoint;
 public interface IWorkspacePath extends IPath {
 
   /**
-   * Gets the {@link IReferencePoint} from within
-   * the workspace.
-   * 
+   * Gets the {@link IReferencePoint} from within the workspace.
+   *
    * @param name Name of the {@link IReferencePoint}
    * @return The {@link IReferencePoint} with the given name
    */

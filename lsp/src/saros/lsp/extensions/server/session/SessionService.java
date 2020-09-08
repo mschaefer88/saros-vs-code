@@ -18,8 +18,7 @@ import saros.session.ISarosSessionManager;
 import saros.session.ISessionLifecycleListener;
 import saros.session.SessionEndReason;
 
-public class SessionService
-    implements ISessionService, ISessionLifecycleListener {
+public class SessionService implements ISessionService, ISessionLifecycleListener {
 
   private final ISarosSessionManager sessionManager;
   private final ISarosLanguageClient client;

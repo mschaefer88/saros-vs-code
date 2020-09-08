@@ -1,9 +1,6 @@
 package saros.lsp.extensions.server.account.dto;
 
-/** 
- * The dto represents an account which is used for connecting
- * to a XMPP server.
- */
+/** The dto represents an account which is used for connecting to a XMPP server. */
 public class AccountDto {
   public String username;
 

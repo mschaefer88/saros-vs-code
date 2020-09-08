@@ -10,8 +10,7 @@ import saros.lsp.extensions.server.SarosResponse;
 import saros.lsp.extensions.server.SarosResultResponse;
 import saros.net.ConnectionState;
 
-public class ConnectionService
-    implements IConnectionService, IConnectionStateListener {
+public class ConnectionService implements IConnectionService, IConnectionStateListener {
 
   private final ConnectionHandler connectionHandler;
   private final XMPPAccountStore accountStore;

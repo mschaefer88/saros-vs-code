@@ -14,10 +14,7 @@ import saros.session.ISessionListener;
 import saros.session.SessionEndReason;
 import saros.session.User;
 
-/**
- * Handler responsible for listening to session status changes
- * and reporting them to the user.
- */
+/** Handler responsible for listening to session status changes and reporting them to the user. */
 public class SessionStatusHandler {
 
   private XMPPContactsService contactsService;
@@ -98,7 +95,7 @@ public class SessionStatusHandler {
 
   /**
    * Creates the dto send to the client representing a user.
-   * 
+   *
    * @param user The user of the session whose state has changed
    * @return The dto representing the user
    */

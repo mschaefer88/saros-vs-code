@@ -13,10 +13,9 @@ import saros.lsp.utils.FileUtils;
 import saros.session.AbstractActivityConsumer;
 import saros.session.ISarosSession;
 
-/** 
- * The ActivityHandler is responsible for receiving activities
- * regarding file/folder creations and deletions and applying them
- * to the local workspace.
+/**
+ * The ActivityHandler is responsible for receiving activities regarding file/folder creations and
+ * deletions and applying them to the local workspace.
  */
 public class FileActivityHandler extends AbstractActivityConsumer {
   private static final Logger LOG = Logger.getLogger(FileActivityHandler.class);
@@ -63,7 +62,7 @@ public class FileActivityHandler extends AbstractActivityConsumer {
 
   /**
    * Applies the received deletion of a file or folder.
-   * 
+   *
    * @param fileActivity {@link FileActivity} of type {@link FileActivity#Type} REMOVED
    */
   private void handleDelete(final FileActivity fileActivity) {
@@ -81,7 +80,7 @@ public class FileActivityHandler extends AbstractActivityConsumer {
 
   /**
    * Applies the received creation of a file or folder.
-   * 
+   *
    * @param fileActivity {@link FileActivity} of type {@link FileActivity#Type} CREATED
    */
   private void handleCreate(final FileActivity fileActivity) {

@@ -64,12 +64,11 @@ public class IncomingSessionNegotiationHandler {
     JID peer = negotiation.getPeer();
     Optional<XMPPContact> invitingContact = this.contactService.getContact(peer.getBase());
     String inviteeName =
-        invitingContact.isPresent()
-            ? invitingContact.get().getDisplayableName()
-            : peer.getName();
+        invitingContact.isPresent() ? invitingContact.get().getDisplayableName() : peer.getName();
     String sessionDescription = negotiation.getDescription();
 
     return this.interactionManager.getUserInputYesNo(
-        String.format("'%s' invited you to the session '%s'", inviteeName, sessionDescription), "Accept?");
+        String.format("'%s' invited you to the session '%s'", inviteeName, sessionDescription),
+        "Accept?");
   }
 }

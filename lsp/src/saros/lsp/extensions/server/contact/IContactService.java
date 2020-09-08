@@ -7,48 +7,41 @@ import saros.lsp.extensions.server.SarosResponse;
 import saros.lsp.extensions.server.SarosResultResponse;
 import saros.lsp.extensions.server.contact.dto.ContactDto;
 
-/** 
- * Interface of the contact service that is responsible for 
- * everything XMPP connection related.
- */
+/** Interface of the contact service that is responsible for everything XMPP connection related. */
 @JsonSegment("saros/contact")
 public interface IContactService {
 
   /**
-   *  Adds a contact to the contact list.
-   * 
+   * Adds a contact to the contact list.
+   *
    * @param input The contact to add
-   * @return A future with a result indicating if the request
-   * has been succesfull or not
+   * @return A future with a result indicating if the request has been succesfull or not
    */
   @JsonRequest
   CompletableFuture<SarosResponse> add(ContactDto input);
 
   /**
    * Removes a contact from the contact list.
-   * 
+   *
    * @param input The contact to remove
-   * @return A future with a result indicating if the request
-   * has been succesfull or not
+   * @return A future with a result indicating if the request has been succesfull or not
    */
   @JsonRequest
   CompletableFuture<SarosResponse> remove(ContactDto input);
 
   /**
    * Renames a contact on the contact list.
-   * 
+   *
    * @param input The contact to rename
-   * @return A future with a result indicating if the request
-   * has been succesfull or not
+   * @return A future with a result indicating if the request has been succesfull or not
    */
   @JsonRequest
   CompletableFuture<SarosResponse> rename(ContactDto input);
 
   /**
    * Gets all contacts from the contact list.
-   * 
-   * @return A future with a result containing all contacts
-   * from the contact list
+   *
+   * @return A future with a result containing all contacts from the contact list
    */
   @JsonRequest
   CompletableFuture<SarosResultResponse<ContactDto[]>> getAll();
