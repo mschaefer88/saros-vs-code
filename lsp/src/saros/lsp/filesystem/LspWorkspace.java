@@ -8,6 +8,7 @@ import saros.filesystem.IWorkspaceRunnable;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.monitoring.ProgressMonitor;
 
+/** Saros language server implementation of {@link IWorkspace}. */
 public class LspWorkspace implements IWorkspace {
 
   private ISarosLanguageClient client;

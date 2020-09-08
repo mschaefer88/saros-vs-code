@@ -6,6 +6,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import saros.filesystem.IPath;
 
+/** 
+ * Saros language server implementation of {@link IPath}.
+ * 
+ * @implNote Based on the server implementation.
+ */
 public class LspPath implements IPath {
   private Path delegate;
 

@@ -13,6 +13,11 @@ import org.apache.log4j.Logger;
 import saros.filesystem.IFile;
 import saros.filesystem.IPath;
 
+/** 
+ * Saros language server implementation of {@link IFile}.
+ * 
+ * @implNote Based on the server implementation.
+ */
 public class LspFile extends LspResource implements IFile {
 
   private final Logger LOG = Logger.getLogger(LspFile.class);

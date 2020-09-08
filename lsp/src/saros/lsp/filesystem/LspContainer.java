@@ -12,6 +12,11 @@ import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IResource;
 
+/** 
+ * Saros language server implementation of {@link IContainer}.
+ * 
+ * @implNote Based on the server implementation.
+ */
 public abstract class LspContainer extends LspResource implements IContainer {
 
   public LspContainer(IWorkspacePath workspace, IPath path) {

@@ -3,6 +3,7 @@ package saros.lsp.filesystem;
 import saros.filesystem.IPath;
 import saros.filesystem.IPathFactory;
 
+/** Saros language server implementation of {@link IPathFactory}. */
 public class PathFactory implements IPathFactory {
 
   @Override

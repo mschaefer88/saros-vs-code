@@ -4,6 +4,7 @@ import java.net.URI;
 import java.nio.file.Paths;
 import saros.filesystem.IReferencePoint;
 
+/** Implementation of {@link IWorkspacePath}. */
 public class WorkspacePath extends LspPath implements IWorkspacePath {
   public WorkspacePath(URI path) {
     super(Paths.get(path));

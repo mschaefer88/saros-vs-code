@@ -7,6 +7,11 @@ import saros.filesystem.IPath;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 
+/** 
+ * Saros language server implementation of {@link IResource}.
+ * 
+ * @implNote Based on the server implementation.
+ */
 public abstract class LspResource implements IResource {
   private IWorkspacePath workspace;
   private IPath path;

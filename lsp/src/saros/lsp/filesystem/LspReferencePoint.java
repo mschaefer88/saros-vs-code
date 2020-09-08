@@ -6,6 +6,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import saros.filesystem.IReferencePoint;
 
+/** 
+ * Saros language server implementation of {@link IReferencePoint}.
+ * 
+ * @implNote Based on the server implementation.
+ */
 public class LspReferencePoint extends LspContainer implements IReferencePoint {
 
   public LspReferencePoint(IWorkspacePath workspace, String name) {
