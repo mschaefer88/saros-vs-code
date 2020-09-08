@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.ServerCapabilities;
@@ -32,8 +31,12 @@ public class SarosLanguageServer implements ISarosLanguageServer {
 
   private IConnectionService connectionService;
 
-  public SarosLanguageServer(IAccountService accountService, IContactService contactService,
-      ISessionService sessionService, IDocumentService documentService, IConnectionService connectionService,
+  public SarosLanguageServer(
+      IAccountService accountService,
+      IContactService contactService,
+      ISessionService sessionService,
+      IDocumentService documentService,
+      IConnectionService connectionService,
       WorkspaceService workspaceService) {
     this.accountService = accountService;
     this.contactService = contactService;

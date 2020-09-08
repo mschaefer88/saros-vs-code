@@ -18,13 +18,11 @@ public class UIInteractionManager {
   }
 
   /**
-   * Shows the user a message with a choice between
-   * yes and no to answer.
-   * 
+   * Shows the user a message with a choice between yes and no to answer.
+   *
    * @param title The title of the message to show
    * @param message The actual message
-   * @return <i>true</i> if the user responds with <b>yes</b>
-   * and <i>false</i> otherwise
+   * @return <i>true</i> if the user responds with <b>yes</b> and <i>false</i> otherwise
    */
   public boolean getUserInputYesNo(final String title, final String message) {
 

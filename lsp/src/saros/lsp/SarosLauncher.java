@@ -83,7 +83,7 @@ public class SarosLauncher implements Callable<Integer> {
 
   /**
    * Starts the Saros language server.
-   * 
+   *
    * @param lifecycle The lifecycle of Saros
    * @param serverSocket The used socket for a client connection
    * @throws IOException
@@ -119,9 +119,8 @@ public class SarosLauncher implements Callable<Integer> {
   }
 
   /**
-   * Registers a log appender that logs to the
-   * Saros language client.
-   * 
+   * Registers a log appender that logs to the Saros language client.
+   *
    * @param client The Saros language client
    */
   private void registerClientLogger(final ISarosLanguageClient client) {
@@ -131,11 +130,11 @@ public class SarosLauncher implements Callable<Integer> {
   }
 
   /**
-   * Creates a server socket for receiving Saros language client
-   * connections and waits for the client to connect.
-   * 
+   * Creates a server socket for receiving Saros language client connections and waits for the
+   * client to connect.
+   *
    * @param socketChannel The used socket channel
-   * @return  The socket channel with a client connection
+   * @return The socket channel with a client connection
    * @throws IOException
    * @throws InterruptedException
    * @throws ExecutionException
@@ -165,9 +164,8 @@ public class SarosLauncher implements Callable<Integer> {
   }
 
   /**
-   * Creates the launcher of the language client that
-   * will allow communications to the client.
-   * 
+   * Creates the launcher of the language client that will allow communications to the client.
+   *
    * @param <T> Type of the client
    * @param languageServer The local service endpoint
    * @param remoteInterface The class of the client
@@ -176,7 +174,9 @@ public class SarosLauncher implements Callable<Integer> {
    * @throws IOException
    */
   static <T> Launcher<T> createClientLauncher(
-      final Object languageServer, final Class<T> remoteInterface, final AsynchronousSocketChannel socketChannel)
+      final Object languageServer,
+      final Class<T> remoteInterface,
+      final AsynchronousSocketChannel socketChannel)
       throws IOException {
     final Function<MessageConsumer, MessageConsumer> wrapper =
         consumer -> {

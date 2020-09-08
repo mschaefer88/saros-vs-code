@@ -32,7 +32,7 @@ public class IncomingResourceNegotiationHandler {
 
   /**
    * Handles the incoming negotiation.
-   * 
+   *
    * @param negotiation The incoming resource negotiation
    */
   public void handle(final AbstractIncomingResourceNegotiation negotiation) {
@@ -64,9 +64,8 @@ public class IncomingResourceNegotiationHandler {
   }
 
   /**
-   * Sends a message to the client to show it
-   * to the user.
-   * 
+   * Sends a message to the client to show it to the user.
+   *
    * @param message The message to show
    * @param type The type of message
    */

@@ -21,7 +21,7 @@ public class OutgoingSessionNegotiationHandler {
 
   /**
    * Handles the outgoing negotiation.
-   * 
+   *
    * @param negotiation The outgoing session negotiation
    */
   public void handle(OutgoingSessionNegotiation negotiation) {
@@ -50,9 +50,8 @@ public class OutgoingSessionNegotiationHandler {
   }
 
   /**
-   * Sends a message to the client to show it
-   * to the user.
-   * 
+   * Sends a message to the client to show it to the user.
+   *
    * @param message The message to show
    * @param type The type of message
    */

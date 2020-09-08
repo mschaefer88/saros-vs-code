@@ -24,7 +24,7 @@ public class OutgoingResourceNegotiationHandler {
 
   /**
    * Handles the outgoing negotiation.
-   * 
+   *
    * @param negotiation The outgoing resource negotiation
    */
   public void handle(AbstractOutgoingResourceNegotiation negotiation) {
@@ -53,9 +53,8 @@ public class OutgoingResourceNegotiationHandler {
   }
 
   /**
-   * Sends a message to the client to show it
-   * to the user.
-   * 
+   * Sends a message to the client to show it to the user.
+   *
    * @param message The message to show
    * @param type The type of message
    */

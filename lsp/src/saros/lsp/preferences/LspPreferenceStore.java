@@ -13,9 +13,9 @@ import java.util.InvalidPropertiesFormatException;
 import org.apache.log4j.Logger;
 import saros.preferences.PreferenceStore;
 
-/** 
+/**
  * Preference store of the Saros language server.
- * 
+ *
  * @implNote Based on the server implementation
  */
 public class LspPreferenceStore extends PreferenceStore {

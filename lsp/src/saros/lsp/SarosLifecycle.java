@@ -38,7 +38,7 @@ public class SarosLifecycle extends AbstractContextLifecycle {
 
   /**
    * Gets the instance of the Saros language server.
-   * 
+   *
    * @return The Saros language server
    */
   public ISarosLanguageServer getLanguageServer() {
@@ -47,7 +47,7 @@ public class SarosLifecycle extends AbstractContextLifecycle {
 
   /**
    * Registers the used Saros language client instance.
-   * 
+   *
    * @param client The Saros language client that is connected
    * @return The registered Saros language client
    */
@@ -59,9 +59,8 @@ public class SarosLifecycle extends AbstractContextLifecycle {
   }
 
   /**
-   * Registers the workspace path the Saros language server
-   * is responsible for.
-   * 
+   * Registers the workspace path the Saros language server is responsible for.
+   *
    * @param workspace The used workspace
    * @return The registered workspace path
    */

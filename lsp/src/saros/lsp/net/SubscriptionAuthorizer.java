@@ -9,8 +9,7 @@ import saros.net.xmpp.subscription.SubscriptionHandler;
 import saros.net.xmpp.subscription.SubscriptionListener;
 
 /**
- * Authorizer for incoming subscription requests which
- * will ask the user for consent in that case.
+ * Authorizer for incoming subscription requests which will ask the user for consent in that case.
  */
 public class SubscriptionAuthorizer implements SubscriptionListener {
 

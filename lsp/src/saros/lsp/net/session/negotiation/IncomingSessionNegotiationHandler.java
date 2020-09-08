@@ -30,7 +30,7 @@ public class IncomingSessionNegotiationHandler {
 
   /**
    * Handles the incoming negotiation.
-   * 
+   *
    * @param negotiation The incoming session negotiation
    */
   public void handle(IncomingSessionNegotiation negotiation) {
@@ -58,9 +58,8 @@ public class IncomingSessionNegotiationHandler {
   }
 
   /**
-   * Sends a message to the client to show it
-   * to the user.
-   * 
+   * Sends a message to the client to show it to the user.
+   *
    * @param message The message to show
    * @param type The type of message
    */
@@ -74,12 +73,10 @@ public class IncomingSessionNegotiationHandler {
   }
 
   /**
-   * Asks the user wether the invite should be
-   * accepted or not.
-   * 
+   * Asks the user wether the invite should be accepted or not.
+   *
    * @param negotiation The incoming negotiation
-   * @return <i>true</i> if the invite is accepted,
-   * <i>false</i> otherwise.
+   * @return <i>true</i> if the invite is accepted, <i>false</i> otherwise.
    */
   private boolean AskAcceptInvite(IncomingSessionNegotiation negotiation) {
     JID peer = negotiation.getPeer();
