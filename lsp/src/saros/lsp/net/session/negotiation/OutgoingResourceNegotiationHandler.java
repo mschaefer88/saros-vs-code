@@ -1,4 +1,4 @@
-package saros.lsp.interaction.session.negotiation;
+package saros.lsp.net.session.negotiation;
 
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;

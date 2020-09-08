@@ -133,18 +133,18 @@ public class SarosLauncher implements Callable<Integer> {
    * Creates a server socket for receiving Saros language client connections and waits for the
    * client to connect.
    *
-   * @param socketChannel The used socket channel
+   * @param serverSocket The used server socket
    * @return The socket channel with a client connection
    * @throws IOException
    * @throws InterruptedException
    * @throws ExecutionException
    */
-  static AsynchronousSocketChannel createSocket(final AsynchronousServerSocketChannel socketChannel)
+  static AsynchronousSocketChannel createSocket(final AsynchronousServerSocketChannel serverSocket)
       throws IOException, InterruptedException, ExecutionException {
 
     AsynchronousSocketChannel socketChannel;
 
-    socketChannel = socketChannel.accept().get();
+    socketChannel = serverSocket.accept().get();
 
     Runtime.getRuntime()
         .addShutdownHook(
