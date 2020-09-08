@@ -5,6 +5,7 @@ import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.jsonrpc.services.JsonDelegate;
 import org.eclipse.lsp4j.services.LanguageServer;
 import saros.lsp.extensions.server.account.IAccountService;
+import saros.lsp.extensions.server.connection.IConnectionService;
 import saros.lsp.extensions.server.contact.IContactService;
 import saros.lsp.extensions.server.document.IDocumentService;
 import saros.lsp.extensions.server.session.ISessionService;
@@ -22,14 +23,34 @@ public interface ISarosLanguageServer extends LanguageServer {
   @JsonDelegate
   IAccountService getSarosAccountService();
 
+  /** Provides access to the contact services. */
   @JsonDelegate
   IContactService getSarosContactService();
 
+  /** Provides access to the session services. */
   @JsonDelegate
-  ISessionService getSarosConnectionService();
+  ISessionService getSarosSessionService();
 
+  /** Provides access to the connection services. */
+  @JsonDelegate
+  IConnectionService getSarosConnectionService();
+
+  /**
+   * Registers a {@link Runnable} that will be executed
+   * when the server exits.
+   * 
+   * @param runnable {@link Runnable} to execute upon exit
+   */
   void onExit(Runnable runnable);
 
+  /**
+   * Registers a {@link Consumer} that will
+   * be executed when the server initializes.
+   * 
+   * @param consumer {@link Consumer} that takes the
+   * {@link InitializeParams} and will be executed
+   * upon initialization.
+   */
   void onInitialize(Consumer<InitializeParams> consumer);
 
   @Override

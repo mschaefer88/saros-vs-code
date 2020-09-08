@@ -7,6 +7,7 @@ import saros.lsp.filesystem.LspWorkspace;
 import saros.lsp.filesystem.PathFactory;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 
+/** ContextFactory for components that are filesystem related. */
 public class FileSystemContextFactory extends AbstractContextFactory {
 
   @Override

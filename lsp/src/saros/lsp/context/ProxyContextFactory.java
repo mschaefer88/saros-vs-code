@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import saros.context.AbstractContextFactory;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 
+/** ContextFactory for a single proxy. Used when a component may not be available at startup. */
 public class ProxyContextFactory<T> extends AbstractContextFactory {
 
   private final Supplier<T> supplier;

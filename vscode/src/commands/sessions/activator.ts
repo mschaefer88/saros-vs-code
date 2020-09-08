@@ -2,7 +2,7 @@ import {commands} from 'vscode';
 import {
   ConnectRequest,
   DisconnectRequest,
-  IsOnlineRequest,
+  ConnectionStateRequest,
   StartSessionRequest,
   StopSessionRequest,
   SarosExtension,
@@ -34,7 +34,7 @@ export function activateSessions(extension: SarosExtension) {
   commands.registerCommand('saros.session.status', async () => {
     await extension.onReady();
     const result =
-      await extension.client.sendRequest(IsOnlineRequest.type, null);
+      await extension.client.sendRequest(ConnectionStateRequest.type, null);
     showMessage(result,
       result.result ? 'Saros is connected!' : 'Saros is disconnected!');
   });

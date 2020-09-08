@@ -1,5 +1,6 @@
 package saros.lsp.extensions.server.session.dto;
 
+/** The dto represents a contact that participates in a session. */
 public class SessionUserDto {
   public String id;
 

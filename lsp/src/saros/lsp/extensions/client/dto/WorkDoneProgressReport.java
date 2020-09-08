@@ -1,5 +1,10 @@
 package saros.lsp.extensions.client.dto;
 
+/** 
+ * WorkDoneProgressReport implementation of the language server protocol.
+ * 
+ * @see https://microsoft.github.io/language-server-protocol/specification#workDoneProgressReport
+ */
 public class WorkDoneProgressReport {
   public String kind = "report";
 

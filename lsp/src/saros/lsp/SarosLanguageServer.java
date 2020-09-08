@@ -119,7 +119,7 @@ public class SarosLanguageServer implements ISarosLanguageServer {
   }
 
   @Override
-  public ISessionService getSarosConnectionService() {
+  public ISessionService getSarosSessionService() {
     return this.sessionService;
   }
 }

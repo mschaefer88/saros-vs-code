@@ -21,6 +21,7 @@ import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.session.INegotiationHandler;
 import saros.session.ISarosSessionContextFactory;
 
+/** ContextFactory for Saros core components. */
 public class CoreContextFactory extends AbstractContextFactory {
 
   @Override

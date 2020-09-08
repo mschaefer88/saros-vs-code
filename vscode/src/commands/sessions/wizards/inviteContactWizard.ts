@@ -1,4 +1,4 @@
-import {ContactDto, InviteContactRequest, SarosExtension} from '../../../lsp';
+import {ContactDto, InviteContactRequest, SarosExtension, InviteInput} from '../../../lsp';
 import {Wizard} from '../../../types';
 import {ContactListStep} from '../steps';
 import {showMessage} from '../../../utils';
@@ -20,8 +20,9 @@ export async function inviteContactWizard(contact: ContactDto,
   contact = await wizard.execute();
 
   if (!wizard.aborted) {
+    const inviteInput = {id: contact.id, description: 'VS Code Invitation'} as InviteInput;
     const result =
-      await extension.client.sendRequest(InviteContactRequest.type, contact);
+      await extension.client.sendRequest(InviteContactRequest.type, inviteInput);
     showMessage(result, `${contact.nickname} has been invited!`);
   }
 }

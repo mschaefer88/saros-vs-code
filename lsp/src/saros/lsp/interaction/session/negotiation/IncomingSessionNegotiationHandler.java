@@ -28,7 +28,7 @@ public class IncomingSessionNegotiationHandler {
   }
 
   public void handle(IncomingSessionNegotiation negotiation) {
-    if (!this.AskAcceptInvite(negotiation.getPeer())) {
+    if (!this.AskAcceptInvite(negotiation)) {
       negotiation.localCancel("Declined", CancelOption.NOTIFY_PEER);
     } else {
       SessionNegotiation.Status status = negotiation.accept(new ProgressMonitor(this.client));
@@ -60,14 +60,16 @@ public class IncomingSessionNegotiationHandler {
     this.client.showMessage(messageParams);
   }
 
-  private boolean AskAcceptInvite(JID inviteeJid) {
-    Optional<XMPPContact> invitingContact = this.contactService.getContact(inviteeJid.getBase());
+  private boolean AskAcceptInvite(IncomingSessionNegotiation negotiation) {
+    JID peer = negotiation.getPeer();
+    Optional<XMPPContact> invitingContact = this.contactService.getContact(peer.getBase());
     String inviteeName =
         invitingContact.isPresent()
             ? invitingContact.get().getDisplayableName()
-            : inviteeJid.getName();
+            : peer.getName();
+    String sessionDescription = negotiation.getDescription();
 
     return this.interactionManager.getUserInputYesNo(
-        String.format("'%s' invited you to a session", inviteeName), "Accept?");
+        String.format("'%s' invited you to the session '%s'", inviteeName, sessionDescription), "Accept?");
   }
 }

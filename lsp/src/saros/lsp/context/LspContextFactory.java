@@ -15,6 +15,7 @@ import saros.lsp.extensions.server.session.ISessionService;
 import saros.lsp.extensions.server.session.SessionService;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 
+/** ContextFactory for all Saros language server services. */
 public class LspContextFactory extends AbstractContextFactory {
 
   @Override

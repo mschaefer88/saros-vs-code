@@ -70,9 +70,9 @@ export interface ContactDto {
  * Contains data about the user to invite.
  *
  * @export
- * @interface InviteDto
+ * @interface InviteInput
  */
-export interface InviteDto {
+export interface InviteInput {
   id: string;
   description: string;
 }
@@ -139,7 +139,7 @@ export namespace SessionStateNotification {
 export namespace ConnectedStateNotification {
   export const type =
     new NotificationType<SarosResultResponse<boolean>, void>(
-        'saros/connected',
+        'saros/connection/state',
     );
 }
 
@@ -275,7 +275,7 @@ export namespace GetAllContactRequest {
 export namespace ConnectRequest {
   export const type =
     new RequestType<void, SarosResponse, void, unknown>(
-        'saros/session/connect',
+        'saros/connection/connect',
     );
 }
 
@@ -288,20 +288,20 @@ export namespace ConnectRequest {
 export namespace DisconnectRequest {
   export const type =
     new RequestType<void, SarosResponse, void, unknown>(
-        'saros/session/disconnect',
+        'saros/connection/disconnect',
     );
 }
 
 /**
  * Request to the server to get the current state
- * of the session, ie. active or not.
+ * of the connection, ie. active or not.
  * 
  * @export
  */
-export namespace IsOnlineRequest {
+export namespace ConnectionStateRequest {
   export const type =
     new RequestType<void, SarosResultResponse<boolean>, void, unknown>(
-        'saros/session/status',
+        'saros/connection/state',
     );
 }
 
@@ -313,7 +313,7 @@ export namespace IsOnlineRequest {
  */
 export namespace InviteContactRequest {
   export const type =
-    new RequestType<ContactDto, SarosResultResponse<boolean>, void, unknown>(
+    new RequestType<InviteInput, SarosResultResponse<boolean>, void, unknown>(
         'saros/session/invite',
     );
 }

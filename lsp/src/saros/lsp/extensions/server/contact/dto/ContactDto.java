@@ -1,5 +1,6 @@
 package saros.lsp.extensions.server.contact.dto;
 
+/** The dto represents a contact from the contact list. */
 public class ContactDto {
   public String id;
 

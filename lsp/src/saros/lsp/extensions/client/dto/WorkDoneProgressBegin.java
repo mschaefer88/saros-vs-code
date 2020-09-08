@@ -1,5 +1,10 @@
 package saros.lsp.extensions.client.dto;
 
+/** 
+ * WorkDoneProgressBegin implementation of the language server protocol.
+ * 
+ * @see https://microsoft.github.io/language-server-protocol/specification#workDoneProgressBegin
+ */
 public class WorkDoneProgressBegin {
   public String kind = "begin";
 

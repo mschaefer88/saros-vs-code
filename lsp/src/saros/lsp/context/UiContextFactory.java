@@ -11,6 +11,7 @@ import saros.monitoring.IProgressMonitor;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.synchronize.UISynchronizer;
 
+/** ContextFactory for UI related components. */
 public class UIContextFactory extends AbstractContextFactory {
 
   @Override
