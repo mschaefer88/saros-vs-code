@@ -3,12 +3,9 @@ import {
   workspace,
   window,
   ProgressLocation,
-  OverviewRulerLane,
-  TextEditorDecorationType,
   OutputChannel,
 } from 'vscode';
 import {SarosServer} from './sarosServer';
-import {AnnotationNotification} from './sarosProtocol';
 import {
   LanguageClientOptions,
   RevealOutputChannelOn,
@@ -18,7 +15,7 @@ import {SarosClient} from './sarosClient';
 import * as _ from 'lodash';
 import {IEventAggregator, EventAggregator} from '../types/eventAggregator';
 import {SarosErrorHandler, ErrorCallback} from './sarosErrorHandler';
-import { SarosAnnotator } from './sarosAnnotator';
+import {SarosAnnotator} from './sarosAnnotator';
 
 type SubscriptionCallback<TArgs> = (args: TArgs) => void;
 

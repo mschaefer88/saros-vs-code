@@ -1,4 +1,8 @@
-import {activateAccounts, activateContacts, activateSessions} from './commands';
+import {
+  activateAccounts,
+  activateContacts,
+  activateSessions,
+} from './commands';
 import {SarosContactView, SarosSessionView, SarosAccountView} from './views';
 import {sarosExtensionInstance} from './lsp';
 import {ExtensionContext, workspace, window, commands} from 'vscode';
@@ -12,12 +16,14 @@ import {variables} from './views/variables';
  */
 export function activate(context: ExtensionContext) {
   const activationConditionError = getActivationConditionError();
-  if(activationConditionError) {
+  if (activationConditionError) {
     window.showErrorMessage(activationConditionError);
     deactivate();
     return;
   }
-  commands.registerCommand("fff.fff", () => {console.log("HI");});
+  commands.registerCommand('fff.fff', () => {
+    console.log('HI');
+  });
   sarosExtensionInstance.setContext(context)
       .init()
       .then(() => {
@@ -39,14 +45,15 @@ export function activate(context: ExtensionContext) {
 /**
  * Checks if extension is supported within the opened workspace.
  *
- * @returns {(string|undefined)} undefined if extension can be activated
+ * @return {(string|undefined)} undefined if extension can be activated
  *  and a reason if extension doesn't support the opened workspace.
  */
 function getActivationConditionError(): string|undefined {
-  if(workspace.workspaceFolders === undefined) {
+  if (workspace.workspaceFolders === undefined) {
     return 'Workspace is empty - Saros deactivated';
-  } else if(workspace.workspaceFolders.length > 1) {
-    return 'Multiple workspaces aren\'t currently supported - Saros deactivated';
+  } else if (workspace.workspaceFolders.length > 1) {
+    return 'Multiple workspaces aren\'t currently supported' +
+           ' - Saros deactivated';
   }
 }
 

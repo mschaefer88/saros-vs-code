@@ -125,7 +125,7 @@ export class SarosServer {
       }
 
       console.log('Spawning jar process.');
-      this._process = cp.spawn('java', ['-jar',pathToJar,...args]);
+      this._process = cp.spawn('java', ['-jar', pathToJar, ...args]);
 
       return this;
     }

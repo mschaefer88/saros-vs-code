@@ -1,4 +1,7 @@
-import {NotificationType, RequestType, TextDocumentIdentifier} from 'vscode-languageclient';
+import {
+  NotificationType,
+  RequestType,
+  TextDocumentIdentifier} from 'vscode-languageclient';
 import {Range} from 'vscode';
 
 /**
@@ -105,7 +108,7 @@ export interface AnnotationParams {
 /**
  * Notification that issues the client to open
  * an editor with the file contents.
- * 
+ *
  * @export
  */
 export namespace OpenEditorNotification {
@@ -119,7 +122,7 @@ export namespace OpenEditorNotification {
  * Notification that informs the client about a
  * state change of the session, ie. if it's
  * active or not.
- * 
+ *
  * @export
  */
 export namespace SessionStateNotification {
@@ -133,7 +136,7 @@ export namespace SessionStateNotification {
  * Notification that informs the client about a
  * state change of the XMPP connection, ie. if
  * it's active or not.
- * 
+ *
  * @export
  */
 export namespace ConnectedStateNotification {
@@ -147,7 +150,7 @@ export namespace ConnectedStateNotification {
  * Notification that informs the client about a
  * state change of a contact, eg. online status
  * or saros support.
- * 
+ *
  * @export
  */
 export namespace ContactStateNotification {
@@ -158,7 +161,7 @@ export namespace ContactStateNotification {
 /**
  * Request to the server to add a new account for
  * connections to the XMPP server.
- * 
+ *
  * @export
  */
 export namespace AddAccountRequest {
@@ -170,7 +173,7 @@ export namespace AddAccountRequest {
 
 /**
  * Request to the server to update an existing account.
- * 
+ *
  * @export
  */
 export namespace UpdateAccountRequest {
@@ -182,7 +185,7 @@ export namespace UpdateAccountRequest {
 
 /**
  * Request to the server to remove an existing account.
- * 
+ *
  * @export
  */
 export namespace RemoveAccountRequest {
@@ -194,7 +197,7 @@ export namespace RemoveAccountRequest {
 
 /**
  * Request to the server to set the currently active account.
- * 
+ *
  * @export
  */
 export namespace SetActiveAccountRequest {
@@ -206,7 +209,7 @@ export namespace SetActiveAccountRequest {
 
 /**
  * Request to the server to get all saved accounts.
- * 
+ *
  * @export
  */
 export namespace GetAllAccountRequest {
@@ -218,7 +221,7 @@ export namespace GetAllAccountRequest {
 
 /**
  * Request to the server to add a new contact.
- * 
+ *
  * @export
  */
 export namespace AddContactRequest {
@@ -230,7 +233,7 @@ export namespace AddContactRequest {
 
 /**
  * Request to the server to remove an existing contact.
- * 
+ *
  * @export
  */
 export namespace RemoveContactRequest {
@@ -243,7 +246,7 @@ export namespace RemoveContactRequest {
 /**
  * Request to the server to change the nickname of an
  * existing contact.
- * 
+ *
  * @export
  */
 export namespace RenameContactRequest {
@@ -256,7 +259,7 @@ export namespace RenameContactRequest {
 /**
  * Request to the server to get all contacts
  * of the contact list.
- * 
+ *
  * @export
  */
 export namespace GetAllContactRequest {
@@ -269,7 +272,7 @@ export namespace GetAllContactRequest {
 /**
  * Request to the server to connect to the XMPP
  * server with the currently active account.
- * 
+ *
  * @export
  */
 export namespace ConnectRequest {
@@ -282,7 +285,7 @@ export namespace ConnectRequest {
 /**
  * Request to the server to disconnect from the XMPP
  * server.
- * 
+ *
  * @export
  */
 export namespace DisconnectRequest {
@@ -295,7 +298,7 @@ export namespace DisconnectRequest {
 /**
  * Request to the server to get the current state
  * of the connection, ie. active or not.
- * 
+ *
  * @export
  */
 export namespace ConnectionStateRequest {
@@ -308,7 +311,7 @@ export namespace ConnectionStateRequest {
 /**
  * Request to the server to invite a contact from
  * the contact list to a new or active session.
- * 
+ *
  * @export
  */
 export namespace InviteContactRequest {
@@ -320,7 +323,7 @@ export namespace InviteContactRequest {
 
 /**
  * Request to the server to start a new empty session.
- * 
+ *
  * @export
  */
 export namespace StartSessionRequest {
@@ -333,7 +336,7 @@ export namespace StartSessionRequest {
 /**
  * Request to the server to stop the currently
  * active session.
- * 
+ *
  * @export
  */
 export namespace StopSessionRequest {
@@ -346,7 +349,7 @@ export namespace StopSessionRequest {
 /**
  * Notification to the client that a user has
  * joined the currently active session.
- * 
+ *
  * @export
  */
 export namespace UserJoinedSessionNotification {
@@ -360,7 +363,7 @@ export namespace UserJoinedSessionNotification {
  * Notification to the client that the state
  * of a user that is part of the session has
  * changed.
- * 
+ *
  * @export
  */
 export namespace UserChangedSessionNotification {
@@ -373,7 +376,7 @@ export namespace UserChangedSessionNotification {
 /**
  * Notification to the client that a user
  * that is part of the session has left.
- * 
+ *
  * @export
  */
 export namespace UserLeftSessionNotification {
@@ -386,7 +389,7 @@ export namespace UserLeftSessionNotification {
 /**
  * Notification to the client that annotations
  * have changed.
- * 
+ *
  * @export
  */
 export namespace AnnotationNotification {
@@ -399,12 +402,13 @@ export namespace AnnotationNotification {
 /**
  * Request to the server to get all annotations
  * of an editor.
- * 
+ *
  * @export
  */
 export namespace GetAnnotationsRequest {
   export const type =
-    new RequestType<TextDocumentIdentifier, SarosResultResponse<AnnotationParams[]>, void, unknown>(
-        'textDocument/getAnnotations',
-    );
+    new RequestType<TextDocumentIdentifier,
+          SarosResultResponse<AnnotationParams[]>, void, unknown>(
+              'textDocument/getAnnotations',
+          );
 }

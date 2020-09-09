@@ -1,4 +1,4 @@
-import {ExtensionContext, Color, window} from 'vscode';
+import {ExtensionContext, window} from 'vscode';
 
 export namespace icons {
   /**
@@ -54,15 +54,16 @@ export namespace icons {
    * @param {string} color The annotation color as hex representation
    * @return {string} Absolute path to the icon
    */
-  export const getUserColorIcon = async (context: ExtensionContext, color: string) => {   
+  export const getUserColorIcon =
+  async (context: ExtensionContext, color: string) => {
     const fs = require('fs');
     const fileName = `color_${color}_25x25.png`;
     const relativeFolderPath = '/media/colors-generated';
     const relativeFilePath = `${relativeFolderPath}/${fileName}`;
     const absoluteFilePath = context.asAbsolutePath(relativeFilePath);
     const absoluteFolderPath = context.asAbsolutePath(relativeFolderPath);
-    if(!fs.existsSync(absoluteFilePath)) {
-      if(!fs.existsSync(absoluteFolderPath)) {
+    if (!fs.existsSync(absoluteFilePath)) {
+      if (!fs.existsSync(absoluteFolderPath)) {
         fs.mkdirSync(absoluteFolderPath);
       }
       try {
@@ -72,7 +73,7 @@ export namespace icons {
       }
     }
     return absoluteFilePath;
-  }
+  };
 
   /**
    * Creates an image filled with the given color.
@@ -82,7 +83,7 @@ export namespace icons {
    * @return {Promise<void>} Awaitable promise that returns once the
    *  file has been created
    */
-  function createColorImage(color: string, file: string): Promise<void> {
+  export const createColorImage = (color: string, file: string) => {
     const fs = require('fs');
     const pImage = require('pureimage');
     const canvas = pImage.make(25, 25);
@@ -90,5 +91,5 @@ export namespace icons {
     ctx.fillStyle = color;
     ctx.fillRect(0, 0, 25, 25);
     return pImage.encodePNGToStream(canvas, fs.createWriteStream(file));
-  }
+  };
 }

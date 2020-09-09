@@ -1,7 +1,6 @@
 import {Disposable} from 'vscode-languageclient';
 import {
   SarosClient,
-  ContactDto,
   UserJoinedSessionNotification,
   UserLeftSessionNotification,
   SessionUserDto,
@@ -21,7 +20,7 @@ import {
 } from 'vscode';
 import {variables} from './variables';
 import {icons} from '../utils/icons';
-import {config} from '../lsp/sarosConfig'
+import {config} from '../lsp/sarosConfig';
 
 /**
  * Provider for users that are in the session.
@@ -132,9 +131,9 @@ export class SarosSessionProvider implements TreeDataProvider<SessionUserDto> {
     contactItem.description = element.id;
     contactItem.contextValue = 'user';
     contactItem.iconPath =
-        await icons.getUserColorIcon(this._context, 
-          config.getAnnotationColor(element.annotationColorId));
-    
+        await icons.getUserColorIcon(this._context,
+            config.getAnnotationColor(element.annotationColorId));
+
     return contactItem;
   }
 
