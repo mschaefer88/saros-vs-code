@@ -1,8 +1,9 @@
 import {
   NotificationType,
   RequestType,
-  TextDocumentIdentifier} from 'vscode-languageclient';
-import {Range} from 'vscode';
+  TextDocumentIdentifier
+} from 'vscode-languageclient';
+import { Range } from 'vscode';
 
 /**
  * Generic response that indicates success or failure.
@@ -33,26 +34,16 @@ export interface SarosResultResponse<T> extends SarosResponse {
  *
  * @export
  * @interface AccountDto
- * @extends {AccountIdDto}
  */
-export interface AccountDto extends AccountIdDto {
+export interface AccountDto {
+  username: string;
+  domain: string;
   password: string;
   server: string;
   port: number;
   useTLS: boolean;
   useSASL: boolean;
   isDefault: boolean;
-}
-
-/**
- * Identifies an account.
- *
- * @export
- * @interface AccountIdDto
- */
-export interface AccountIdDto {
-  username: string;
-  domain: string;
 }
 
 /**
@@ -165,8 +156,23 @@ export namespace ContactStateNotification {
  * @export
  */
 export namespace AddAccountRequest {
+  /**
+   * Used to add an account to the account store.
+   *
+   * @export
+   * @interface AddInput
+   */
+  export interface AddInput {
+    password: string;
+    server: string;
+    port: number;
+    useTLS: boolean;
+    useSASL: boolean;
+    isDefault: boolean;
+  }
+
   export const type =
-    new RequestType<AccountDto, SarosResponse, void, unknown>(
+    new RequestType<AddInput, SarosResponse, void, unknown>(
         'saros/account/add',
     );
 }
@@ -177,8 +183,23 @@ export namespace AddAccountRequest {
  * @export
  */
 export namespace UpdateAccountRequest {
+  /**
+   * Used to update an account in the account store.
+   *
+   * @export
+   * @interface UpdateInput
+   */
+  export interface UpdateInput {
+    password: string;
+    server: string;
+    port: number;
+    useTLS: boolean;
+    useSASL: boolean;
+    isDefault: boolean;
+  }
+
   export const type =
-    new RequestType<AccountDto, SarosResponse, void, unknown>(
+    new RequestType<UpdateInput, SarosResponse, void, unknown>(
         'saros/account/update',
     );
 }
@@ -189,8 +210,19 @@ export namespace UpdateAccountRequest {
  * @export
  */
 export namespace RemoveAccountRequest {
+  /**
+   * Used to remove an account from the account store.
+   *
+   * @export
+   * @interface RemoveAccountInput
+   */
+  export interface RemoveInput {
+    username: string;
+    domain: string;
+  }
+
   export const type =
-    new RequestType<AccountIdDto, SarosResponse, void, unknown>(
+    new RequestType<RemoveInput, SarosResponse, void, unknown>(
         'saros/account/remove',
     );
 }
@@ -201,8 +233,19 @@ export namespace RemoveAccountRequest {
  * @export
  */
 export namespace SetActiveAccountRequest {
+  /**
+   * Used to set an account active.
+   *
+   * @export
+   * @interface SetActiveInput
+   */
+  export interface SetActiveInput {
+    username: string;
+    domain: string;
+  }
+
   export const type =
-    new RequestType<AccountIdDto, SarosResponse, void, unknown>(
+    new RequestType<SetActiveInput, SarosResponse, void, unknown>(
         'saros/account/setActive',
     );
 }
@@ -408,7 +451,7 @@ export namespace AnnotationNotification {
 export namespace GetAnnotationsRequest {
   export const type =
     new RequestType<TextDocumentIdentifier,
-          SarosResultResponse<AnnotationParams[]>, void, unknown>(
-              'textDocument/getAnnotations',
-          );
+      SarosResultResponse<AnnotationParams[]>, void, unknown>(
+          'textDocument/getAnnotations',
+      );
 }

@@ -1,5 +1,6 @@
 import {WizardContext, WizardStepBase} from '../../../types';
 import {ContactDto} from '../../../lsp';
+import { regex } from '../../../utils/regex';
 
 /**
  * Wizard step to enter a nickname.
@@ -29,7 +30,8 @@ export class NicknameStep extends WizardStepBase<ContactDto> {
    */
   async execute(context: WizardContext<ContactDto>): Promise<void> {
     const nickname = await context.showInputBox({
-      value: context.target.nickname || '',
+      value: context.target.nickname ||
+        this.getJidPrefix(context.target.id) || '',
       prompt: 'Enter nickname',
       placeholder: undefined,
       password: false,
@@ -37,5 +39,17 @@ export class NicknameStep extends WizardStepBase<ContactDto> {
     });
 
     context.target.nickname = nickname;
+  }
+
+  /**
+   * Strips the JID prefix of the id.
+   *
+   * @private
+   * @param {string} jid The JID
+   * @return {string} The prefix of the JID
+   * @memberof NicknameStep
+   */
+  private getJidPrefix(jid: string): string {
+    return jid.split(regex.jidPartDivider)[0];
   }
 }

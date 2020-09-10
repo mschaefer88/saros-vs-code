@@ -17,11 +17,12 @@ export namespace regex {
       ].map((r) => r.source).join('') +
       ']+',
   );
+  export const jidPartDivider = '@';
   export const jidSuffix = new RegExp('^' + jidPartSuffix.source + '$');
   export const jidPrefix = new RegExp('^' + jidPartPrefix.source + '$');
   export const jid = new RegExp('^' +
     jidPartPrefix.source +
-    '@' +
+    jidPartDivider +
     jidPartSuffix.source +
     '$');
 }

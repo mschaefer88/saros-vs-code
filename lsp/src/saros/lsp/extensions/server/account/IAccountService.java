@@ -6,7 +6,10 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 import saros.lsp.extensions.server.SarosResponse;
 import saros.lsp.extensions.server.SarosResultResponse;
 import saros.lsp.extensions.server.account.dto.AccountDto;
-import saros.lsp.extensions.server.account.dto.AccountIdDto;
+import saros.lsp.extensions.server.account.dto.AddInput;
+import saros.lsp.extensions.server.account.dto.RemoveInput;
+import saros.lsp.extensions.server.account.dto.SetActiveInput;
+import saros.lsp.extensions.server.account.dto.UpdateInput;
 
 /** Interface of the account service that is responsible for everything account related. */
 @JsonSegment("saros/account")
@@ -19,7 +22,7 @@ public interface IAccountService {
    * @return A future with a result indicating if the request has been succesfull or not
    */
   @JsonRequest
-  CompletableFuture<SarosResponse> add(AccountDto input);
+  CompletableFuture<SarosResponse> add(AddInput input);
 
   /**
    * Updates an existing account in the account store.
@@ -28,7 +31,7 @@ public interface IAccountService {
    * @return A future with a result indicating if the request has been succesfull or not
    */
   @JsonRequest
-  CompletableFuture<SarosResponse> update(AccountDto input);
+  CompletableFuture<SarosResponse> update(UpdateInput input);
 
   /**
    * Removes an existing account from the account store.
@@ -37,7 +40,7 @@ public interface IAccountService {
    * @return A future with a result indicating if the request has been succesfull or not
    */
   @JsonRequest
-  CompletableFuture<SarosResponse> remove(AccountIdDto input);
+  CompletableFuture<SarosResponse> remove(RemoveInput input);
 
   /**
    * Sets an account as active, ie. it's used when connecting to the XMPP server.
@@ -46,7 +49,7 @@ public interface IAccountService {
    * @return A future with a result indicating if the request has been succesfull or not
    */
   @JsonRequest
-  CompletableFuture<SarosResponse> setActive(AccountIdDto input);
+  CompletableFuture<SarosResponse> setActive(SetActiveInput input);
 
   /**
    * Gets all accounts from the account store.
