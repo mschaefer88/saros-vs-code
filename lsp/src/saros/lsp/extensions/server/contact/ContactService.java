@@ -8,7 +8,10 @@ import java.util.function.BiPredicate;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.extensions.server.SarosResponse;
 import saros.lsp.extensions.server.SarosResultResponse;
+import saros.lsp.extensions.server.contact.dto.AddInput;
 import saros.lsp.extensions.server.contact.dto.ContactDto;
+import saros.lsp.extensions.server.contact.dto.RemoveInput;
+import saros.lsp.extensions.server.contact.dto.RenameInput;
 import saros.lsp.ui.UIInteractionManager;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.contact.IContactsUpdate;
@@ -21,9 +24,7 @@ public class ContactService implements IContactService, IContactsUpdate {
   private ISarosLanguageClient client;
   private UIInteractionManager interactionManager;
 
-  public ContactService(
-      XMPPContactsService contactsService,
-      ISarosLanguageClient client,
+  public ContactService(XMPPContactsService contactsService, ISarosLanguageClient client,
       UIInteractionManager interactionManager) {
     this.contactsService = contactsService;
     this.client = client;
@@ -33,24 +34,21 @@ public class ContactService implements IContactService, IContactsUpdate {
   }
 
   @Override
-  public CompletableFuture<SarosResponse> add(ContactDto request) {
+  public CompletableFuture<SarosResponse> add(AddInput input) {
 
     CompletableFuture<SarosResponse> c = new CompletableFuture<SarosResponse>();
 
-    Executors.newCachedThreadPool()
-        .submit(
-            () -> {
-              try {
-                this.contactsService.addContact(
-                    new JID(request.id), request.nickname, this.fromUserInput());
+    Executors.newCachedThreadPool().submit(() -> {
+      try {
+        this.contactsService.addContact(new JID(input.id), input.nickname, this.fromUserInput());
 
-                c.complete(new SarosResponse());
-              } catch (Exception e) {
-                c.complete(new SarosResponse(e));
-              }
+        c.complete(new SarosResponse());
+      } catch (Exception e) {
+        c.complete(new SarosResponse(e));
+      }
 
-              return null;
-            });
+      return null;
+    });
 
     return c;
   }
@@ -60,10 +58,10 @@ public class ContactService implements IContactService, IContactsUpdate {
   }
 
   @Override
-  public CompletableFuture<SarosResponse> remove(ContactDto request) {
+  public CompletableFuture<SarosResponse> remove(RemoveInput input) {
 
     try {
-      final Optional<XMPPContact> contact = this.contactsService.getContact(request.id);
+      final Optional<XMPPContact> contact = this.contactsService.getContact(input.id);
 
       if (contact.isPresent()) {
         this.contactsService.removeContact(contact.get());
@@ -76,13 +74,17 @@ public class ContactService implements IContactService, IContactsUpdate {
   }
 
   @Override
-  public CompletableFuture<SarosResponse> rename(ContactDto request) {
+  public CompletableFuture<SarosResponse> rename(RenameInput input) {
 
     try {
-      final Optional<XMPPContact> contact = this.contactsService.getContact(request.id);
-      if (contact.isPresent()) {
-        this.contactsService.renameContact(contact.get(), request.nickname);
-        this.client.sendStateContact(request);
+      final Optional<XMPPContact> optionalContact = this.contactsService.getContact(input.id);
+      if (optionalContact.isPresent()) {
+        final XMPPContact contact = optionalContact.get();
+        this.contactsService.renameContact(contact, input.nickname);
+
+        final ContactDto contactDto = this.createDto(contact);
+        contactDto.nickname = input.nickname;
+        this.client.sendStateContact(contactDto);
       }
     } catch (Exception e) {
       return CompletableFuture.completedFuture(new SarosResponse(e));
@@ -96,33 +98,32 @@ public class ContactService implements IContactService, IContactsUpdate {
 
     final List<XMPPContact> contacts = this.contactsService.getAllContacts();
 
-    final ContactDto[] dtos =
-        contacts
-            .stream()
-            .map(
-                contact -> {
-                  ContactDto dto = new ContactDto();
-                  dto.id = contact.getBareJid().toString();
-                  dto.nickname = contact.getDisplayableName();
-                  dto.isOnline = contact.getStatus().isOnline();
-                  dto.hasSarosSupport = contact.hasSarosSupport();
-
-                  return dto;
-                })
-            .toArray(size -> new ContactDto[size]);
+    final ContactDto[] dtos = contacts.stream().map(contact -> this.createDto(contact))
+      .toArray(size -> new ContactDto[size]);
 
     return CompletableFuture.completedFuture(new SarosResultResponse<ContactDto[]>(dtos));
+  }
+
+  /**
+   * Creates a dto of a {@link XMPPContact}.
+   * @param contact The contact
+   * @return The contact as {@link ContactDto}
+   */
+  private ContactDto createDto(XMPPContact contact) {
+    ContactDto dto = new ContactDto();
+    dto.id = contact.getBareJid().toString();
+    dto.nickname = contact.getDisplayableName();
+    dto.isOnline = contact.getStatus().isOnline();
+    dto.hasSarosSupport = contact.hasSarosSupport();
+
+    return dto;
   }
 
   @Override
   public void update(Optional<XMPPContact> contact, UpdateType updateType) {
     if (contact.isPresent()) {
       XMPPContact con = contact.get();
-      ContactDto dto = new ContactDto();
-      dto.id = con.getBareJid().toString();
-      dto.hasSarosSupport = con.hasSarosSupport();
-      dto.isOnline = con.getStatus().isOnline();
-      dto.nickname = con.getDisplayableName();
+      ContactDto dto = this.createDto(con);
       dto.subscribed = updateType != UpdateType.REMOVED;
 
       this.client.sendStateContact(dto);

@@ -5,7 +5,10 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 import saros.lsp.extensions.server.SarosResponse;
 import saros.lsp.extensions.server.SarosResultResponse;
+import saros.lsp.extensions.server.contact.dto.AddInput;
 import saros.lsp.extensions.server.contact.dto.ContactDto;
+import saros.lsp.extensions.server.contact.dto.RemoveInput;
+import saros.lsp.extensions.server.contact.dto.RenameInput;
 
 /** Interface of the contact service that is responsible for everything XMPP connection related. */
 @JsonSegment("saros/contact")
@@ -18,7 +21,7 @@ public interface IContactService {
    * @return A future with a result indicating if the request has been succesfull or not
    */
   @JsonRequest
-  CompletableFuture<SarosResponse> add(ContactDto input);
+  CompletableFuture<SarosResponse> add(AddInput input);
 
   /**
    * Removes a contact from the contact list.
@@ -27,7 +30,7 @@ public interface IContactService {
    * @return A future with a result indicating if the request has been succesfull or not
    */
   @JsonRequest
-  CompletableFuture<SarosResponse> remove(ContactDto input);
+  CompletableFuture<SarosResponse> remove(RemoveInput input);
 
   /**
    * Renames a contact on the contact list.
@@ -36,7 +39,7 @@ public interface IContactService {
    * @return A future with a result indicating if the request has been succesfull or not
    */
   @JsonRequest
-  CompletableFuture<SarosResponse> rename(ContactDto input);
+  CompletableFuture<SarosResponse> rename(RenameInput input);
 
   /**
    * Gets all contacts from the contact list.
